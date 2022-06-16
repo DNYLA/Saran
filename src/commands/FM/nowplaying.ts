@@ -70,9 +70,10 @@ export default class Clear extends Command {
     }
 
     try {
+      console.log(track.album);
+      console.log(track);
       const messageEmbed = new MessageEmbed()
         .setColor('#4a5656')
-        // .setTitle(ticketDetails.type)
         .setAuthor({
           name: user.lastFMName,
           url: `https://www.last.fm/user/${user.lastFMName}`,
@@ -93,7 +94,7 @@ export default class Clear extends Command {
           }
         )
         .setFooter({
-          text: `Playcount: ${track.userplaycount}  ∙ Album: ${track.album.title}`,
+          text: `Playcount: ${track.userplaycount}  ∙ Album: ${recentTrack.album['#text']}`,
         });
 
       const npMessage = await message.channel.send({
@@ -103,6 +104,7 @@ export default class Clear extends Command {
       npMessage.react('987085556733321247');
     } catch (err) {
       message.reply('Unable to display track! Try playing another one');
+      console.log(err);
     }
 
     // infoMessage.react('fire');
