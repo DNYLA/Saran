@@ -3,7 +3,7 @@ import axios from 'axios';
 import { channel } from 'diagnostics_channel';
 import { Message, MessageEmbed, Permissions } from 'discord.js';
 import { getRecentTracks, getTrackInfo } from '../../api/lastfm';
-import Command from '../../utils/Base/Command';
+import Command from '../../utils/Base/command';
 import DiscordClient from '../../utils/client';
 import { RecentTrack, Track } from '../../utils/types';
 
@@ -70,8 +70,6 @@ export default class Clear extends Command {
     }
 
     try {
-      console.log(track.album);
-      console.log(track);
       const messageEmbed = new MessageEmbed()
         .setColor('#4a5656')
         .setAuthor({

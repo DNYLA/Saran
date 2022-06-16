@@ -1,6 +1,6 @@
 import { GuildConfig } from '@prisma/client';
 import { Client, ClientOptions, Collection } from 'discord.js';
-import Command from './Base/Command';
+import Command from './Base/command';
 import Event from './base/event';
 
 export default class DiscordClient extends Client {
