@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "BetterFM discord bot",
   "main": "main.ts",
+  "engines": {
+    "node": "16.15.1"
+  },
   "scripts": {
     "start": "node build/main.js",
     "build": "tsc",
