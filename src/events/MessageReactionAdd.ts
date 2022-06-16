@@ -34,8 +34,8 @@ export default class MessageReactionAdd extends Event {
       const reactions = message.reactions.cache;
       const sobEmoji = reactions.get('😭');
 
+      if (!sobEmoji) return;
       if (sobEmoji.count != config.reactionBoardLimit) return;
-
       if (!reaction.message.channel.isText()) return;
 
       const reactionChannel = await guild.channels.fetch(
