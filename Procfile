@@ -1,0 +1,1 @@
+discord: npm run start
