@@ -5,7 +5,7 @@ import DiscordClient from '../../utils/client';
 
 const prisma = new PrismaClient();
 
-export default class Clear extends Command {
+export default class SetUsername extends Command {
   constructor() {
     super('lfset', 'LastFM', ['']);
   }

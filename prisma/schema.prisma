@@ -18,4 +18,6 @@ model User {
 model GuildConfig {
   id              String   @id
   prefix String @default(",")
+  reactionBoardChannel String?
+  reactionBoardLimit Int @default(0)
 }

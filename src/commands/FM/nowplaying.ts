@@ -7,7 +7,7 @@ import { RecentTrack, Track } from '../../utils/types';
 
 const prisma = new PrismaClient();
 
-export default class Clear extends Command {
+export default class NowPlaying extends Command {
   constructor() {
     super('np', 'LastFM', ['']);
   }
