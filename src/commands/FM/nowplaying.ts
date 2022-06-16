@@ -1,9 +1,7 @@
 import { PrismaClient } from '@prisma/client';
-import axios from 'axios';
-import { channel } from 'diagnostics_channel';
 import { Message, MessageEmbed, Permissions } from 'discord.js';
 import { getRecentTracks, getTrackInfo } from '../../api/lastfm';
-import Command from '../../utils/Base/command';
+import Command from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
 import { RecentTrack, Track } from '../../utils/types';
 

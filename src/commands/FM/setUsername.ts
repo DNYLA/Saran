@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { Message } from 'discord.js';
-import Command from '../../utils/Base/command';
+import Command from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
 
 const prisma = new PrismaClient();
