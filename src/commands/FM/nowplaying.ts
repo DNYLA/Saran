@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
 
 export default class NowPlaying extends Command {
   constructor() {
-    super('np', 'LastFM', ['']);
+    super('np', 'LastFM', ['fm']);
   }
 
   async run(client: DiscordClient, message: Message, args: string[]) {
