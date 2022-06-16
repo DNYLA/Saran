@@ -49,6 +49,7 @@ export default class MessageReactionAdd extends Event {
           url: message.url,
           iconURL: message.author.avatarURL(),
         })
+        .setDescription(message.content)
         .addFields(
           {
             name: `#${reactionChannel.name}`,

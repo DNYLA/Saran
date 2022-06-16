@@ -14,6 +14,8 @@ export default class SetReactionBoardChannel extends Command {
   async run(client: DiscordClient, message: Message, args: string[]) {
     message.channel.sendTyping();
     console.log(args);
+    if (!message.member.permissions.has('ADMINISTRATOR'))
+      return message.reply('You need to be admin');
 
     if (args.length != 2) {
       return message.channel.send(
