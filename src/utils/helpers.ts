@@ -10,3 +10,17 @@ export function getArgsFromMsg(
     args: args.slice(1),
   };
 }
+
+export enum MessageType {
+  Channel = '#',
+  Mention = '@',
+}
+
+export function getIdFromTag(msg: string, messageType: MessageType) {
+  console.log(messageType);
+  console.log(msg);
+  if (msg.includes(messageType)) {
+    const index = msg.indexOf(messageType);
+    console.log(index);
+  }
+}
