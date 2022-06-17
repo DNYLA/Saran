@@ -19,7 +19,9 @@ export default class GetAvatar extends Command {
   async run(client: DiscordClient, message: Message, args: string[]) {
     message.channel.sendTyping();
     if (args.length === 0) return message.reply('Provide a query to search!');
-    const query = args[0];
+    const query = args.join(' ');
+
+    console.log(query);
 
     let results = client.getImage(query);
 
