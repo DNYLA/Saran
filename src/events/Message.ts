@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { Guild, Message } from 'discord.js';
 import Event from '../utils/base/event';
 import DiscordClient from '../utils/client';
+import { getUser } from '../utils/database/User';
 import { getArgsFromMsg } from '../utils/helpers';
 const prisma = new PrismaClient();
 
@@ -13,9 +14,7 @@ export default class MessageEvent extends Event {
   async run(client: DiscordClient, message: Message) {
     if (message.author.bot) return;
 
-    const userConfig = await prisma.user.findUnique({
-      where: { id: message.author.id },
-    });
+    const userConfig = await getUser(message.author.id);
 
     let config = await prisma.guildConfig.findUnique({
       where: { id: message.guildId },
@@ -29,17 +28,7 @@ export default class MessageEvent extends Event {
     }
     client.setConfig(config);
 
-    // let { data: guildConfig } = await getGuildConfig(guildId);
-
-    // if (!guildConfig) {
-    //   guildConfig = (await createGuildConfig(guildId, message.guild.name)).data;
-    // }
-
-    // if (!guildConfig) {
-    //   return; //After Two Tries move on.
-    // }
-
-    if (userConfig && userConfig.lastFMTag) {
+    if (userConfig.lastFMTag) {
       if (message.content.toLowerCase() == userConfig.lastFMTag.toLowerCase()) {
         const command = client.commands.get('np');
         if (command) {

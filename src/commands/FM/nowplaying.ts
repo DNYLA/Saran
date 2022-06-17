@@ -1,8 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 import { Message, MessageEmbed, Permissions } from 'discord.js';
-import { getRecentTracks, getTrackInfo } from '../../api/lastfm';
+import { fetchRecentTracks, fetchTrackInfo } from '../../api/lastfm';
 import Command from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
+import { getUser } from '../../utils/database/User';
 import { RecentTrack, Track } from '../../utils/types';
 
 const prisma = new PrismaClient();
@@ -14,50 +15,42 @@ export default class NowPlaying extends Command {
 
   async run(client: DiscordClient, message: Message, args: string[]) {
     message.channel.sendTyping();
+    let userId = message.author.id;
 
-    let user = await prisma.user.findUnique({
-      where: { id: message.author.id },
-    });
-
-    if (!user) {
-      user = await prisma.user.create({ data: { id: message.author.id } });
+    const mention = message.mentions.users.first();
+    if (mention) {
+      userId = mention.id;
     }
+
+    const user = await getUser(userId);
 
     if (!user.lastFMName) {
       const usernameNotSetEmbed = new MessageEmbed()
         .setColor('#cb0f0f')
-        .setDescription(`Set your lastFM username by doing ,lfset <username>`);
+        .setDescription(
+          `<@${userId}> Set your lastFM username by doing ,lfset <username>`
+        );
 
       return message.reply({ embeds: [usernameNotSetEmbed] });
     }
 
-    // const { data } = await axios.get(
-    //   `http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${username}&limit=1&api_key=07bcd9b97479a2724d17829809ac0d83&format=json`
-    // );
-
-    // const { data } = await getRecentTracks(username, 1);
-
     let recentTrack: RecentTrack;
+    let track: Track;
 
     try {
-      const { data: res } = await getRecentTracks(user.lastFMName, 1);
-
-      if (res.recenttracks.length == 0) return;
+      const { data: res } = await fetchRecentTracks(user.lastFMName, 1);
+      if (res.recenttracks.length == 0)
+        return message.channel.send(
+          'No data to display! Listen to a track before using this command.'
+        );
 
       recentTrack = res.recenttracks.track[0];
     } catch (err) {
       return message.channel.send('Unable to process request');
     }
 
-    if (!recentTrack)
-      return message.channel.send(
-        'No data to display! Listen to a track before using this command.'
-      );
-
-    let track: Track;
-
     try {
-      const { data } = await getTrackInfo(
+      const { data } = await fetchTrackInfo(
         user.lastFMName,
         recentTrack.artist['#text'],
         recentTrack.name
@@ -102,7 +95,5 @@ export default class NowPlaying extends Command {
       message.reply('Unable to display track! Try playing another one');
       console.log(err);
     }
-
-    // infoMessage.react('fire');
   }
 }

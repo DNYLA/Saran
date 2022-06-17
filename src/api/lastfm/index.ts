@@ -9,12 +9,12 @@ export const createURL = (method: string, params: string) => {
   return `?method=${method}&api_key=${process.env.LASTFM_TOKEN}&format=json&${params}`;
 };
 
-export const getRecentTracks = (username: string, limit: number) =>
+export const fetchRecentTracks = (username: string, limit: number) =>
   AXIOS.get(
     createURL('user.getrecenttracks', `user=${username}&limit=${limit}`)
   );
 
-export const getTrackInfo = (
+export const fetchTrackInfo = (
   username: string,
   artist: string,
   trackName: string
@@ -25,3 +25,8 @@ export const getTrackInfo = (
       `username=${username}&artist=${artist}&track=${trackName}`
     )
   );
+
+AXIOS.interceptors.request.use((request) => {
+  console.log('Starting Request', JSON.stringify(request, null, 2));
+  return request;
+});
