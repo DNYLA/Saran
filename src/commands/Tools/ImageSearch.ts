@@ -50,9 +50,9 @@ export default class GetAvatar extends Command {
 
     if (!results)
       try {
-        const { data } = await fetchQueryImages(query, 1);
+        const data = await fetchQueryImages(query, 1);
         results = {
-          images: data.value,
+          images: data,
           query,
           currentPos: 0,
           requester: message.author.id,
@@ -69,7 +69,7 @@ export default class GetAvatar extends Command {
     const imageEmbed = new MessageEmbed()
       .setImage(firstImage.url)
       // .setAuthor({ name: firstImage.title, url: firstImage.url })
-      .setTitle(firstImage.title)
+      .setTitle(firstImage.snippet)
       .setURL(firstImage.url)
       .setFooter({
         text: `Page 1/${results.images.length} ∙ Requested by ${message.author.username}`,

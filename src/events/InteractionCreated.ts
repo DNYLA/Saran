@@ -70,7 +70,7 @@ export default class InteractionCreated extends Event {
       const image = results.images[newPos];
       const imageEmbed = new MessageEmbed()
         .setImage(image.url)
-        .setTitle(image.title)
+        .setTitle(image.snippet)
         .setURL(image.url)
         .setFooter({
           text: `Page ${newPos + 1}/${results.images.length} ∙ Requested by ${

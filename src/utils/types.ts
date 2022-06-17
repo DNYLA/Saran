@@ -60,8 +60,6 @@ export type WebSearchImages = {
 
 export type WebSearchImage = {
   url: string;
-  height: number;
-  width: number;
   thumbnail: string;
-  title: string;
+  snippet: string;
 };
