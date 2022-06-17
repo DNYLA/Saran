@@ -80,7 +80,7 @@ export default class NowPlaying extends Command {
         .addFields(
           {
             name: 'Track',
-            value: `[${track.name}](${track.url})`,
+            value: `[${recentTrack.name}](${recentTrack.url})`,
             inline: true,
           },
           {
