@@ -21,8 +21,6 @@ export default class GetAvatar extends Command {
     if (args.length === 0) return message.reply('Provide a query to search!');
     const query = args.join(' ');
 
-    console.log(query);
-
     let results = client.getImage(query);
 
     // let results: WebSearchImages = {
@@ -52,7 +50,6 @@ export default class GetAvatar extends Command {
 
     if (!results)
       try {
-        console.log('Fetching Query');
         const { data } = await fetchQueryImages(query, 1);
         results = {
           images: data.value,
@@ -86,7 +83,11 @@ export default class GetAvatar extends Command {
       new MessageButton()
         .setCustomId(`image-forward-${query}`)
         .setLabel('>')
-        .setStyle('PRIMARY')
+        .setStyle('PRIMARY'),
+      new MessageButton()
+        .setCustomId(`image-delete-${query}`)
+        .setLabel('X')
+        .setStyle('DANGER')
     );
 
     const imgMessage = await message.channel.send({
@@ -95,7 +96,6 @@ export default class GetAvatar extends Command {
     });
 
     setTimeout(() => {
-      console.log('Ran Timeout');
       imgMessage.edit({ components: [] });
     }, 60000);
   }

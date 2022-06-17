@@ -23,6 +23,8 @@ export default class InteractionCreated extends Event {
     } else if (interaction.customId.startsWith('image-backward')) {
       query = interaction.customId.split('image-backward-')[1];
       forward = false;
+    } else {
+      query = interaction.customId.split('image-delete-')[1];
     }
 
     const results = client.getImage(query);
@@ -41,12 +43,15 @@ export default class InteractionCreated extends Event {
       });
     }
 
+    if (interaction.customId.startsWith('image-delete')) {
+      const embed = new MessageEmbed().setTitle('Request Deleted');
+      return interaction.update({ embeds: [embed], components: [] });
+    }
+
     let newPos = results.currentPos;
 
     if (forward) {
       newPos++;
-      console.log(results.images.length);
-      console.log(newPos);
       if (newPos > results.images.length - 1)
         return interaction.reply({
           content: 'No More Images!',
