@@ -46,6 +46,7 @@ export default class NowPlaying extends Command {
 
       recentTrack = res.recenttracks.track[0];
     } catch (err) {
+      console.log(err);
       return message.channel.send('Unable to process request');
     }
 
@@ -57,6 +58,7 @@ export default class NowPlaying extends Command {
       );
       track = data.track;
     } catch (err) {
+      console.log(err);
       return message.channel.send('Unable to process request');
     }
 

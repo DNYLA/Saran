@@ -6,7 +6,9 @@ const CONFIG: AxiosRequestConfig = {
 const AXIOS = axios.create(CONFIG); //Axios Uses .defaults.baseURL to set/call the API this way we can change the API URL outside the library.
 
 export const createURL = (method: string, params: string) => {
-  return `?method=${method}&api_key=${process.env.LASTFM_TOKEN}&format=json&${params}`;
+  return encodeURI(
+    `?method=${method}&api_key=${process.env.LASTFM_TOKEN}&format=json&${params}`
+  );
 };
 
 export const fetchRecentTracks = (username: string, limit: number) =>
