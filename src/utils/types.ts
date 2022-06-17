@@ -50,3 +50,18 @@ type FMImage = {
   size: string;
   '#text': string;
 };
+
+export type WebSearchImages = {
+  query: string;
+  currentPos: number;
+  requester: string;
+  images: WebSearchImage[];
+};
+
+export type WebSearchImage = {
+  url: string;
+  height: number;
+  width: number;
+  thumbnail: string;
+  title: string;
+};

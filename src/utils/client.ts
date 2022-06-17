@@ -2,11 +2,12 @@ import { GuildConfig } from '@prisma/client';
 import { Client, ClientOptions, Collection } from 'discord.js';
 import Command from './base/command';
 import Event from './base/event';
+import { WebSearchImage, WebSearchImages } from './types';
 
 export default class DiscordClient extends Client {
   private _commands = new Collection<string, Command>();
   private _events = new Collection<string, Event>();
-
+  private _images = new Collection<string, WebSearchImages>();
   private _configs = new Array<GuildConfig>();
 
   constructor(options?: ClientOptions) {
@@ -19,6 +20,15 @@ export default class DiscordClient extends Client {
 
   get events(): Collection<string, Event> {
     return this._events;
+  }
+
+  getImage(name: string): WebSearchImages {
+    return this._images[name];
+    // return this._images.find((image) => image.query === name);
+  }
+
+  setImage(images: WebSearchImages) {
+    this._images[images.query] = images;
   }
 
   getConfig(id: string): GuildConfig {

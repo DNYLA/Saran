@@ -15,17 +15,23 @@ export default class MessageEvent extends Event {
     if (message.author.bot) return;
 
     const userConfig = await getUser(message.author.id);
-
-    let config = await prisma.guildConfig.findUnique({
-      where: { id: message.guildId },
-    });
-
-    if (!config) {
-      console.log('Does not exist');
-      config = await prisma.guildConfig.create({
-        data: { id: message.guildId },
+    let config;
+    try {
+      config = await prisma.guildConfig.findUnique({
+        where: { id: message.guildId },
       });
+
+      if (!config) {
+        console.log('Does not exist');
+        config = await prisma.guildConfig.create({
+          data: { id: message.guildId },
+        });
+      }
+    } catch (err) {
+      message.reply('Undiagnosable Error occured');
+      return;
     }
+
     client.setConfig(config);
 
     if (userConfig.lastFMTag) {
