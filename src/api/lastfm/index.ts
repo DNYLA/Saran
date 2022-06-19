@@ -28,6 +28,25 @@ export const fetchTrackInfo = (
     )
   );
 
+export enum Periods {
+  'overall' = 'overall',
+  '7d' = '7day',
+  '1w' = '7day',
+  '1m' = '1month',
+  '3m' = '3month',
+  '6m' = '6month',
+  '12m' = '12month',
+  '1y' = '12month',
+}
+
+export const fetchTopArtists = (username: string, period: Periods) =>
+  AXIOS.get(
+    createURL(
+      'user.getTopArtists',
+      `username=${username}&period=${period}&limit=10`
+    )
+  );
+
 AXIOS.interceptors.request.use((request) => {
   console.log('Starting Request', JSON.stringify(request, null, 2));
   return request;

@@ -39,6 +39,13 @@ export type Album = {
   image: FMImage[];
 };
 
+export type ArtistInfo = {
+  name: string;
+  playcount: string;
+  url: string;
+  image: FMImage[];
+};
+
 export type RecentArtist = {
   '#text': string;
 };

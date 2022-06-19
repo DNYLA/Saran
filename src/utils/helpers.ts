@@ -1,3 +1,5 @@
+import { Periods } from '../api/lastfm';
+
 export function getArgsFromMsg(
   msg: string,
   prefixLn: number
@@ -22,5 +24,26 @@ export function getIdFromTag(msg: string, messageType: MessageType) {
   if (msg.includes(messageType)) {
     const index = msg.indexOf(messageType);
     console.log(index);
+  }
+}
+
+export function convertPeriodToText(period: Periods) {
+  switch (period) {
+    case Periods.overall:
+      return 'overall';
+    case Periods['7d']:
+      return 'weekly';
+    case Periods['1w']:
+      return 'weekly';
+    case Periods['1m']:
+      return 'monthly';
+    case Periods['6m']:
+      return 'bi-yearly';
+    case Periods['12m']:
+      return 'yearly';
+    case Periods['1y']:
+      return 'yearly';
+    default:
+      return 'overall';
   }
 }
