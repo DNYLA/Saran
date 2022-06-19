@@ -8,6 +8,12 @@ export type RecentTrack = {
   date: FMTimestamp;
 };
 
+export type PartialUser = {
+  user: string;
+  totalPages: string;
+  total: string;
+};
+
 export type Track = {
   name: string;
   url: string;

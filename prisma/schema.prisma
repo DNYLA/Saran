@@ -16,9 +16,24 @@ model User {
   lastFMTag String?
 }
 
+model GuildUser {
+  id String
+  serverId String
+  lastFMTag String?
+  reactionBoardScore Int @default(0)
+  @@id([id, serverId])
+}
+
 model GuildConfig {
   id              String   @id
   prefix String @default(",")
   reactionBoardChannel String?
   reactionBoardLimit Int @default(0)
 }
+
+model ReactionBoardMessages {
+  id String
+  serverId String
+  @@id([id, serverId])
+}
+

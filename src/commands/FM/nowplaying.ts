@@ -4,7 +4,7 @@ import { fetchRecentTracks, fetchTrackInfo } from '../../api/lastfm';
 import Command from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
 import { getUser } from '../../utils/database/User';
-import { RecentTrack, Track } from '../../utils/types';
+import { PartialUser, RecentTrack, Track } from '../../utils/types';
 
 const prisma = new PrismaClient();
 
@@ -16,6 +16,12 @@ export default class NowPlaying extends Command {
   async run(client: DiscordClient, message: Message, args: string[]) {
     message.channel.sendTyping();
     let userId = message.author.id;
+
+    let normalEmbed = true;
+
+    if (args.includes('alt')) {
+      normalEmbed = false;
+    }
 
     const mention = message.mentions.users.first();
     if (mention) {
@@ -36,6 +42,7 @@ export default class NowPlaying extends Command {
 
     let recentTrack: RecentTrack;
     let track: Track;
+    let userInfo: PartialUser;
 
     try {
       const { data: res } = await fetchRecentTracks(user.lastFMName, 1);
@@ -45,6 +52,9 @@ export default class NowPlaying extends Command {
         );
 
       recentTrack = res.recenttracks.track[0];
+      userInfo = res.recenttracks['@attr'];
+
+      console.log(userInfo);
     } catch (err) {
       console.log(err);
       return message.channel.send('Unable to process request');
@@ -63,31 +73,59 @@ export default class NowPlaying extends Command {
     }
 
     try {
-      const messageEmbed = new MessageEmbed()
-        .setColor('#4a5656')
-        .setAuthor({
-          name: user.lastFMName,
-          url: `https://www.last.fm/user/${user.lastFMName}`,
-          iconURL:
-            'https://lastfm.freetls.fastly.net/i/u/avatar170s/a7ff67ef791aaba0c0c97e9c8a97bf04.png',
-        })
-        .setThumbnail(recentTrack.image[3]['#text'])
-        .addFields(
-          {
-            name: 'Track',
-            value: `[${recentTrack.name}](${recentTrack.url})`,
-            inline: true,
-          },
-          {
-            name: 'Artist',
-            value: `[${track.artist.name}](${track.artist.url})`,
-            inline: true,
-          }
-        )
-        .setFooter({
-          text: `Playcount: ${track.userplaycount}  ∙ Album: ${recentTrack.album['#text']}`,
-        });
-
+      let messageEmbed;
+      if (normalEmbed)
+        messageEmbed = new MessageEmbed()
+          .setColor('#4a5656')
+          .setAuthor({
+            name: user.lastFMName,
+            url: `https://www.last.fm/user/${user.lastFMName}`,
+            iconURL:
+              'https://lastfm.freetls.fastly.net/i/u/avatar170s/a7ff67ef791aaba0c0c97e9c8a97bf04.png',
+          })
+          .setThumbnail(recentTrack.image[3]['#text'])
+          .addFields(
+            {
+              name: 'Track',
+              value: `[${recentTrack.name}](${recentTrack.url})`,
+              inline: true,
+            },
+            {
+              name: 'Artist',
+              value: `[${track.artist.name}](${track.artist.url})`,
+              inline: true,
+            }
+          )
+          .setFooter({
+            text: `Playcount: ${track.userplaycount}  ∙ Album: ${recentTrack.album['#text']}`,
+          });
+      else
+        messageEmbed = new MessageEmbed()
+          .setColor('#4a5656')
+          .setTitle(recentTrack.name)
+          .setURL(recentTrack.url)
+          .setAuthor({
+            name: user.lastFMName,
+            url: `https://www.last.fm/user/${user.lastFMName}`,
+            iconURL:
+              'https://lastfm.freetls.fastly.net/i/u/avatar170s/a7ff67ef791aaba0c0c97e9c8a97bf04.png',
+          })
+          .setThumbnail(recentTrack.image[3]['#text'])
+          .addFields(
+            {
+              name: `[link](http://example.com)`,
+              value: `[${track.artist.name}](${track.artist.url}) ∙ [${track.album.title}](${track.album.url})`,
+              inline: true,
+            },
+            {
+              name: 'Plays',
+              value: `${track.userplaycount}`,
+              inline: true,
+            }
+          )
+          .setFooter({
+            text: `Jungaal has ${userInfo.total}  ∙ Album: ${recentTrack.album['#text']}`,
+          });
       const npMessage = await message.channel.send({
         embeds: [messageEmbed],
       });

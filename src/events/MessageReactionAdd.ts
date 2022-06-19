@@ -30,6 +30,7 @@ export default class MessageReactionAdd extends Event {
 
       if (!channel) return;
       if (!channel.isText()) return;
+      if (reaction.emoji.name != '😭') return;
 
       const reactions = message.reactions.cache;
       const sobEmoji = reactions.get('😭');
@@ -41,6 +42,14 @@ export default class MessageReactionAdd extends Event {
       const reactionChannel = await guild.channels.fetch(
         reaction.message.channelId
       );
+
+      let imageUrl;
+
+      // const attachemnt = reaction.message.attachments.first();
+      // console.log(reaction.message.url);
+      // if (attachemnt) imageUrl =
+
+      // console.log(attachemnt);
 
       const messageEmbed = new MessageEmbed()
         .setColor('#1e7842')
@@ -61,6 +70,7 @@ export default class MessageReactionAdd extends Event {
             value: `${reaction.emoji.name} x${config.reactionBoardLimit}`,
           }
         )
+        .setFooter({ text: 'Emoji Score: 15' })
         .setTimestamp();
 
       channel.send({ embeds: [messageEmbed] });
