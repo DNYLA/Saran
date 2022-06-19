@@ -13,6 +13,12 @@ export default class MessageEvent extends Event {
       status: 'online',
     });
 
+    client.user.setActivity('Down Below', {
+      type: 'LISTENING',
+      name: 'Youtube',
+      url: 'https://www.youtube.com/watch?v=CJOZc02VwJM',
+    });
+
     console.log(`${client.user.username} is running.`);
   }
 }

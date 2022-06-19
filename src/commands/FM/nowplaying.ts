@@ -34,7 +34,7 @@ export default class NowPlaying extends Command {
       const usernameNotSetEmbed = new MessageEmbed()
         .setColor('#cb0f0f')
         .setDescription(
-          `<@${userId}> Set your lastFM username by doing ,lfset <username>`
+          `<@${userId}> Set your lastFM username by doing ,lf set <username>`
         );
 
       return message.reply({ embeds: [usernameNotSetEmbed] });

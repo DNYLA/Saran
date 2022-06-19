@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 
 export default class SetUsername extends Command {
   constructor() {
-    super('lfset', 'LastFM', ['']);
+    super('lf set', 'LastFM', ['lfset']);
   }
 
   async run(client: DiscordClient, message: Message, args: string[]) {

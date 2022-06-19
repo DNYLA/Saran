@@ -63,6 +63,7 @@ export default class MessageEvent extends Event {
         return;
       }
 
+      //Re-Write getArgsFromMsg to concat modules which have space names.
       const { commandName, args } = getArgsFromMsg(
         message.content,
         config.prefix.length
@@ -73,6 +74,23 @@ export default class MessageEvent extends Event {
       if (command) {
         try {
           command.run(client, message, args, config);
+        } catch (err) {
+          message.channel.send(
+            'There was an error when attempting to execute this command'
+          );
+        }
+      } else if (
+        (!command && commandName.startsWith('lf')) ||
+        commandName.startsWith('fm')
+      ) {
+        let newCommandName = `${commandName} ${args.shift()}`;
+        const newCommand = client.commands.get(newCommandName.toLowerCase());
+
+        console.log(newCommandName);
+
+        if (!newCommand) return;
+        try {
+          newCommand.run(client, message, args, config);
         } catch (err) {
           message.channel.send(
             'There was an error when attempting to execute this command'

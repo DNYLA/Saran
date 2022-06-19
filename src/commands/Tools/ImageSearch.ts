@@ -1,4 +1,3 @@
-import { PrismaClient } from '@prisma/client';
 import {
   Message,
   MessageActionRow,
@@ -8,8 +7,6 @@ import {
 import { fetchQueryImages } from '../../api/WebSearch';
 import Command from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
-import { AvatarType, getAvatarEmbed } from '../../utils/Helpers/Avatars';
-import { WebSearchImages } from '../../utils/types';
 
 export default class GetAvatar extends Command {
   constructor() {
@@ -22,31 +19,6 @@ export default class GetAvatar extends Command {
     const query = args.join(' ');
 
     let results = client.getImage(query);
-
-    // let results: WebSearchImages = {
-    //   query: 'test',
-    //   currentPos: 0,
-    //   requester: message.author.id,
-    //   images: [
-    //     {
-    //       url: 'https://sm.pcmag.com/t/pcmag_au/news/l/lime-tests/lime-tests-citra-electric-motorbike-in-long-beach_r69j.1200.jpg',
-    //       height: 675,
-    //       width: 1200,
-    //       thumbnail:
-    //         'https://rapidapi.usearch.com/api/thumbnail/get?value=7322731056287538692',
-    //       title: 'Lime Tests Citra Electric Motorbike in Long Beach',
-    //     },
-    //     {
-    //       url: 'https://thewell.unc.edu/wp-content/uploads/sites/1007/2022/01/COVID-test.jpg',
-    //       height: 675,
-    //       width: 1200,
-    //       thumbnail:
-    //         'https://rapidapi.usearch.com/api/thumbnail/get?value=661206131314380158',
-    //       title:
-    //         'Do home COVID-19 test results guarantee safety? - The Well : The Well',
-    //     },
-    //   ],
-    // };
 
     if (!results)
       try {
