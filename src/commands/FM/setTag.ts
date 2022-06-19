@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 
 export default class SetUsername extends Command {
   constructor() {
-    super('lftag', 'LastFM', ['']);
+    super('lf tag', 'LastFM', ['lftag']);
   }
 
   async run(client: DiscordClient, message: Message, args: string[]) {
@@ -17,9 +17,9 @@ export default class SetUsername extends Command {
       return message.reply('Please provide a tag as a paramter!');
 
     if (updateUserById(message.author.id, { lastFMTag: args[0] })) {
-      message.reply(`Successfully set name to ${args[0]}`);
+      message.reply(`Successfully set custom tag to ${args[0]}`);
     } else {
-      message.reply('Error Occured whilst trying to set your username.');
+      message.reply('Error Occured whilst trying to set your custom tag.');
     }
   }
 }
