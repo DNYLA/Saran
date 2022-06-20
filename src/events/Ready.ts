@@ -13,7 +13,7 @@ export default class MessageEvent extends Event {
       status: 'online',
     });
 
-    client.user.setActivity('Down Below', {
+    client.user.setActivity('Spotify', {
       type: 'LISTENING',
       name: 'Youtube',
       url: 'https://www.youtube.com/watch?v=CJOZc02VwJM',

@@ -41,28 +41,32 @@ export default class MessageEvent extends Event {
     }
 
     client.setConfig(config);
+    try {
+      if (userConfig.lastFMTag) {
+        if (
+          message.content
+            .toLowerCase()
+            .startsWith(userConfig.lastFMTag.toLowerCase())
+        ) {
+          const command = client.commands.get('np');
+          const args = message.content
+            .slice(userConfig.lastFMName.length)
+            .split(/ +/);
 
-    if (userConfig.lastFMTag) {
-      if (
-        message.content
-          .toLowerCase()
-          .startsWith(userConfig.lastFMTag.toLowerCase())
-      ) {
-        const command = client.commands.get('np');
-        const args = message.content
-          .slice(userConfig.lastFMName.length)
-          .split(/ +/);
-
-        if (command) {
-          try {
-            command.run(client, message, args, config);
-          } catch (err) {
-            message.channel.send(
-              'There was an error when attempting to execute this command'
-            );
+          if (command) {
+            try {
+              command.run(client, message, args, config);
+            } catch (err) {
+              message.channel.send(
+                'There was an error when attempting to execute this command'
+              );
+            }
           }
         }
       }
+    } catch (err) {
+      message.reply('failed to execute this retardic ahh command.');
+      return;
     }
 
     if (message.content.startsWith(config.prefix)) {
