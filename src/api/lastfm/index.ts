@@ -47,7 +47,15 @@ export const fetchTopArtists = (username: string, period: Periods) =>
     )
   );
 
-AXIOS.interceptors.request.use((request) => {
-  console.log('Starting Request', JSON.stringify(request, null, 2));
-  return request;
-});
+export const fetchTopTenTracks = (username: string, period: Periods) =>
+  AXIOS.get(
+    createURL(
+      'user.getTopTracks',
+      `username=${username}&period=${period}&limit=10`
+    )
+  );
+
+// AXIOS.interceptors.request.use((request) => {
+//   console.log('Starting Request', JSON.stringify(request, null, 2));
+//   return request;
+// });

@@ -26,6 +26,18 @@ export type Track = {
   album: Album;
 };
 
+export type TopTrack = {
+  name: string;
+  url: string;
+  playcount: number;
+  artist: TopTrackArtist;
+};
+
+export type TopTrackArtist = {
+  name: string;
+  url: string;
+};
+
 export type Artist = {
   name: string;
   mbid: string;

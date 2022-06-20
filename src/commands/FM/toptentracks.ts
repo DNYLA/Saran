@@ -3,6 +3,7 @@ import { Message, MessageEmbed, Permissions } from 'discord.js';
 import {
   fetchRecentTracks,
   fetchTopArtists,
+  fetchTopTenTracks,
   fetchTrackInfo,
   Periods,
 } from '../../api/lastfm';
@@ -10,13 +11,19 @@ import Command from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
 import { getUser } from '../../utils/database/User';
 import { convertPeriodToText } from '../../utils/helpers';
-import { ArtistInfo, PartialUser, RecentTrack, Track } from '../../utils/types';
+import {
+  ArtistInfo,
+  PartialUser,
+  RecentTrack,
+  TopTrack,
+  Track,
+} from '../../utils/types';
 
 const prisma = new PrismaClient();
 
 export default class NowPlaying extends Command {
   constructor() {
-    super('lf tar', 'LastFM', ['']);
+    super('lf ttt', 'LastFM', ['']);
   }
 
   async run(client: DiscordClient, message: Message, args: string[]) {
@@ -50,34 +57,32 @@ export default class NowPlaying extends Command {
 
     // return message.reply(period);
 
-    let topArtists: ArtistInfo[];
-    let track: Track;
-    let userInfo: PartialUser;
+    let topTracks: TopTrack[] = [];
 
     try {
-      const { data: res } = await fetchTopArtists(user.lastFMName, period);
+      const { data: res } = await fetchTopTenTracks(user.lastFMName, period);
 
-      topArtists = res.topartists.artist;
-      // console.log(topArtists);
+      topTracks = res.toptracks.track;
+      // console.log(topTracks);
     } catch (err) {
       console.log(err);
       return message.channel.send('Unable to process request');
     }
 
-    if (topArtists.length === 0) {
+    if (topTracks.length === 0) {
       const noDataEmbed = new MessageEmbed().setTitle('No data availble!');
       return message.channel.send({ embeds: [noDataEmbed] });
     }
 
     const embedTitle = `${user.lastFMName} ${convertPeriodToText(
       period
-    )} top artists`;
+    )} top tracks`;
 
     let description = '';
-    topArtists.forEach((artist, i) => {
+    topTracks.forEach((track, i) => {
       try {
-        description += `**${i + 1}. [${artist.name}](${artist.url})** (${
-          artist.playcount
+        description += `**${i + 1}. [${track.name}](${track.url})** (${
+          track.playcount
         })\n`;
       } catch (err) {
         console.log(err);
