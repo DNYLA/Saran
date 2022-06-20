@@ -25,6 +25,7 @@ export default class NowPlaying extends Command {
 
     const mention = message.mentions.users.first();
     if (mention) {
+      message.reply(mention.username);
       userId = mention.id;
     }
 
