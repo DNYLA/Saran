@@ -14,6 +14,14 @@ export default class MessageEvent extends Event {
   async run(client: DiscordClient, message: Message) {
     if (message.author.bot) return;
 
+    if (message.content.includes('v/s')) {
+      await message.react('◀️');
+      await message.react('▶️');
+    } else if (message.content.includes('y/n')) {
+      await message.react('🔼');
+      await message.react('🔽');
+    }
+
     const userConfig = await getUser(message.author.id);
     let config;
     try {
