@@ -3,6 +3,7 @@ import { Message, MessageEmbed, Permissions } from 'discord.js';
 import {
   fetchRecentTracks,
   fetchTopArtists,
+  fetchTopTenAlbums,
   fetchTopTenTracks,
   fetchTrackInfo,
   Periods,
@@ -15,6 +16,7 @@ import {
   ArtistInfo,
   PartialUser,
   RecentTrack,
+  TopAlbum,
   TopTrack,
   Track,
 } from '../../utils/types';
@@ -23,7 +25,7 @@ const prisma = new PrismaClient();
 
 export default class NowPlaying extends Command {
   constructor() {
-    super('lf ttt', 'LastFM', ['']);
+    super('lf tta', 'LastFM', ['']);
   }
 
   async run(client: DiscordClient, message: Message, args: string[]) {
@@ -57,32 +59,32 @@ export default class NowPlaying extends Command {
 
     // return message.reply(period);
 
-    let topTracks: TopTrack[] = [];
+    let topAlbums: TopAlbum[] = [];
 
     try {
-      const { data: res } = await fetchTopTenTracks(user.lastFMName, period);
-
-      topTracks = res.toptracks.track;
-      // console.log(topTracks);
+      const { data: res } = await fetchTopTenAlbums(user.lastFMName, period);
+      // console.log(res);
+      topAlbums = res.topalbums.album;
+      // console.log(topAlbums);
     } catch (err) {
       console.log(err);
       return message.channel.send('Unable to process request');
     }
 
-    if (topTracks.length === 0) {
+    if (topAlbums.length === 0) {
       const noDataEmbed = new MessageEmbed().setTitle('No data availble!');
       return message.channel.send({ embeds: [noDataEmbed] });
     }
 
     const embedTitle = `${user.lastFMName} ${convertPeriodToText(
       period
-    )} top tracks`;
+    )} top albums`;
 
     let description = '';
-    topTracks.forEach((track, i) => {
+    topAlbums.forEach((album, i) => {
       try {
-        description += `**${i + 1}. [${track.name}](${track.url})** (${
-          track.playcount
+        description += `**${i + 1}. [${album.name}](${album.url})** (${
+          album.playcount
         })\n`;
       } catch (err) {
         console.log(err);
@@ -105,7 +107,7 @@ export default class NowPlaying extends Command {
         embeds: [messageEmbed],
       });
     } catch (err) {
-      message.reply('Unable to display top tracks!');
+      message.reply('Unable to display top albums!');
       console.log(err);
     }
   }

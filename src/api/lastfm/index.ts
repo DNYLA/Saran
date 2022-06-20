@@ -55,6 +55,14 @@ export const fetchTopTenTracks = (username: string, period: Periods) =>
     )
   );
 
+export const fetchTopTenAlbums = (username: string, period: Periods) =>
+  AXIOS.get(
+    createURL(
+      'user.getTopAlbums',
+      `username=${username}&period=${period}&limit=10`
+    )
+  );
+
 // AXIOS.interceptors.request.use((request) => {
 //   console.log('Starting Request', JSON.stringify(request, null, 2));
 //   return request;

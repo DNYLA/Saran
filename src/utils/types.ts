@@ -30,12 +30,20 @@ export type TopTrack = {
   name: string;
   url: string;
   playcount: number;
-  artist: TopTrackArtist;
+  artist: TopTenArtist;
 };
 
-export type TopTrackArtist = {
+export type TopTenArtist = {
   name: string;
   url: string;
+};
+
+export type TopAlbum = {
+  name: string;
+  url: string;
+  playcount: string;
+  artist: TopTenArtist;
+  image: FMImage[];
 };
 
 export type Artist = {
