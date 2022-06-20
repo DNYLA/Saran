@@ -23,8 +23,8 @@ export default class Ban extends Command {
     }
     const embed = new MessageEmbed()
       .setAuthor({
-        name: message.member.displayName,
-        iconURL: message.member.displayAvatarURL(),
+        name: deletedMessage.member.displayName,
+        iconURL: deletedMessage.member.displayAvatarURL(),
       })
       .setDescription(deletedMessage.content)
       .setFooter({ text: `Sniped by ${message.member.displayName}` })
