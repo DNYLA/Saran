@@ -1,7 +1,9 @@
 import { User } from '@prisma/client';
 import { Channel, Message, MessageEmbed, TextChannel } from 'discord.js';
 import {
+  fetchAlbumInfo,
   fetchRecentTracks,
+  fetchSearchAlbum,
   fetchSearchTrack,
   fetchTopArtists,
   fetchTopTenAlbums,
@@ -104,7 +106,7 @@ export function sendNoDataEmbed(message: Message) {
   return message.channel.send({ embeds: [embed] });
 }
 
-export enum TopTenType {
+export enum SearchType {
   Track,
   Artist,
   Album,
@@ -113,7 +115,7 @@ export enum TopTenType {
 export async function getTopTenStats(
   message: Message,
   args: string[],
-  type: TopTenType
+  type: SearchType
 ) {
   message.channel.sendTyping();
   const user = await getUserFromMessage(message);
@@ -124,13 +126,13 @@ export async function getTopTenStats(
   let topStats: ArtistInfo[];
 
   try {
-    if (type === TopTenType.Track) {
+    if (type === SearchType.Track) {
       const { data: res } = await fetchTopTenTracks(user.lastFMName, period);
       topStats = res.toptracks.track;
-    } else if (type === TopTenType.Artist) {
+    } else if (type === SearchType.Artist) {
       const { data: res } = await fetchTopArtists(user.lastFMName, period);
       topStats = res.topartists.artist;
-    } else if (type === TopTenType.Album) {
+    } else if (type === SearchType.Album) {
       const { data: res } = await fetchTopTenAlbums(user.lastFMName, period);
       topStats = res.topalbums.album;
     }
@@ -186,7 +188,6 @@ export async function fetchSearchTrackInfo(
     const { data: res } = await fetchSearchTrack(username, name, artist);
     if (res.results.trackmatches.track.length == 0) return null;
 
-    // console.log(data);
     const trackSearch: any = res.results.trackmatches.track;
     const { data } = await fetchTrackInfo(
       username,
@@ -195,6 +196,61 @@ export async function fetchSearchTrackInfo(
     );
     // console.log(data);
     return data.track;
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
+
+export async function fetchRecentAlbumInfo(username: string): Promise<{
+  track: Track;
+  recentTrack: RecentTrack;
+  user: PartialUser;
+}> {
+  let recentTrack: RecentTrack;
+  let userInfo: PartialUser;
+
+  try {
+    const { data: res } = await fetchRecentTracks(username, 1);
+    if (res.recenttracks.length == 0) return null;
+
+    recentTrack = res.recenttracks.track[0];
+    userInfo = res.recenttracks['@attr'];
+
+    console.log(recentTrack);
+
+    const { data } = await fetchAlbumInfo(
+      username,
+      recentTrack.album['#text'],
+      recentTrack.artist['#text']
+    );
+
+    return { track: data.album, recentTrack: recentTrack, user: userInfo };
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
+
+export async function fetchSearchAlbumInfo(
+  username: string,
+  name: string,
+  artist?: string
+): Promise<Track> {
+  try {
+    const { data: res } = await fetchSearchAlbum(name);
+    if (res.results.albummatches.album.length == 0) return null;
+
+    //Loop through albums and see closest match to artsiName
+
+    const albumSearch: any = res.results.albummatches.album;
+    const { data } = await fetchAlbumInfo(
+      username,
+      albumSearch[0].name,
+      albumSearch[0].artist
+    );
+    console.log(data);
+    return data.album;
   } catch (err) {
     console.log(err);
     return null;

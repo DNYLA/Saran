@@ -49,6 +49,22 @@ export const fetchSearchTrack = (
   return AXIOS.get(escapedURI.URI);
 };
 
+export const fetchAlbumInfo = (
+  username: string,
+  name: string,
+  artist: string
+) =>
+  AXIOS.get(
+    new EscapedURI('album.getInfo')
+      .addAlbum(name)
+      .addArtist(artist)
+      .addUsername(username).URI
+  );
+
+export const fetchSearchAlbum = (name: string) => {
+  return AXIOS.get(new EscapedURI('album.search').addAlbum(name).URI);
+};
+
 export const fetchTopArtists = (username: string, period: Periods) =>
   AXIOS.get(
     new EscapedURI('user.getTopArtists')
@@ -86,6 +102,10 @@ class EscapedURI {
     this.uri = `?method=${method}&api_key=${process.env.LASTFM_TOKEN}&format=json`;
   }
 
+  addAlbum(name: string): EscapedURI {
+    this.uri += this.addField('album', name);
+    return this;
+  }
   addUser(username: string): EscapedURI {
     this.uri += this.addField('user', username);
     return this;

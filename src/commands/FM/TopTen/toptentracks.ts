@@ -12,7 +12,7 @@ import {
   getUserFromMessage,
   hasUsernameSet,
   sendNoDataEmbed,
-  TopTenType,
+  SearchType,
 } from '../../../utils/fmHelpers';
 import { convertPeriodToText, mentionUser } from '../../../utils/helpers';
 import {
@@ -31,6 +31,6 @@ export default class NowPlaying extends Command {
   }
 
   async run(client: DiscordClient, message: Message, args: string[]) {
-    getTopTenStats(message, args, TopTenType.Track);
+    getTopTenStats(message, args, SearchType.Track);
   }
 }

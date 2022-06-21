@@ -10,7 +10,7 @@ import {
   getUserFromMessage,
   hasUsernameSet,
   sendNoDataEmbed,
-  TopTenType,
+  SearchType,
 } from '../../../utils/fmHelpers';
 import { TopAlbum } from '../../../utils/types';
 
@@ -22,6 +22,6 @@ export default class NowPlaying extends Command {
   }
 
   async run(client: DiscordClient, message: Message, args: string[]) {
-    getTopTenStats(message, args, TopTenType.Album);
+    getTopTenStats(message, args, SearchType.Album);
   }
 }
