@@ -18,6 +18,11 @@ export default class Ban extends Command {
 
     const user = await GetUserFromMessage(client, message, args);
     if (!user) return;
+
+    if (user.id === '827212859447705610') {
+      return message.reply('Cant commit treason on my father');
+    }
+
     const guildUser = await message.guild.members.fetch(user.id);
     let reason = '';
     let amount = 0;
