@@ -44,6 +44,7 @@ export default class NowPlaying extends Command {
       console.log(err);
       message.reply('Cant scrobble view this track');
     }
+
     if (!track || !recentTrack)
       return message.reply('Unable to display this track!');
 
