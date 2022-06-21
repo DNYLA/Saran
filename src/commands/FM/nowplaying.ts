@@ -4,6 +4,7 @@ import { fetchRecentTracks, fetchTrackInfo } from '../../api/lastfm';
 import Command from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
 import { getUser } from '../../utils/database/User';
+import { getUserFromMessage, hasUsernameSet } from '../../utils/fmHelpers';
 import { PartialUser, RecentTrack, Track } from '../../utils/types';
 
 const prisma = new PrismaClient();
@@ -15,30 +16,14 @@ export default class NowPlaying extends Command {
 
   async run(client: DiscordClient, message: Message, args: string[]) {
     message.channel.sendTyping();
-    let userId = message.author.id;
+    const user = await getUserFromMessage(message);
+    if (user.id !== message.author.id) args.shift();
+    if (!hasUsernameSet(message, user)) return;
 
     let normalEmbed = true;
 
     if (args.includes('alt')) {
       normalEmbed = false;
-    }
-
-    const mention = message.mentions.users.first();
-    if (mention) {
-      message.reply(mention.username);
-      userId = mention.id;
-    }
-
-    const user = await getUser(userId);
-
-    if (!user.lastFMName) {
-      const usernameNotSetEmbed = new MessageEmbed()
-        .setColor('#cb0f0f')
-        .setDescription(
-          `<@${userId}> Set your lastFM username by doing ,lf set <username>`
-        );
-
-      return message.reply({ embeds: [usernameNotSetEmbed] });
     }
 
     let recentTrack: RecentTrack;

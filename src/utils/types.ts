@@ -29,7 +29,7 @@ export type Track = {
 export type TopTrack = {
   name: string;
   url: string;
-  playcount: number;
+  playcount: string;
   artist: TopTenArtist;
 };
 

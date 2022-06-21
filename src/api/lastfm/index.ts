@@ -32,6 +32,7 @@ export enum Periods {
   'overall' = 'overall',
   '7d' = '7day',
   '1w' = '7day',
+  '30d' = '1month',
   '1m' = '1month',
   '3m' = '3month',
   '6m' = '6month',

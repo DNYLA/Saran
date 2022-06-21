@@ -1,3 +1,4 @@
+import { Message } from 'discord.js';
 import { Periods } from '../api/lastfm';
 
 export function getArgsFromMsg(
@@ -27,6 +28,10 @@ export function getIdFromTag(msg: string, messageType: MessageType) {
   }
 }
 
+export function mentionUser(userId: string): string {
+  return `<@${userId}>`;
+}
+
 export function convertPeriodToText(period: Periods) {
   switch (period) {
     case Periods.overall:
@@ -35,6 +40,8 @@ export function convertPeriodToText(period: Periods) {
       return 'weekly';
     case Periods['1w']:
       return 'weekly';
+    case Periods['30d']:
+      return 'monthly';
     case Periods['1m']:
       return 'monthly';
     case Periods['6m']:
