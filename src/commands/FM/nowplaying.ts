@@ -1,4 +1,5 @@
 import { Message, MessageEmbed } from 'discord.js';
+import { UserInfo } from 'os';
 import { fetchRecentTracks, fetchTrackInfo } from '../../api/lastfm';
 import Command from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
@@ -7,6 +8,7 @@ import {
   getUserFromMessage,
   hasUsernameSet,
 } from '../../utils/fmHelpers';
+import { PartialUser, RecentTrack, Track } from '../../utils/types';
 
 export default class NowPlaying extends Command {
   constructor() {
@@ -25,14 +27,25 @@ export default class NowPlaying extends Command {
     if (args.includes('alt')) {
       normalEmbed = false;
     }
+    let track: Track;
+    let recentTrack: RecentTrack;
+    let userInfo: PartialUser;
 
-    const {
-      track,
-      recentTrack,
-      user: userInfo,
-    } = await fetchRecentTrackInfo(user.lastFMName);
-
-    if (!track) return message.reply('Unable to display this track!');
+    try {
+      const {
+        track: tr,
+        recentTrack: rt,
+        user: UserInfo,
+      } = await fetchRecentTrackInfo(user.lastFMName);
+      track = tr;
+      recentTrack = rt;
+      userInfo = UserInfo;
+    } catch (err) {
+      console.log(err);
+      message.reply('Cant scrobble view this track');
+    }
+    if (!track || !recentTrack)
+      return message.reply('Unable to display this track!');
 
     try {
       let messageEmbed;
