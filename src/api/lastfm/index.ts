@@ -18,8 +18,8 @@ export const fetchRecentTracks = (username: string, limit: number) =>
 
 export const fetchTrackInfo = (
   username: string,
-  artist: string,
-  trackName: string
+  trackName: string,
+  artist?: string
 ) =>
   AXIOS.get(
     createURL(
@@ -27,6 +27,18 @@ export const fetchTrackInfo = (
       `username=${username}&artist=${artist}&track=${trackName}`
     )
   );
+
+export const fetchSearchTrack = (
+  username: string,
+  trackName: string,
+  artist?: string
+) => {
+  let params = `username=${username}&track=${trackName}&limit=1`;
+
+  if (artist) params += `&artist=${artist}`;
+
+  return AXIOS.get(createURL('track.search', params));
+};
 
 export enum Periods {
   'overall' = 'overall',
@@ -64,7 +76,7 @@ export const fetchTopTenAlbums = (username: string, period: Periods) =>
     )
   );
 
-// AXIOS.interceptors.request.use((request) => {
-//   console.log('Starting Request', JSON.stringify(request, null, 2));
-//   return request;
-// });
+AXIOS.interceptors.request.use((request) => {
+  console.log('Starting Request', JSON.stringify(request, null, 2));
+  return request;
+});

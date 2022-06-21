@@ -7,6 +7,6 @@ export const getTrackInfo = async (
   name: string
 ) => {
   try {
-    const { data } = await fetchTrackInfo(username, artist, name);
+    const { data } = await fetchTrackInfo(username, name, artist);
   } catch (err) {}
 };

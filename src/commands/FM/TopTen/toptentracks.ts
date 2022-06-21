@@ -1,13 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { channel } from 'diagnostics_channel';
 import { Message, MessageEmbed, Permissions } from 'discord.js';
-import {
-  fetchRecentTracks,
-  fetchTopArtists,
-  fetchTopTenTracks,
-  fetchTrackInfo,
-  Periods,
-} from '../../../api/lastfm';
+import { fetchTopTenTracks, Periods } from '../../../api/lastfm';
 import Command from '../../../utils/base/command';
 import DiscordClient from '../../../utils/client';
 import { getUser } from '../../../utils/database/User';

@@ -1,14 +1,8 @@
 import { PrismaClient } from '@prisma/client';
-import { Message, MessageEmbed, Permissions } from 'discord.js';
-import {
-  fetchRecentTracks,
-  fetchTopArtists,
-  fetchTrackInfo,
-  Periods,
-} from '../../../api/lastfm';
+import { Message } from 'discord.js';
+import { fetchTopArtists, Periods } from '../../../api/lastfm';
 import Command from '../../../utils/base/command';
 import DiscordClient from '../../../utils/client';
-import { getUser } from '../../../utils/database/User';
 import {
   convertTopStatsToEmbed,
   getPeriodFromArg,
@@ -16,13 +10,7 @@ import {
   hasUsernameSet,
   sendNoDataEmbed,
 } from '../../../utils/fmHelpers';
-import { convertPeriodToText } from '../../../utils/helpers';
-import {
-  ArtistInfo,
-  PartialUser,
-  RecentTrack,
-  Track,
-} from '../../../utils/types';
+import { ArtistInfo } from '../../../utils/types';
 
 const prisma = new PrismaClient();
 

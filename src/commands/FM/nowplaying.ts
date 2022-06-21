@@ -49,8 +49,8 @@ export default class NowPlaying extends Command {
     try {
       const { data } = await fetchTrackInfo(
         user.lastFMName,
-        recentTrack.artist['#text'],
-        recentTrack.name
+        recentTrack.name,
+        recentTrack.artist['#text']
       );
       track = data.track;
     } catch (err) {
