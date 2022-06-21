@@ -2,8 +2,10 @@ import { User } from '@prisma/client';
 import { Channel, Message, MessageEmbed, TextChannel } from 'discord.js';
 import {
   fetchAlbumInfo,
+  fetchArtistInfo,
   fetchRecentTracks,
   fetchSearchAlbum,
+  fetchSearchArtist,
   fetchSearchTrack,
   fetchTopArtists,
   fetchTopTenAlbums,
@@ -251,6 +253,52 @@ export async function fetchSearchAlbumInfo(
     );
     console.log(data);
     return data.album;
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
+
+export async function fetchRecentArtistInfo(username: string): Promise<{
+  track: Track;
+  recentTrack: RecentTrack;
+  user: PartialUser;
+}> {
+  let recentTrack: RecentTrack;
+  let userInfo: PartialUser;
+
+  try {
+    const { data: res } = await fetchRecentTracks(username, 1);
+    if (res.recenttracks.length == 0) return null;
+
+    recentTrack = res.recenttracks.track[0];
+    userInfo = res.recenttracks['@attr'];
+
+    console.log(recentTrack);
+
+    const { data } = await fetchArtistInfo(
+      username,
+      recentTrack.artist['#text']
+    );
+
+    return { track: data.artist, recentTrack: recentTrack, user: userInfo };
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
+
+export async function fetchSearchArtistInfo(
+  username: string,
+  name: string
+): Promise<Track> {
+  try {
+    const { data: res } = await fetchSearchArtist(name);
+    if (res.results.artistmatches.artist.length == 0) return null;
+
+    const artistSearch: any = res.results.artistmatches.artist;
+    const { data } = await fetchArtistInfo(username, artistSearch[0].name);
+    return data.artist;
   } catch (err) {
     console.log(err);
     return null;

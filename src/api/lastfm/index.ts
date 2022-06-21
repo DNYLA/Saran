@@ -65,6 +65,15 @@ export const fetchSearchAlbum = (name: string) => {
   return AXIOS.get(new EscapedURI('album.search').addAlbum(name).URI);
 };
 
+export const fetchArtistInfo = (username: string, name: string) =>
+  AXIOS.get(
+    new EscapedURI('artist.getInfo').addArtist(name).addUsername(username).URI
+  );
+
+export const fetchSearchArtist = (name: string) => {
+  return AXIOS.get(new EscapedURI('artist.search').addArtist(name).URI);
+};
+
 export const fetchTopArtists = (username: string, period: Periods) =>
   AXIOS.get(
     new EscapedURI('user.getTopArtists')

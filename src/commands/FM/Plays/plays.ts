@@ -9,58 +9,50 @@ import Command from '../../../utils/base/command';
 import DiscordClient from '../../../utils/client';
 import { updateUserById } from '../../../utils/database/User';
 import {
-  fetchRecentAlbumInfo,
+  fetchRecentArtistInfo,
   fetchRecentTrackInfo,
-  fetchSearchAlbumInfo,
+  fetchSearchArtistInfo,
   fetchSearchTrackInfo,
   getUserFromMessage,
   hasUsernameSet,
 } from '../../../utils/fmHelpers';
-import { joinArgs } from '../../../utils/helpers';
 import { PartialUser, RecentTrack, Track } from '../../../utils/types';
 
 export default class SetUsername extends Command {
   constructor() {
-    super('lf playsa', 'LastFM', [
-      'lf playsalbum',
-      'lf pa',
-      'lf ap',
-      'lf palbum',
-    ]);
+    super('lf plays', 'LastFM', ['lf p']);
   }
 
   async run(client: DiscordClient, message: Message, args: string[]) {
     message.channel.sendTyping();
-
     const user = await getUserFromMessage(message);
     if (user.id !== message.author.id) args.shift();
     if (!hasUsernameSet(message, user)) return;
 
-    let albumName: string;
+    let trackName: string;
     let artistName = null;
 
-    const joinedArgs = joinArgs(args);
+    if (args.length > 0) {
+      trackName = args.join(' ');
 
-    if (joinedArgs.length > 0) {
-      albumName = joinedArgs[0];
-      if (joinedArgs.length > 1) artistName = joinedArgs[1];
+      const trackDetails = trackName.split(' | ');
+      if (trackDetails.length > 0) {
+        artistName = trackDetails[0];
+      }
     }
 
     let track: Track;
     let userInfo: PartialUser;
 
-    if (!albumName) {
-      const res = await fetchRecentAlbumInfo(user.lastFMName);
+    if (!trackName) {
+      const res = await fetchRecentArtistInfo(user.lastFMName);
       track = res.track;
       userInfo = res.user;
     } else {
-      track = await fetchSearchAlbumInfo(
-        user.lastFMName,
-        albumName,
-        artistName
-      );
+      track = await fetchSearchArtistInfo(user.lastFMName, artistName);
     }
 
+    console.log(track);
     if (!track) return message.reply('No track found!');
 
     // const messageEmbed = CreateEmbed({
@@ -70,21 +62,25 @@ export default class SetUsername extends Command {
     // });
 
     let imageUrl;
+    let plays = '0';
     try {
       const typeA: any = track;
       console.log(typeA);
       imageUrl = typeA.image[3]['#text'];
+      plays = typeA.stats.userplaycount;
     } catch (err) {
       console.log(err);
     }
+
+    imageUrl = '';
 
     try {
       const messageEmbed = new MessageEmbed()
         .setColor('#2F3136')
         .setTitle(imageUrl ? '\u200B' : '')
-        .setThumbnail(imageUrl)
+        // .setThumbnail(imageUrl)
         .setDescription(
-          `**${user.lastFMName}** has a total of **${track.userplaycount} plays** on **[${track.name}](${track.url})**`
+          `**${user.lastFMName}** has a total of **${plays} plays** for **[${track.name}](${track.url})**`
         );
 
       message.channel.send({
