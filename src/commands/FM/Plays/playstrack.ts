@@ -32,6 +32,8 @@ export default class SetUsername extends Command {
     if (user.id !== message.author.id) args.shift();
     if (!hasUsernameSet(message, user)) return;
 
+    console.log(message.channel.client);
+
     let trackName: string;
     let artistName = null;
 
