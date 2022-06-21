@@ -3,7 +3,8 @@ import DiscordClient from '../client';
 
 //This is added incase i decide to improve how permissions are handled.
 export function hasAdminPermissions(message: Message) {
-  if (!message.member.permissions.has('ADMINISTRATOR')) {
+  const isOwner = message.guild.ownerId === message.member.id;
+  if (!message.member.permissions.has('ADMINISTRATOR') || !isOwner) {
     message.reply('You need to be admin');
     return false;
   }
