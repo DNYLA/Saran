@@ -6,9 +6,11 @@ import DiscordClient from '../../../utils/client';
 import {
   convertTopStatsToEmbed,
   getPeriodFromArg,
+  getTopTenStats,
   getUserFromMessage,
   hasUsernameSet,
   sendNoDataEmbed,
+  TopTenType,
 } from '../../../utils/fmHelpers';
 import { TopAlbum } from '../../../utils/types';
 
@@ -20,29 +22,6 @@ export default class NowPlaying extends Command {
   }
 
   async run(client: DiscordClient, message: Message, args: string[]) {
-    message.channel.sendTyping();
-    const user = await getUserFromMessage(message);
-    if (user.id !== message.author.id) args.shift();
-    if (!hasUsernameSet(message, user)) return;
-
-    const period: Periods = getPeriodFromArg(args);
-
-    let topAlbums: TopAlbum[] = [];
-
-    try {
-      const { data: res } = await fetchTopTenAlbums(user.lastFMName, period);
-      topAlbums = res.topalbums.album;
-      // console.log(topAlbums);
-    } catch (err) {
-      console.log(err);
-      return message.channel.send('Unable to process request');
-    }
-
-    if (topAlbums.length === 0) return sendNoDataEmbed(message);
-
-    const embed = convertTopStatsToEmbed(user, topAlbums, period, 'tracks');
-
-    if (embed) message.channel.send({ embeds: [embed] });
-    else message.reply('Unable to display top tracks!');
+    getTopTenStats(message, args, TopTenType.Album);
   }
 }

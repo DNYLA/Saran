@@ -1,8 +1,17 @@
 import { User } from '@prisma/client';
 import { Channel, Message, MessageEmbed, TextChannel } from 'discord.js';
-import { Periods } from '../api/lastfm';
+import {
+  fetchRecentTracks,
+  fetchSearchTrack,
+  fetchTopArtists,
+  fetchTopTenAlbums,
+  fetchTopTenTracks,
+  fetchTrackInfo,
+  Periods,
+} from '../api/lastfm';
 import { getUser } from './database/User';
 import { convertPeriodToText, mentionUser } from './helpers';
+import { ArtistInfo, PartialUser, RecentTrack, Track } from './types';
 
 //Returns either the author id or if a mention exists the mentioned users id
 export async function getUserFromMessage(msg: Message) {
@@ -93,4 +102,101 @@ export function convertTopStatsToEmbed(
 export function sendNoDataEmbed(message: Message) {
   const embed = new MessageEmbed().setTitle('No Data Availble!');
   return message.channel.send({ embeds: [embed] });
+}
+
+export enum TopTenType {
+  Track,
+  Artist,
+  Album,
+}
+
+export async function getTopTenStats(
+  message: Message,
+  args: string[],
+  type: TopTenType
+) {
+  message.channel.sendTyping();
+  const user = await getUserFromMessage(message);
+  if (user.id !== message.author.id) args.shift();
+  if (!hasUsernameSet(message, user)) return;
+
+  const period: Periods = getPeriodFromArg(args);
+  let topStats: ArtistInfo[];
+
+  try {
+    if (type === TopTenType.Track) {
+      const { data: res } = await fetchTopTenTracks(user.lastFMName, period);
+      topStats = res.toptracks.track;
+    } else if (type === TopTenType.Artist) {
+      const { data: res } = await fetchTopArtists(user.lastFMName, period);
+      topStats = res.topartists.artist;
+    } else if (type === TopTenType.Album) {
+      const { data: res } = await fetchTopTenAlbums(user.lastFMName, period);
+      topStats = res.topalbums.album;
+    }
+  } catch (err) {
+    console.log(err);
+    return message.channel.send('Unable to process request');
+  }
+
+  if (topStats.length === 0) return sendNoDataEmbed(message);
+
+  const embed = convertTopStatsToEmbed(user, topStats, period, 'artists');
+
+  if (embed) message.channel.send({ embeds: [embed] });
+  else message.reply('Unable to display top tracks!');
+}
+
+export async function fetchRecentTrackInfo(username: string): Promise<{
+  track: Track;
+  recentTrack: RecentTrack;
+  user: PartialUser;
+}> {
+  let recentTrack: RecentTrack;
+  let userInfo: PartialUser;
+
+  try {
+    const { data: res } = await fetchRecentTracks(username, 1);
+    if (res.recenttracks.length == 0) return null;
+
+    recentTrack = res.recenttracks.track[0];
+    userInfo = res.recenttracks['@attr'];
+
+    console.log(recentTrack);
+
+    const { data } = await fetchTrackInfo(
+      username,
+      recentTrack.name,
+      recentTrack.artist['#text']
+    );
+
+    return { track: data.track, recentTrack: recentTrack, user: userInfo };
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
+
+export async function fetchSearchTrackInfo(
+  username: string,
+  name: string,
+  artist?: string
+): Promise<Track> {
+  try {
+    const { data: res } = await fetchSearchTrack(username, name, artist);
+    if (res.results.trackmatches.track.length == 0) return null;
+
+    // console.log(data);
+    const trackSearch: any = res.results.trackmatches.track;
+    const { data } = await fetchTrackInfo(
+      username,
+      trackSearch[0].name,
+      trackSearch[0].artist
+    );
+    // console.log(data);
+    return data.track;
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
 }

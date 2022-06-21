@@ -1,13 +1,12 @@
-import { PrismaClient } from '@prisma/client';
-import { Message, MessageEmbed, Permissions } from 'discord.js';
+import { Message, MessageEmbed } from 'discord.js';
 import { fetchRecentTracks, fetchTrackInfo } from '../../api/lastfm';
 import Command from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
-import { getUser } from '../../utils/database/User';
-import { getUserFromMessage, hasUsernameSet } from '../../utils/fmHelpers';
-import { PartialUser, RecentTrack, Track } from '../../utils/types';
-
-const prisma = new PrismaClient();
+import {
+  fetchRecentTrackInfo,
+  getUserFromMessage,
+  hasUsernameSet,
+} from '../../utils/fmHelpers';
 
 export default class NowPlaying extends Command {
   constructor() {
@@ -16,6 +15,7 @@ export default class NowPlaying extends Command {
 
   async run(client: DiscordClient, message: Message, args: string[]) {
     message.channel.sendTyping();
+
     const user = await getUserFromMessage(message);
     if (user.id !== message.author.id) args.shift();
     if (!hasUsernameSet(message, user)) return;
@@ -26,37 +26,13 @@ export default class NowPlaying extends Command {
       normalEmbed = false;
     }
 
-    let recentTrack: RecentTrack;
-    let track: Track;
-    let userInfo: PartialUser;
+    const {
+      track,
+      recentTrack,
+      user: userInfo,
+    } = await fetchRecentTrackInfo(user.lastFMName);
 
-    try {
-      const { data: res } = await fetchRecentTracks(user.lastFMName, 1);
-      if (res.recenttracks.length == 0)
-        return message.channel.send(
-          'No data to display! Listen to a track before using this command.'
-        );
-
-      recentTrack = res.recenttracks.track[0];
-      userInfo = res.recenttracks['@attr'];
-
-      console.log(userInfo);
-    } catch (err) {
-      console.log(err);
-      return message.channel.send('Unable to process request');
-    }
-
-    try {
-      const { data } = await fetchTrackInfo(
-        user.lastFMName,
-        recentTrack.name,
-        recentTrack.artist['#text']
-      );
-      track = data.track;
-    } catch (err) {
-      console.log(err);
-      return message.channel.send('Unable to process request');
-    }
+    if (!track) return message.reply('Unable to display this track!');
 
     try {
       let messageEmbed;
@@ -71,6 +47,7 @@ export default class NowPlaying extends Command {
           })
           .setThumbnail(recentTrack.image[3]['#text'])
           .addFields(
+            // GenerateField('Track', value, true)
             {
               name: 'Track',
               value: `[${recentTrack.name}](${recentTrack.url})`,

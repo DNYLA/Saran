@@ -8,9 +8,11 @@ import { getUser } from '../../../utils/database/User';
 import {
   convertTopStatsToEmbed,
   getPeriodFromArg,
+  getTopTenStats,
   getUserFromMessage,
   hasUsernameSet,
   sendNoDataEmbed,
+  TopTenType,
 } from '../../../utils/fmHelpers';
 import { convertPeriodToText, mentionUser } from '../../../utils/helpers';
 import {
@@ -29,29 +31,6 @@ export default class NowPlaying extends Command {
   }
 
   async run(client: DiscordClient, message: Message, args: string[]) {
-    message.channel.sendTyping();
-    const user = await getUserFromMessage(message);
-    if (user.id !== message.author.id) args.shift();
-    if (!hasUsernameSet(message, user)) return;
-
-    const period: Periods = getPeriodFromArg(args);
-
-    let topTracks: TopTrack[] = [];
-
-    try {
-      const { data: res } = await fetchTopTenTracks(user.lastFMName, period);
-
-      topTracks = res.toptracks.track;
-    } catch (err) {
-      console.log(err);
-      return message.channel.send('Unable to process request');
-    }
-
-    if (topTracks.length === 0) return sendNoDataEmbed(message);
-
-    const embed = convertTopStatsToEmbed(user, topTracks, period, 'tracks');
-
-    if (embed) message.channel.send({ embeds: [embed] });
-    else message.reply('Unable to display top tracks!');
+    getTopTenStats(message, args, TopTenType.Track);
   }
 }

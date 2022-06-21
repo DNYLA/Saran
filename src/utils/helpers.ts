@@ -32,6 +32,16 @@ export function mentionUser(userId: string): string {
   return `<@${userId}>`;
 }
 
+export function joinArgs(args: string[]) {
+  if (args.length > 0) {
+    const joined = args.join(' ');
+
+    return joined.split(' | ');
+  }
+
+  return [];
+}
+
 export function convertPeriodToText(period: Periods) {
   switch (period) {
     case Periods.overall:

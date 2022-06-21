@@ -1,18 +1,7 @@
-import { PrismaClient } from '@prisma/client';
 import { Message } from 'discord.js';
-import { fetchTopArtists, Periods } from '../../../api/lastfm';
 import Command from '../../../utils/base/command';
 import DiscordClient from '../../../utils/client';
-import {
-  convertTopStatsToEmbed,
-  getPeriodFromArg,
-  getUserFromMessage,
-  hasUsernameSet,
-  sendNoDataEmbed,
-} from '../../../utils/fmHelpers';
-import { ArtistInfo } from '../../../utils/types';
-
-const prisma = new PrismaClient();
+import { getTopTenStats, TopTenType } from '../../../utils/fmHelpers';
 
 export default class NowPlaying extends Command {
   constructor() {
@@ -20,29 +9,6 @@ export default class NowPlaying extends Command {
   }
 
   async run(client: DiscordClient, message: Message, args: string[]) {
-    message.channel.sendTyping();
-    const user = await getUserFromMessage(message);
-    if (user.id !== message.author.id) args.shift();
-    if (!hasUsernameSet(message, user)) return;
-
-    const period: Periods = getPeriodFromArg(args);
-    let topArtists: ArtistInfo[];
-
-    try {
-      const { data: res } = await fetchTopArtists(user.lastFMName, period);
-
-      topArtists = res.topartists.artist;
-      // console.log(topArtists);
-    } catch (err) {
-      console.log(err);
-      return message.channel.send('Unable to process request');
-    }
-
-    if (topArtists.length === 0) return sendNoDataEmbed(message);
-
-    const embed = convertTopStatsToEmbed(user, topArtists, period, 'artists');
-
-    if (embed) message.channel.send({ embeds: [embed] });
-    else message.reply('Unable to display top tracks!');
+    getTopTenStats(message, args, TopTenType.Artist);
   }
 }
