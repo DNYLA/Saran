@@ -10,7 +10,10 @@ import {
 import { fetchQueryImages } from '../../api/WebSearch';
 import Command from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
-import { GetUserFromMessage } from '../../utils/Helpers/Moderation';
+import {
+  getUserFromId,
+  GetUserFromMessage,
+} from '../../utils/Helpers/Moderation';
 
 export default class GetAvatar extends Command {
   constructor() {
@@ -18,7 +21,7 @@ export default class GetAvatar extends Command {
   }
 
   async run(client: DiscordClient, message: Message, args: string[]) {
-    const user = await GetUserFromMessage(client, message, args);
+    const user = await getUserFromId(client, message, args);
     if (!user) return;
 
     message.channel.sendTyping();

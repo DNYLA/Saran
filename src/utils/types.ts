@@ -1,3 +1,48 @@
+import { Message, MessageEmbed } from 'discord.js';
+
+export type CommandOptions = {
+  name: string;
+  aliases?: string[];
+  module: string;
+  description: string;
+  errorMessage: string | MessageEmbed;
+  invalidUsage: string | MessageEmbed;
+  invalidPermissions: string | MessageEmbed;
+  guildOnly: boolean;
+  deleteCommand: boolean;
+  examples?: string[];
+  usage?: string;
+  requirments?: Requirments;
+  hooks?: Hooks;
+};
+
+export type Argument = {
+  key: string;
+  prompt?: string;
+  type: string;
+  default?: string;
+};
+
+export type Requirments = {
+  userIDs?: () => string[] | string[];
+  roleIDs?: () => string[] | string[];
+  roleNames?: () => string[] | string[];
+  custom?: () => string;
+  permissions?: Permissions;
+};
+
+export type Permissions = {
+  administrator?: boolean;
+  manageMessage?: boolean;
+};
+
+export type Hooks = {
+  preCommand?: () => void;
+  postCheck?: () => void;
+  postExecution?: () => void;
+  postCommand?: () => void;
+};
+
 export type RecentTrack = {
   name: string;
   url: string;
