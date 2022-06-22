@@ -72,10 +72,10 @@ export default class NowPlaying extends Command {
       .slice(0, 10)
       .map(({ displayName, fmName, plays }, i) => {
         try {
-          sum += plays;
-          return (description += `**${
-            i + 1
-          }. [${displayName}](https://www.last.fm/user/${fmName})** has **${plays}** plays\n`);
+          sum += Number(plays);
+          return (description += `**${i + 1}. [${
+            i === 0 ? '👑' : ''
+          } ${displayName}](https://www.last.fm/user/${fmName})** has **${plays}** plays\n`);
         } catch (err) {
           console.log(err);
         }
@@ -100,6 +100,7 @@ export default class NowPlaying extends Command {
 
       return message.channel.send({ embeds: [embed] });
     } catch (err) {
+      console.log(err);
       return null;
     }
 
