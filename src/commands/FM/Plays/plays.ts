@@ -16,7 +16,7 @@ import {
   getUserFromMessage,
   hasUsernameSet,
 } from '../../../utils/fmHelpers';
-import { PartialUser, RecentTrack, Track } from '../../../utils/types';
+import { Artist, PartialUser, RecentTrack, Track } from '../../../utils/types';
 
 export default class SetUsername extends Command {
   constructor() {
@@ -29,31 +29,29 @@ export default class SetUsername extends Command {
     if (user.id !== message.author.id) args.shift();
     if (!hasUsernameSet(message, user)) return;
 
-    let trackName: string;
-    let artistName = null;
+    let artistName: string;
 
     if (args.length > 0) {
-      trackName = args.join(' ');
+      artistName = args.join(' ');
 
-      const trackDetails = trackName.split(' | ');
-      if (trackDetails.length > 0) {
-        artistName = trackDetails[0];
+      const artistDetails = artistName.split(' | ');
+      if (artistDetails.length > 0) {
+        artistName = artistDetails[0];
       }
     }
 
-    let track: Track;
+    let artist: Artist;
     let userInfo: PartialUser;
 
-    if (!trackName) {
-      const res = await fetchRecentArtistInfo(user.lastFMName);
-      track = res.track;
-      userInfo = res.user;
+    if (!artistName) {
+      const artistInfo = await fetchRecentArtistInfo(user.lastFMName);
+      artist = artistInfo.artist;
+      userInfo = artistInfo.user;
     } else {
-      track = await fetchSearchArtistInfo(user.lastFMName, artistName);
+      artist = await fetchSearchArtistInfo(user.lastFMName, artistName);
     }
 
-    console.log(track);
-    if (!track) return message.reply('No track found!');
+    if (!artist) return message.reply('No artist found!');
 
     // const messageEmbed = CreateEmbed({
     //   color: '#fff',
@@ -62,12 +60,9 @@ export default class SetUsername extends Command {
     // });
 
     let imageUrl;
-    let plays = '0';
+    let plays = artist.stats.userplaycount;
     try {
-      const typeA: any = track;
-      console.log(typeA);
-      imageUrl = typeA.image[3]['#text'];
-      plays = typeA.stats.userplaycount;
+      imageUrl = artist.image[3]['#text'];
     } catch (err) {
       console.log(err);
     }
@@ -80,7 +75,7 @@ export default class SetUsername extends Command {
         .setTitle(imageUrl ? '\u200B' : '')
         // .setThumbnail(imageUrl)
         .setDescription(
-          `**${user.lastFMName}** has a total of **${plays} plays** for **[${track.name}](${track.url})**`
+          `**${user.lastFMName}** has a total of **${plays} plays** for **[${artist.name}](${artist.url})**`
         );
 
       message.channel.send({

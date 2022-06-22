@@ -1,17 +1,18 @@
 export type RecentTrack = {
-  artist: RecentArtist;
-  streamable: number;
-  image: FMImage[];
-  album: RecentAlbum;
   name: string;
   url: string;
+  streamable: number;
+  mbid?: string;
+  artist: RecentInfo;
+  album: RecentInfo;
   date: FMTimestamp;
+  image: FMImage[];
+  '@atrr': { nowplaying: boolean };
 };
 
-export type PartialUser = {
-  user: string;
-  totalPages: string;
-  total: string;
+export type RecentInfo = {
+  '#text': string;
+  mbid?: string;
 };
 
 export type Track = {
@@ -21,41 +22,86 @@ export type Track = {
   listeners: number;
   playcount: number;
   userplaycount: number;
-  userloved: string;
-  artist: Artist;
-  album: Album;
+  userloved: number;
+  artist: PartialArtist;
+  album: PartialAlbum;
 };
 
-export type TopTrack = {
+export type Album = {
   name: string;
+  artist: string;
   url: string;
-  playcount: string;
-  artist: TopTenArtist;
-};
-
-export type TopTenArtist = {
-  name: string;
-  url: string;
-};
-
-export type TopAlbum = {
-  name: string;
-  url: string;
-  playcount: string;
-  artist: TopTenArtist;
+  userplaycount: number;
+  mbid?: string;
+  tracks: AlbumTrack[];
   image: FMImage[];
 };
 
 export type Artist = {
   name: string;
-  mbid: string;
   url: string;
+  ontour: boolean;
+  stats: { listeners: number; playcount: number; userplaycount: number };
+  image: FMImage[];
 };
 
-export type Album = {
+export type AlbumTrack = {
+  name: string;
+  url: string;
+  duration: number;
+  artist: PartialArtist;
+  '@attr': { rank: number };
+};
+
+export type PartialArtist = {
+  name: string;
+  url: string;
+  mbid?: string;
+};
+
+export type PartialAlbum = {
   artist: string;
   title: string;
   url: string;
+  image?: FMImage[];
+};
+
+export type SearchedItem = {
+  name: string;
+  url: string;
+  images?: FMImage[];
+};
+
+export type SearchedTrackOrAlbum = SearchedItem & {
+  artist: string;
+};
+
+export type PartialUser = {
+  user: number;
+  totalPages: number;
+  page: number;
+  perPage: number;
+  total: number;
+};
+
+export type TopTrack = {
+  name: string;
+  url: string;
+  playcount: number;
+  artist: PartialArtist;
+  image: FMImage[];
+};
+
+export type TopArtist = PartialArtist & {
+  playcount: number;
+  image: FMImage[];
+};
+
+export type TopAlbum = {
+  name: string;
+  url: string;
+  playcount: number;
+  artist: PartialArtist;
   image: FMImage[];
 };
 
@@ -64,14 +110,6 @@ export type ArtistInfo = {
   playcount: string;
   url: string;
   image: FMImage[];
-};
-
-export type RecentArtist = {
-  '#text': string;
-};
-
-export type RecentAlbum = {
-  '#text': string;
 };
 
 export type FMTimestamp = {

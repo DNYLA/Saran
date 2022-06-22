@@ -1,4 +1,17 @@
 import axios, { AxiosRequestConfig } from 'axios';
+import {
+  Album,
+  Artist,
+  ArtistInfo,
+  PartialUser,
+  RecentTrack,
+  SearchedItem,
+  SearchedTrackOrAlbum,
+  TopAlbum,
+  TopArtist,
+  TopTrack,
+  Track,
+} from '../../utils/types';
 
 export enum Periods {
   'overall' = 'overall',
@@ -17,28 +30,50 @@ const CONFIG: AxiosRequestConfig = {
 };
 const AXIOS = axios.create(CONFIG); //Axios Uses .defaults.baseURL to set/call the API this way we can change the API URL outside the library.
 
-export const fetchRecentTracks = (username: string, limit: number) =>
-  AXIOS.get(
-    new EscapedURI('user.getrecenttracks').addUser(username).addLimit(limit).URI
-  );
+export async function fetchRecentTracks(
+  username: string,
+  limit: number
+): Promise<{ tracks: RecentTrack[]; user: PartialUser }> {
+  try {
+    const { data } = await AXIOS.get(
+      new EscapedURI('user.getrecenttracks').addUser(username).addLimit(limit)
+        .URI
+    );
 
-export const fetchTrackInfo = (
+    return {
+      tracks: data.recenttracks.track,
+      user: data.recenttracks['@attr'],
+    };
+  } catch (err) {
+    console.log(err);
+    return { tracks: [], user: null };
+  }
+}
+
+export async function fetchTrackInfo(
   username: string,
   trackName: string,
   artist?: string
-) =>
-  AXIOS.get(
-    new EscapedURI('track.getInfo')
-      .addUsername(username)
-      .addTrackName(trackName)
-      .addArtist(artist).URI
-  );
+): Promise<Track> {
+  try {
+    const { data } = await AXIOS.get(
+      new EscapedURI('track.getInfo')
+        .addUsername(username)
+        .addTrackName(trackName)
+        .addArtist(artist).URI
+    );
+    return data.track;
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
 
-export const fetchSearchTrack = (
+export async function fetchSearchTrack(
   username: string,
   trackName: string,
   artist?: string
-) => {
+): Promise<SearchedTrackOrAlbum> {
   const escapedURI = new EscapedURI('track.search')
     .addUsername(username)
     .addTrackName(trackName)
@@ -46,57 +81,138 @@ export const fetchSearchTrack = (
 
   if (artist) escapedURI.addArtist(artist);
 
-  return AXIOS.get(escapedURI.URI);
-};
+  try {
+    const { data } = await AXIOS.get(escapedURI.URI);
+    if (data.results.trackmatches.track.length === 0) return null;
+    return data.results.trackmatches.track[0];
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
 
-export const fetchAlbumInfo = (
+export async function fetchAlbumInfo(
   username: string,
   name: string,
   artist: string
-) =>
-  AXIOS.get(
-    new EscapedURI('album.getInfo')
-      .addAlbum(name)
-      .addArtist(artist)
-      .addUsername(username).URI
-  );
+): Promise<Album> {
+  try {
+    const { data } = await AXIOS.get(
+      new EscapedURI('album.getInfo')
+        .addAlbum(name)
+        .addArtist(artist)
+        .addUsername(username).URI
+    );
 
-export const fetchSearchAlbum = (name: string) => {
-  return AXIOS.get(new EscapedURI('album.search').addAlbum(name).URI);
-};
+    return data.album;
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
 
-export const fetchArtistInfo = (username: string, name: string) =>
-  AXIOS.get(
-    new EscapedURI('artist.getInfo').addArtist(name).addUsername(username).URI
-  );
+export async function fetchSearchAlbum(
+  name: string
+): Promise<SearchedTrackOrAlbum> {
+  try {
+    const { data } = await AXIOS.get(
+      new EscapedURI('album.search').addAlbum(name).URI
+    );
 
-export const fetchSearchArtist = (name: string) => {
-  return AXIOS.get(new EscapedURI('artist.search').addArtist(name).URI);
-};
+    if (data.results.albummatches.album.length === 0) return null;
+    return data.results.albummatches.album[0];
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
 
-export const fetchTopArtists = (username: string, period: Periods) =>
-  AXIOS.get(
-    new EscapedURI('user.getTopArtists')
-      .addUsername(username)
-      .addPeriod(period)
-      .addLimit(10).URI
-  );
+export async function fetchArtistInfo(
+  username: string,
+  name: string
+): Promise<Artist> {
+  try {
+    const { data } = await AXIOS.get(
+      new EscapedURI('artist.getInfo').addArtist(name).addUsername(username).URI
+    );
 
-export const fetchTopTenTracks = (username: string, period: Periods) =>
-  AXIOS.get(
-    new EscapedURI('user.getTopTracks')
-      .addUsername(username)
-      .addPeriod(period)
-      .addLimit(10).URI
-  );
+    return data.artist;
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
 
-export const fetchTopTenAlbums = (username: string, period: Periods) =>
-  AXIOS.get(
-    new EscapedURI('user.getTopAlbums')
-      .addUsername(username)
-      .addPeriod(period)
-      .addLimit(10).URI
-  );
+export async function fetchSearchArtist(name: string): Promise<SearchedItem> {
+  try {
+    const { data } = await AXIOS.get(
+      new EscapedURI('artist.search').addArtist(name).URI
+    );
+
+    if (data.results.artistmatches.artist.length === 0) return null;
+    return data.results.artistmatches.artist[0];
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
+
+export async function fetchTopArtists(
+  username: string,
+  period: Periods
+): Promise<TopArtist[]> {
+  try {
+    const { data } = await AXIOS.get(
+      new EscapedURI('user.getTopArtists')
+        .addUsername(username)
+        .addPeriod(period)
+        .addLimit(10).URI
+    );
+
+    return data.topartists.artist;
+  } catch (err) {
+    console.log(err);
+    return [];
+  }
+}
+
+export async function fetchTopTenTracks(
+  username: string,
+  period: Periods
+): Promise<TopTrack[]> {
+  try {
+    const { data } = await AXIOS.get(
+      new EscapedURI('user.getTopTracks')
+        .addUsername(username)
+        .addPeriod(period)
+        .addLimit(10).URI
+    );
+
+    return data.toptracks.track;
+  } catch (err) {
+    console.log(err);
+    return [];
+  }
+}
+
+export async function fetchTopTenAlbums(
+  username: string,
+  period: Periods
+): Promise<TopAlbum[]> {
+  try {
+    const { data } = await AXIOS.get(
+      new EscapedURI('user.getTopAlbums')
+        .addUsername(username)
+        .addPeriod(period)
+        .addLimit(10).URI
+    );
+
+    return data.topalbums.album;
+  } catch (err) {
+    console.log(err);
+    return [];
+  }
+}
 
 AXIOS.interceptors.request.use((request) => {
   // console.log('Starting Request', JSON.stringify(request, null, 2));

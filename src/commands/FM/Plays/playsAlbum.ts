@@ -17,7 +17,7 @@ import {
   hasUsernameSet,
 } from '../../../utils/fmHelpers';
 import { joinArgs } from '../../../utils/helpers';
-import { PartialUser, RecentTrack, Track } from '../../../utils/types';
+import { Album, PartialUser, RecentTrack, Track } from '../../../utils/types';
 
 export default class SetUsername extends Command {
   constructor() {
@@ -46,22 +46,18 @@ export default class SetUsername extends Command {
       if (joinedArgs.length > 1) artistName = joinedArgs[1];
     }
 
-    let track: Track;
+    let album: Album;
     let userInfo: PartialUser;
 
     if (!albumName) {
-      const res = await fetchRecentAlbumInfo(user.lastFMName);
-      track = res.track;
-      userInfo = res.user;
+      const albumInfo = await fetchRecentAlbumInfo(user.lastFMName);
+      album = albumInfo.album;
+      userInfo = albumInfo.user;
     } else {
-      track = await fetchSearchAlbumInfo(
-        user.lastFMName,
-        albumName,
-        artistName
-      );
+      album = await fetchSearchAlbumInfo(user.lastFMName, albumName);
     }
 
-    if (!track) return message.reply('No track found!');
+    if (!album) return message.reply('No album found!');
 
     // const messageEmbed = CreateEmbed({
     //   color: '#fff',
@@ -71,9 +67,7 @@ export default class SetUsername extends Command {
 
     let imageUrl;
     try {
-      const typeA: any = track;
-      console.log(typeA);
-      imageUrl = typeA.image[3]['#text'];
+      imageUrl = album.image[3]['#text'];
     } catch (err) {
       console.log(err);
     }
@@ -84,7 +78,7 @@ export default class SetUsername extends Command {
         .setTitle(imageUrl ? '\u200B' : '')
         .setThumbnail(imageUrl)
         .setDescription(
-          `**${user.lastFMName}** has a total of **${track.userplaycount} plays** on **[${track.name}](${track.url})**`
+          `**${user.lastFMName}** has a total of **${album.userplaycount} plays** on **[${album.name}](${album.url})**`
         );
 
       message.channel.send({

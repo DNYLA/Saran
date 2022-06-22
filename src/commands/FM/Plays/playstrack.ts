@@ -51,9 +51,9 @@ export default class SetUsername extends Command {
     let userInfo: PartialUser;
 
     if (!trackName) {
-      const res = await fetchRecentTrackInfo(user.lastFMName);
-      track = res.track;
-      userInfo = res.user;
+      const trackInfo = await fetchRecentTrackInfo(user.lastFMName);
+      track = trackInfo.track;
+      userInfo = trackInfo.user;
     } else {
       track = await fetchSearchTrackInfo(
         user.lastFMName,

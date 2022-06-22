@@ -1,22 +1,17 @@
 import { Message, MessageEmbed } from 'discord.js';
-import {
-  fetchAlbumInfo,
-  fetchArtistInfo,
-  fetchTrackInfo,
-} from '../../../api/lastfm';
+import { fetchAlbumInfo, fetchTrackInfo } from '../../../api/lastfm';
 import Command from '../../../utils/base/command';
 import DiscordClient from '../../../utils/client';
 import { getGuildUsers } from '../../../utils/database/User';
 import {
   fetchRecentAlbumInfo,
-  fetchRecentArtistInfo,
   getUserFromMessage,
   hasUsernameSet,
 } from '../../../utils/fmHelpers';
 
 export default class NowPlaying extends Command {
   constructor() {
-    super('lf wk', 'LastFM', ['']);
+    super('lf wka', 'LastFM', ['']);
   }
 
   async run(client: DiscordClient, message: Message, args: string[]) {
@@ -30,13 +25,11 @@ export default class NowPlaying extends Command {
     if (!guildUsers || guildUsers.length === 0)
       return message.reply('Server hasnt been indexed use ,lf index');
 
-    const { artist, recentTrack } = await fetchRecentArtistInfo(
-      user.lastFMName
-    );
+    const { album, recentTrack } = await fetchRecentAlbumInfo(user.lastFMName);
 
-    if (!artist || !recentTrack)
+    if (!album || !recentTrack)
       return message.reply(
-        'The current track you are listening to is not trackable!'
+        'The current album you are listening to is not trackable!'
       );
 
     let sum = 0;
@@ -46,18 +39,19 @@ export default class NowPlaying extends Command {
       const member = guildUsers[i];
       if (!member.lastFMName) continue; //This shouldnt occur but checked anyways
       try {
-        const artistInfo = await fetchArtistInfo(
+        const albumInfo = await fetchAlbumInfo(
           member.lastFMName,
-          artist.name
+          album.name,
+          album.artist
         );
 
-        if (!artistInfo) continue;
-        if (artistInfo.stats.userplaycount === 0) continue;
+        if (!albumInfo) continue;
+        if (albumInfo.userplaycount === 0) continue;
 
         wkInfo.push({
           displayName: member.guilds[0].displayName,
           fmName: member.lastFMName,
-          plays: artistInfo.stats.userplaycount,
+          plays: albumInfo.userplaycount,
         });
       } catch (err) {
         console.log(err);
@@ -87,7 +81,7 @@ export default class NowPlaying extends Command {
           iconURL:
             'https://lastfm.freetls.fastly.net/i/u/avatar170s/a7ff67ef791aaba0c0c97e9c8a97bf04.png',
         })
-        .setTitle(`Top Listeners for ${artist.name}`)
+        .setTitle(`Top Listeners for ${album.name} by ${album.artist}`)
         .setDescription(description)
         .setFooter({
           text: `Total Listeners: ${wkInfo.length} ∙ Total Plays: ${sum}`,
@@ -98,5 +92,24 @@ export default class NowPlaying extends Command {
       console.log(err);
       return null;
     }
+
+    //This is glitched
+    // guildUsers.forEach(async (member) => {
+    //   if (!member.lastFMTag) return; //This shouldnt occur but checked anyways
+    //   try {
+    //     const trackInfo = await fetchTrackInfoWrapper(
+    //       member.lastFMName,
+    //       track.name,
+    //       track.artist.name
+    //     );
+    //     console.log(member);
+    //     if (!trackInfo) return;
+    //     if (trackInfo.userplaycount === 0) return;
+
+    //     wkInfo.push({ member, plays: trackInfo.userplaycount });
+    //   } catch (err) {
+    //     console.log(err);
+    //   }
+    // });
   }
 }
