@@ -18,6 +18,18 @@ export function getUserIdFromMessage(message: Message, argument: string) {
   else return argument;
 }
 
+export async function getUserFromMessage(
+  client: DiscordClient,
+  message: Message,
+  args: string[]
+) {
+  try {
+    return await client.users.fetch(message.author.id);
+  } catch (err) {
+    message.reply('Unable to fetch user!');
+  }
+}
+
 export async function GetUserFromMessage(
   client: DiscordClient,
   message: Message,

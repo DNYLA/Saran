@@ -82,11 +82,20 @@ export default class MessageEvent extends Event {
       );
 
       const command = client.commands.get(commandName.toLowerCase());
-
+      const command2 = client.commands2.get(commandName.toLowerCase());
       if (command) {
         try {
           command.run(client, message, args, config);
         } catch (err) {
+          message.channel.send(
+            'There was an error when attempting to execute this command'
+          );
+        }
+      } else if (command2) {
+        try {
+          command2.execute(client, message, args);
+        } catch (err) {
+          console.log(err);
           message.channel.send(
             'There was an error when attempting to execute this command'
           );

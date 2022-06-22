@@ -1,11 +1,13 @@
 import { GuildConfig } from '@prisma/client';
 import { Client, ClientOptions, Collection, Message } from 'discord.js';
 import Command from './base/command';
+import Command2 from './base/Command2';
 import Event from './base/event';
 import { WebSearchImage, WebSearchImages } from './types';
 
 export default class DiscordClient extends Client {
   private _commands = new Collection<string, Command>();
+  private _commands2 = new Collection<string, Command2>();
   private _events = new Collection<string, Event>();
   private _images = new Collection<string, WebSearchImages>();
   private _configs = new Array<GuildConfig>();
@@ -16,6 +18,10 @@ export default class DiscordClient extends Client {
 
   get commands(): Collection<string, Command> {
     return this._commands;
+  }
+
+  get commands2(): Collection<string, Command2> {
+    return this._commands2;
   }
 
   get events(): Collection<string, Event> {

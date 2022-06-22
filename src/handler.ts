@@ -28,6 +28,32 @@ export async function registerCommands(client: DiscordClient, dir = '') {
   }
 }
 
+export async function registerCommands2(client: DiscordClient, dir = '') {
+  if (dir === '') dir = './_commands';
+
+  const filePath = path.join(__dirname, dir);
+  const files = await fs.promises.readdir(filePath);
+
+  for (const file of files) {
+    if ((await fs.promises.lstat(path.join(filePath, file))).isDirectory()) {
+      const newPath = `${path.join(dir, file)}`;
+      registerCommands2(client, newPath);
+    }
+
+    if (file.endsWith('.d.ts')) continue;
+    if (file.endsWith('.ts') || file.endsWith('.js')) {
+      const newPathFileName = path.join(`./${dir}/${file}`).replace(/\\/g, '/');
+      const { default: Command } = await import(`./${newPathFileName}`);
+      const command = new Command();
+
+      client.commands2.set(command.getName(), command);
+      command.getAliases().forEach((alias: string) => {
+        client.commands2.set(alias, command);
+      });
+    }
+  }
+}
+
 export async function registerEvents(client: DiscordClient, dir = '') {
   if (dir === '') dir = './events';
   const filePath = path.join(__dirname, dir);
@@ -35,7 +61,7 @@ export async function registerEvents(client: DiscordClient, dir = '') {
 
   for (const file of files) {
     if ((await fs.promises.lstat(path.join(filePath, file))).isDirectory())
-      registerCommands(client, path.join(dir, file));
+      registerEvents(client, path.join(dir, file));
 
     if (file.endsWith('.d.ts')) {
       continue;

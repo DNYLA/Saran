@@ -1,19 +1,18 @@
 import { Message, MessageEmbed } from 'discord.js';
+import { RequirmentsType } from './base/Command2';
 
 export type CommandOptions = {
-  name: string;
-  aliases?: string[];
-  module: string;
-  description: string;
-  errorMessage: string | MessageEmbed;
-  invalidUsage: string | MessageEmbed;
-  invalidPermissions: string | MessageEmbed;
-  guildOnly: boolean;
-  deleteCommand: boolean;
-  examples?: string[];
-  usage?: string;
-  requirments?: Requirments;
-  hooks?: Hooks;
+  aliases?: string[]; //Done
+  module?: string;
+  description?: string;
+  errorMessage?: string; //Done
+  invalidUsage?: string | MessageEmbed;
+  invalidPermissions?: string; //Done
+  guildOnly?: boolean;
+  deleteCommand?: boolean; //Done
+  usage?: string[];
+  requirments?: Requirments; //Done
+  hooks?: Hooks; //Done
 };
 
 export type Argument = {
@@ -24,10 +23,10 @@ export type Argument = {
 };
 
 export type Requirments = {
-  userIDs?: () => string[] | string[];
-  roleIDs?: () => string[] | string[];
+  userIDs?: ((message: Message) => string[]) | string[] | string;
+  roleIDs?: () => string[] | string;
   roleNames?: () => string[] | string[];
-  custom?: () => string;
+  custom?: (msg: Message) => Promise<boolean>;
   permissions?: Permissions;
 };
 
@@ -37,9 +36,14 @@ export type Permissions = {
 };
 
 export type Hooks = {
-  preCommand?: () => void;
-  postCheck?: () => void;
-  postExecution?: () => void;
+  preCommand?: (msg: Message, args: string[]) => void;
+  postCheck?: (
+    msg: Message,
+    args: string[],
+    valid: boolean,
+    type: RequirmentsType
+  ) => void;
+  postExecution?: (valid: boolean) => void;
   postCommand?: () => void;
 };
 
