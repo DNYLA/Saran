@@ -18,12 +18,15 @@ import { convertPeriodToText, mentionUser } from './helpers';
 import { ArtistInfo, PartialUser, RecentTrack, Track } from './types';
 
 //Returns either the author id or if a mention exists the mentioned users id
-export async function getUserFromMessage(msg: Message) {
+export async function getUserFromMessage(
+  msg: Message,
+  ignoreMention?: boolean
+) {
   let userId = msg.author.id;
 
   const mention = msg.mentions.users.first();
 
-  if (mention) {
+  if (mention && !ignoreMention) {
     userId = mention.id;
   }
 
@@ -177,6 +180,20 @@ export async function fetchRecentTrackInfo(username: string): Promise<{
     return { track: data.track, recentTrack: recentTrack, user: userInfo };
   } catch (err) {
     console.log(err);
+    return { track: null, recentTrack: null, user: null };
+  }
+}
+
+export async function fetchTrackInfoWrapper(
+  username: string,
+  name: string,
+  artist: string
+): Promise<Track> {
+  try {
+    const { data } = await fetchTrackInfo(username, name, artist);
+
+    return data.track;
+  } catch (err) {
     return null;
   }
 }

@@ -1,4 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+import { GuildUser, PrismaClient, User } from '@prisma/client';
+import { GuildMember } from 'discord.js';
 
 const prisma = new PrismaClient();
 
@@ -11,6 +12,41 @@ export const getUser = async (id: string) => {
   } catch (err) {
     console.log(err);
     return null;
+  }
+};
+
+export type UserWithGuilds = User & {
+  guilds?: GuildUser[];
+};
+
+export const getGuildUsers = async (
+  serverId: string
+): Promise<UserWithGuilds[]> => {
+  try {
+    return await prisma.user.findMany({
+      where: { lastFMName: { not: null }, guilds: { some: { serverId } } },
+      include: { guilds: true },
+    });
+  } catch (err) {
+    return null;
+  }
+};
+
+export const createGuildMember = async (member: GuildMember) => {
+  try {
+    await prisma.user.update({
+      where: { id: member.id },
+      data: {
+        guilds: {
+          create: {
+            displayName: member.displayName,
+            serverId: member.guild.id,
+          },
+        },
+      },
+    });
+  } catch (err) {
+    //Most likely user doesnt exist
   }
 };
 

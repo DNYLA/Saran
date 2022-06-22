@@ -11,30 +11,38 @@ datasource db {
 }
 
 model User {
-  id         String  @id
+  id         String      @id
   lastFMName String?
   lastFMTag  String?
+  guilds     GuildUser[]
 }
 
 model GuildUser {
-  id                 String
+  userId             String
+  displayName        String
   serverId           String
   lastFMTag          String?
   reactionBoardScore Int     @default(0)
+  user               User    @relation(fields: [userId], references: [id])
 
-  @@id([id, serverId])
+  @@id([userId, serverId])
 }
 
 model GuildConfig {
-  id                   String  @id
-  prefix               String  @default(",")
+  id                   String                  @id
+  prefix               String                  @default(",")
   reactionBoardChannel String?
-  reactionBoardLimit   Int     @default(0)
+  reactionBoardLimit   Int                     @default(0)
+  rbMessages           ReactionBoardMessages[]
 }
 
 model ReactionBoardMessages {
-  id       String
-  serverId String
+  id           String
+  serverId     String
+  reactionName String
+  reactions    Int
+  userId       String
+  guild        GuildConfig @relation(fields: [serverId], references: [id])
 
   @@id([id, serverId])
 }
