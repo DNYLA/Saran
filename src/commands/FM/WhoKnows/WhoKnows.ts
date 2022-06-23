@@ -14,7 +14,6 @@ import {
   getTargetUserId,
   SearchType,
 } from '../../../utils/fmHelpers';
-import { redis } from '../../../utils/redis';
 
 export default class WhoKnows extends Command {
   constructor() {
@@ -31,7 +30,6 @@ export default class WhoKnows extends Command {
 
   async run(message: Message, args: string[]) {
     const user = await getUser(getTargetUserId(message, args, true));
-
     const guildUsers = await getGuildUsers(message.guildId);
 
     if (!guildUsers || guildUsers.length === 0)

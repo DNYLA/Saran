@@ -1,6 +1,8 @@
 import { Message, MessageEmbed } from 'discord.js';
-import { fetchAlbumInfo } from '../../../api/lastfm';
-import UsernameCheck from '../../../checks/UsernameCheck';
+import { fetchTrackInfo } from '../../../api/lastfm';
+import UsernameCheck, {
+  UsernameCheckNoMentions,
+} from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
 import Command from '../../../utils/base/command';
@@ -8,18 +10,22 @@ import {
   getCachedPlays,
   setCachedPlays,
 } from '../../../utils/database/redisManager';
-import { getGuildUsers, getUser } from '../../../utils/database/User';
 import {
-  fetchRecentAlbumInfo,
+  getGuildUsers,
+  getUser,
+  getUsersWithUsername,
+} from '../../../utils/database/User';
+import {
+  fetchRecentTrackInfo,
   getTargetUserId,
   SearchType,
 } from '../../../utils/fmHelpers';
 
-export default class WhoKnowsAlbum extends Command {
+export default class GlobalWhoKnowstrack extends Command {
   constructor() {
-    super('lf wka', {
+    super('lf gwkt', {
       requirments: {
-        custom: UsernameCheck,
+        custom: UsernameCheckNoMentions,
       },
       hooks: {
         preCommand: StartTyping,
@@ -30,31 +36,32 @@ export default class WhoKnowsAlbum extends Command {
 
   async run(message: Message, args: string[]) {
     const user = await getUser(getTargetUserId(message, args, true));
-    const guildUsers = await getGuildUsers(message.guildId);
+
+    const guildUsers = await getUsersWithUsername();
 
     if (!guildUsers || guildUsers.length === 0)
       return message.reply('Server hasnt been indexed use ,lf index');
 
-    const { album, recentTrack } = await fetchRecentAlbumInfo(user.lastFMName);
+    const { track, recentTrack } = await fetchRecentTrackInfo(user.lastFMName);
 
-    if (!album || !recentTrack)
+    if (!track || !recentTrack)
       return message.reply(
-        'The current album you are listening to is not trackable!'
+        'Unable to find recent track or track isnt valid to who knows!'
       );
 
     let sum = 0;
     let description = '';
     const wkInfo = [];
+
     for (let i = 0; i < guildUsers.length; i++) {
       const member = guildUsers[i];
       if (!member.lastFMName) continue; //This shouldnt occur but checked anyways
       try {
         const cachedPlays = await getCachedPlays(
           member.lastFMName,
-          `${album.name}-${album.artist}`,
-          SearchType.Album
+          `${track.name}-${track.artist.name}`,
+          SearchType.Track
         );
-
         const item = {
           id: member.id,
           fmName: member.lastFMName,
@@ -64,35 +71,32 @@ export default class WhoKnowsAlbum extends Command {
           continue;
         }
 
-        const albumInfo = await fetchAlbumInfo(
+        const trackInfo = await fetchTrackInfo(
           member.lastFMName,
-          album.name,
-          album.artist
+          track.name,
+          track.artist.name
         );
 
-        if (!albumInfo) continue;
-        if (albumInfo.userplaycount === 0) continue;
+        if (!trackInfo) continue;
+        if (Number(trackInfo.userplaycount) === 0) continue;
 
-        wkInfo.push({
-          ...item,
-          plays: albumInfo.userplaycount,
-        });
+        wkInfo.push({ ...item, plays: trackInfo.userplaycount });
 
         await setCachedPlays(
           member.lastFMName,
-          `${album.name}-${album.artist}`,
-          albumInfo.userplaycount,
-          SearchType.Album
+          `${track.name}-${track.artist.name}`,
+          trackInfo.userplaycount,
+          SearchType.Track
         );
       } catch (err) {
         console.log(err);
       }
     }
 
-    wkInfo.sort((a, b) => b.plays - a.plays).slice(0, 10);
+    const sortedArray = wkInfo.sort((a, b) => b.plays - a.plays).slice(0, 10);
 
-    for (let i = 0; i < wkInfo.length; i++) {
-      const { id, fmName, plays } = wkInfo[i];
+    for (let i = 0; i < sortedArray.length; i++) {
+      const { id, fmName, plays } = sortedArray[i];
       console.log(id);
       try {
         const discordUser = await message.client.users.fetch(id);
@@ -116,7 +120,7 @@ export default class WhoKnowsAlbum extends Command {
           iconURL:
             'https://lastfm.freetls.fastly.net/i/u/avatar170s/a7ff67ef791aaba0c0c97e9c8a97bf04.png',
         })
-        .setTitle(`Top Listeners for ${album.name} by ${album.artist}`)
+        .setTitle(`Top Listeners for ${track.name} by ${track.artist.name}`)
         .setDescription(description)
         .setFooter({
           text: `Total Listeners: ${wkInfo.length} ∙ Total Plays: ${sum}`,

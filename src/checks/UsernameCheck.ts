@@ -10,3 +10,12 @@ export default async (message: Message, args: string[]): Promise<boolean> => {
 
   return user.lastFMName !== null;
 };
+
+export const UsernameCheckNoMentions = async (
+  message: Message,
+  args: string[]
+): Promise<boolean> => {
+  const user = await getUser(message.author.id);
+
+  return user.lastFMName !== null;
+};

@@ -1,6 +1,8 @@
 import { Message, MessageEmbed } from 'discord.js';
 import { fetchTrackInfo } from '../../../api/lastfm';
-import UsernameCheck from '../../../checks/UsernameCheck';
+import UsernameCheck, {
+  UsernameCheckNoMentions,
+} from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
 import Command from '../../../utils/base/command';
@@ -19,7 +21,7 @@ export default class WhoKnowstrack extends Command {
   constructor() {
     super('lf wkt', {
       requirments: {
-        custom: UsernameCheck,
+        custom: UsernameCheckNoMentions,
       },
       hooks: {
         preCommand: StartTyping,

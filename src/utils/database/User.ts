@@ -32,6 +32,16 @@ export const getGuildUsers = async (
   }
 };
 
+export const getUsersWithUsername = async (): Promise<User[]> => {
+  try {
+    return await prisma.user.findMany({
+      where: { lastFMName: { not: null } },
+    });
+  } catch (err) {
+    return null;
+  }
+};
+
 export const createGuildMember = async (member: GuildMember) => {
   try {
     await prisma.user.update({

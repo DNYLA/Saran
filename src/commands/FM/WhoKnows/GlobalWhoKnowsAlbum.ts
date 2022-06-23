@@ -8,16 +8,20 @@ import {
   getCachedPlays,
   setCachedPlays,
 } from '../../../utils/database/redisManager';
-import { getGuildUsers, getUser } from '../../../utils/database/User';
+import {
+  getGuildUsers,
+  getUser,
+  getUsersWithUsername,
+} from '../../../utils/database/User';
 import {
   fetchRecentAlbumInfo,
   getTargetUserId,
   SearchType,
 } from '../../../utils/fmHelpers';
 
-export default class WhoKnowsAlbum extends Command {
+export default class GlobalWhoKnowsAlbum extends Command {
   constructor() {
-    super('lf wka', {
+    super('lf gwka', {
       requirments: {
         custom: UsernameCheck,
       },
@@ -30,7 +34,7 @@ export default class WhoKnowsAlbum extends Command {
 
   async run(message: Message, args: string[]) {
     const user = await getUser(getTargetUserId(message, args, true));
-    const guildUsers = await getGuildUsers(message.guildId);
+    const guildUsers = await getUsersWithUsername();
 
     if (!guildUsers || guildUsers.length === 0)
       return message.reply('Server hasnt been indexed use ,lf index');
@@ -89,10 +93,10 @@ export default class WhoKnowsAlbum extends Command {
       }
     }
 
-    wkInfo.sort((a, b) => b.plays - a.plays).slice(0, 10);
+    const sortedArray = wkInfo.sort((a, b) => b.plays - a.plays).slice(0, 10);
 
-    for (let i = 0; i < wkInfo.length; i++) {
-      const { id, fmName, plays } = wkInfo[i];
+    for (let i = 0; i < sortedArray.length; i++) {
+      const { id, fmName, plays } = sortedArray[i];
       console.log(id);
       try {
         const discordUser = await message.client.users.fetch(id);

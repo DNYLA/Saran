@@ -30,7 +30,7 @@ export async function getCachedPlays(
   key: string,
   type: SearchType
 ) {
-  return await redis.HGET(contructTableName(username, type), key);
+  return await redis.HGET(contructTableName(username.toLowerCase(), type), key);
 }
 
 export async function setCachedPlays(
@@ -39,7 +39,11 @@ export async function setCachedPlays(
   value: number,
   type: SearchType
 ) {
-  return await redis.HSET(contructTableName(username, type), key, value);
+  return await redis.HSET(
+    contructTableName(username.toLowerCase(), type),
+    key,
+    value
+  );
 }
 
 const setExpire = async (key, time) => {
