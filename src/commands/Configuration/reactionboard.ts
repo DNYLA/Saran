@@ -1,29 +1,35 @@
 import { PrismaClient } from '@prisma/client';
 import { Message } from 'discord.js';
+import StartTyping from '../../hooks/StartTyping';
 import Command from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
-import { getIdFromTag, MessageType } from '../../utils/helpers';
 
 const prisma = new PrismaClient();
 
 export default class SetReactionBoardChannel extends Command {
   constructor() {
-    super('reactionboard', 'LastFM', ['rb']);
+    super('reactionboard', {
+      aliases: ['rb'],
+      requirments: {
+        permissions: {
+          administrator: true,
+        },
+      },
+      invalidPermissions: 'You must be admin to use this!',
+      invalidUsage: `Do ,rb <#channel> <reaction_limit>`,
+      hooks: {
+        preCommand: StartTyping,
+      },
+      arguments: {
+        required: true,
+        minAmount: 2,
+      },
+    });
   }
 
-  async run(client: DiscordClient, message: Message, args: string[]) {
-    message.channel.sendTyping();
-    console.log(args);
-    if (!message.member.permissions.has('ADMINISTRATOR'))
-      return message.reply('You need to be admin');
-
-    if (args.length != 2) {
-      return message.channel.send(
-        'Provide the correct paramters. ,rb <#channel> <reaction_limit>'
-      );
-    }
-
+  async run(message: Message, args: string[]) {
     const boardChannel = message.mentions.channels.first();
+    const client = message.client as DiscordClient;
     if (!boardChannel)
       return message.reply('Provide a channel with the message');
 

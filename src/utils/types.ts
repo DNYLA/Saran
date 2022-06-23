@@ -1,5 +1,5 @@
 import { Message, MessageEmbed } from 'discord.js';
-import { RequirmentsType } from './base/Command2';
+import { RequirmentsType } from './base/command';
 
 export type CommandOptions = {
   aliases?: string[]; //Done

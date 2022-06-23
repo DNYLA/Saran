@@ -128,9 +128,9 @@ export function sendNoDataEmbed(message: Message) {
 }
 
 export enum SearchType {
-  Track,
-  Artist,
-  Album,
+  Track = 'Track',
+  Artist = 'Artist',
+  Album = 'Album',
 }
 
 export async function getTopTenStats(
@@ -158,7 +158,12 @@ export async function getTopTenStats(
 
   if (topStats.length === 0) return sendNoDataEmbed(message);
 
-  const embed = convertTopStatsToEmbed(user, topStats, period, 'artists');
+  const embed = convertTopStatsToEmbed(
+    user,
+    topStats,
+    period,
+    type.toString() + `s`
+  );
 
   if (embed) message.channel.send({ embeds: [embed] });
   else message.reply('Unable to display top tracks!');
