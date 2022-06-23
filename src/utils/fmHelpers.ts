@@ -19,6 +19,7 @@ import {
   fetchTrackInfo,
   Periods,
 } from '../api/lastfm';
+import { setCachedPlays } from './database/redisManager';
 import { getUser } from './database/User';
 import { convertPeriodToText, mentionUser } from './helpers';
 import {
@@ -81,6 +82,27 @@ export type TopListStats = {
   url: string;
   playcount: string;
 };
+
+export async function cacheTopTenStats(
+  username: string,
+  stats: TopTrack[] | TopArtist[] | TopAlbum[],
+  type: SearchType
+) {
+  if (type === SearchType.Artist) {
+    return stats.forEach(async (stat: TopArtist) => {
+      await setCachedPlays(username, stat.name, stat.playcount, type);
+    });
+  }
+
+  return stats.forEach(async (stat: TopTrack | TopAlbum) => {
+    await setCachedPlays(
+      username,
+      `${stat.name}-${stat.artist.name}`,
+      stat.playcount,
+      type
+    );
+  });
+}
 
 export function convertTopStatsToEmbed(
   user: User,
@@ -157,6 +179,8 @@ export async function getTopTenStats(
   }
 
   if (topStats.length === 0) return sendNoDataEmbed(message);
+  if (period === Periods.overall)
+    await cacheTopTenStats(user.lastFMName, topStats, type);
 
   const embed = convertTopStatsToEmbed(
     user,

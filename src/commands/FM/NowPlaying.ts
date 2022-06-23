@@ -3,8 +3,13 @@ import UsernameCheck from '../../checks/UsernameCheck';
 import NoUsernameSet from '../../hooks/NoUsernameSet';
 import StartTyping from '../../hooks/StartTyping';
 import Command from '../../utils/base/command';
+import { setCachedPlays } from '../../utils/database/redisManager';
 import { getUser } from '../../utils/database/User';
-import { fetchRecentTrackInfo, getTargetUserId } from '../../utils/fmHelpers';
+import {
+  fetchRecentTrackInfo,
+  getTargetUserId,
+  SearchType,
+} from '../../utils/fmHelpers';
 import { PartialUser, RecentTrack, Track } from '../../utils/types';
 
 export default class NowPlaying extends Command {
@@ -51,6 +56,13 @@ export default class NowPlaying extends Command {
 
     if (!track || !recentTrack)
       return message.reply('Unable to display this track!');
+
+    await setCachedPlays(
+      user.lastFMName,
+      `${track.name}-${track.artist.name}`,
+      track.userplaycount,
+      SearchType.Track
+    );
 
     try {
       let messageEmbed;
