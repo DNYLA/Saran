@@ -50,6 +50,19 @@ export const createGuildMember = async (member: GuildMember) => {
   }
 };
 
+export const fetchUserIdsWithUsername = async (): Promise<string[]> => {
+  try {
+    const users = await prisma.user.findMany({
+      where: { lastFMName: { not: null } },
+      select: { id: true },
+    });
+
+    return users.map((user) => user.id);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 export const updateUserById = async (id: string, update: any) => {
   try {
     await prisma.user.upsert({

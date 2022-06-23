@@ -4,10 +4,15 @@ import UsernameCheck from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
 import Command from '../../../utils/base/command';
+import {
+  getCachedPlays,
+  setCachedPlays,
+} from '../../../utils/database/redisManager';
 import { getGuildUsers, getUser } from '../../../utils/database/User';
 import {
   fetchRecentTrackInfo,
   getTargetUserId,
+  SearchType,
 } from '../../../utils/fmHelpers';
 
 export default class WhoKnowstrack extends Command {
@@ -46,6 +51,20 @@ export default class WhoKnowstrack extends Command {
       const member = guildUsers[i];
       if (!member.lastFMName) continue; //This shouldnt occur but checked anyways
       try {
+        const cachedPlays = await getCachedPlays(
+          member.lastFMName,
+          `${track.name}-${track.artist.name}`,
+          SearchType.Track
+        );
+        const item = {
+          displayName: member.guilds[0].displayName,
+          fmName: member.lastFMName,
+        };
+        if (cachedPlays) {
+          wkInfo.push({ ...item, plays: cachedPlays });
+          continue;
+        }
+
         const trackInfo = await fetchTrackInfo(
           member.lastFMName,
           track.name,
@@ -55,11 +74,14 @@ export default class WhoKnowstrack extends Command {
         if (!trackInfo) continue;
         if (Number(trackInfo.userplaycount) === 0) continue;
 
-        wkInfo.push({
-          displayName: member.guilds[0].displayName,
-          fmName: member.lastFMName,
-          plays: trackInfo.userplaycount,
-        });
+        wkInfo.push({ ...item, plays: trackInfo.userplaycount });
+
+        await setCachedPlays(
+          member.lastFMName,
+          `${track.name}-${track.artist.name}`,
+          trackInfo.userplaycount,
+          SearchType.Track
+        );
       } catch (err) {
         console.log(err);
       }

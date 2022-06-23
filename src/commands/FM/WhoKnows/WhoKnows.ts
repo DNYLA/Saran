@@ -4,11 +4,17 @@ import UsernameCheck from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
 import Command from '../../../utils/base/command';
+import {
+  getCachedPlays,
+  setCachedPlays,
+} from '../../../utils/database/redisManager';
 import { getGuildUsers, getUser } from '../../../utils/database/User';
 import {
   fetchRecentArtistInfo,
   getTargetUserId,
+  SearchType,
 } from '../../../utils/fmHelpers';
+import { redis } from '../../../utils/redis';
 
 export default class WhoKnows extends Command {
   constructor() {
@@ -47,19 +53,36 @@ export default class WhoKnows extends Command {
       const member = guildUsers[i];
       if (!member.lastFMName) continue; //This shouldnt occur but checked anyways
       try {
+        const cachedPlays = await getCachedPlays(
+          member.lastFMName,
+          artist.name,
+          SearchType.Artist
+        );
+
+        const item = {
+          displayName: member.guilds[0].displayName,
+          fmName: member.lastFMName,
+        };
+        if (cachedPlays) {
+          wkInfo.push({ ...item, plays: cachedPlays });
+          continue;
+        }
+
         const artistInfo = await fetchArtistInfo(
           member.lastFMName,
           artist.name
         );
-
         if (!artistInfo) continue;
-        if (artistInfo.stats.userplaycount === 0) continue;
+        const fetchedPlays = artistInfo.stats.userplaycount;
+        if (fetchedPlays === 0) continue;
 
-        wkInfo.push({
-          displayName: member.guilds[0].displayName,
-          fmName: member.lastFMName,
-          plays: artistInfo.stats.userplaycount,
-        });
+        wkInfo.push({ ...item, plays: fetchedPlays });
+        await setCachedPlays(
+          member.lastFMName,
+          artist.name,
+          fetchedPlays,
+          SearchType.Artist
+        );
       } catch (err) {
         console.log(err);
       }
