@@ -3,11 +3,13 @@ import UsernameCheck from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
 import Command from '../../../utils/base/command';
+import { setCachedPlays } from '../../../utils/database/redisManager';
 import { getUser } from '../../../utils/database/User';
 import {
   fetchRecentTrackInfo,
   fetchSearchTrackInfo,
   getTargetUserId,
+  SearchType,
 } from '../../../utils/fmHelpers';
 import { PartialUser, Track } from '../../../utils/types';
 
@@ -70,6 +72,12 @@ export default class PlaysTrack extends Command {
 
     if (track.album) {
       imageUrl = track.album.image[3]['#text'];
+      await setCachedPlays(
+        user.lastFMName,
+        `${track.name}-${track.artist.name}`,
+        track.userplaycount,
+        SearchType.Track
+      );
     }
 
     try {

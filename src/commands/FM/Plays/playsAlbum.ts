@@ -3,11 +3,13 @@ import UsernameCheck from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
 import Command from '../../../utils/base/command';
+import { setCachedPlays } from '../../../utils/database/redisManager';
 import { getUser } from '../../../utils/database/User';
 import {
   fetchRecentAlbumInfo,
   fetchSearchAlbumInfo,
   getTargetUserId,
+  SearchType,
 } from '../../../utils/fmHelpers';
 import { joinArgs } from '../../../utils/helpers';
 import { Album, PartialUser } from '../../../utils/types';
@@ -62,6 +64,12 @@ export default class PlaysAlbum extends Command {
     let imageUrl;
     try {
       imageUrl = album.image[3]['#text'];
+      await setCachedPlays(
+        user.lastFMName,
+        `${album.name}-${album.artist}`,
+        album.userplaycount,
+        SearchType.Album
+      );
     } catch (err) {
       console.log(err);
     }
