@@ -76,7 +76,7 @@ export default abstract class Command2 {
     }
 
     //Message is displayed in PostCheck if they chose to
-    if (req.custom && !(await req.custom(message)))
+    if (req.custom && !(await req.custom(message, args)))
       return { valid: false, message: null, type: RequirmentsType.Custom };
 
     return { valid: true, message: null, type: null };

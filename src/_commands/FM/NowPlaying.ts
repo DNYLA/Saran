@@ -1,32 +1,37 @@
 import { Message, MessageEmbed } from 'discord.js';
-import { UserInfo } from 'os';
-import { fetchRecentTracks, fetchTrackInfo } from '../../api/lastfm';
+import UsernameCheck from '../../checks/UsernameCheck';
+import NoUsernameSet from '../../hooks/NoUsernameSet';
+import StartTyping from '../../hooks/StartTyping';
 import Command from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
-import {
-  fetchRecentTrackInfo,
-  getUserFromMessage,
-  hasUsernameSet,
-} from '../../utils/fmHelpers';
+import Command2 from '../../utils/base/Command2';
+import { getUser } from '../../utils/database/User';
+import { fetchRecentTrackInfo, getTargetUserId } from '../../utils/fmHelpers';
 import { PartialUser, RecentTrack, Track } from '../../utils/types';
 
-export default class NowPlaying extends Command {
+export default class NowPlaying extends Command2 {
   constructor() {
-    super('np', 'LastFM', ['fm']);
+    super('np', {
+      aliases: ['fm'],
+      requirments: {
+        custom: UsernameCheck,
+      },
+      hooks: {
+        preCommand: StartTyping,
+        postCheck: NoUsernameSet,
+      },
+    });
   }
 
-  async run(client: DiscordClient, message: Message, args: string[]) {
-    message.channel.sendTyping();
-
-    const user = await getUserFromMessage(message);
-    if (user.id !== message.author.id) args.shift();
-    if (!hasUsernameSet(message, user)) return;
+  async run(message: Message, args: string[]) {
+    const userId = getTargetUserId(message, args, true);
+    const user = await getUser(userId);
 
     let normalEmbed = true;
 
     if (args.includes('alt')) {
       normalEmbed = false;
     }
+
     let track: Track;
     let recentTrack: RecentTrack;
     let userInfo: PartialUser;

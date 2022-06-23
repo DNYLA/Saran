@@ -1,5 +1,5 @@
 import { Message } from 'discord.js';
 
-export default (message: Message): void => {
-  message.channel.sendTyping();
+export default async (message: Message) => {
+  await message.channel.sendTyping();
 };

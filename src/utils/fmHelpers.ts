@@ -1,5 +1,11 @@
 import { User } from '@prisma/client';
-import { Channel, Message, MessageEmbed, TextChannel } from 'discord.js';
+import {
+  Channel,
+  Message,
+  MessageEmbed,
+  MessageMentions,
+  TextChannel,
+} from 'discord.js';
 import {
   fetchAlbumInfo,
   fetchArtistInfo,
@@ -47,7 +53,7 @@ export function getPeriodFromArg(args: string[]): Periods {
   let period: Periods = Periods['overall'];
 
   if (args.length > 0) {
-    const validPeriod = Periods[args[0]];
+    const validPeriod = Periods[args[0].toLowerCase()];
     if (validPeriod) period = validPeriod;
   }
 
@@ -132,10 +138,7 @@ export async function getTopTenStats(
   args: string[],
   type: SearchType
 ) {
-  message.channel.sendTyping();
-  const user = await getUserFromMessage(message);
-  if (user.id !== message.author.id) args.shift();
-  if (!hasUsernameSet(message, user)) return;
+  const user = await getUser(getTargetUserId(message, args, true));
 
   const period: Periods = getPeriodFromArg(args);
   let topStats: TopTrack[] | TopArtist[] | TopAlbum[];
@@ -191,11 +194,7 @@ export async function fetchSearchTrackInfo(
     const trackSearch = await fetchSearchTrack(username, name, artist);
     if (!trackSearch) return null;
 
-    return await fetchTrackInfo(
-      username,
-      trackSearch[0].name,
-      trackSearch[0].artist
-    );
+    return await fetchTrackInfo(username, trackSearch.name, trackSearch.artist);
   } catch (err) {
     console.log(err);
     return null;
@@ -232,11 +231,7 @@ export async function fetchSearchAlbumInfo(
     const albumSearch = await fetchSearchAlbum(name);
     if (!albumSearch) return null;
 
-    return await fetchAlbumInfo(
-      username,
-      albumSearch[0].name,
-      albumSearch[0].artist
-    );
+    return await fetchAlbumInfo(username, albumSearch.name, albumSearch.artist);
   } catch (err) {
     console.log(err);
     return null;
@@ -271,10 +266,29 @@ export async function fetchSearchArtistInfo(
   try {
     const artistSearch = await fetchSearchArtist(name);
     if (!artistSearch) return null;
-
-    return await fetchArtistInfo(username, artistSearch[0].name);
+    return await fetchArtistInfo(username, artistSearch.name);
   } catch (err) {
     console.log(err);
     return null;
   }
+}
+
+export function getTargetUserId(
+  message: Message,
+  args: string[],
+  shiftArgs?: boolean
+) {
+  let userId = message.author.id;
+
+  if (args.length > 0) {
+    const isMention = args[0]
+      .matchAll(MessageMentions.USERS_PATTERN)
+      .next().value;
+    if (isMention) {
+      userId = isMention[1];
+      if (shiftArgs) args.shift();
+    }
+  }
+
+  return userId;
 }

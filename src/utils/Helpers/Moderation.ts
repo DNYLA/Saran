@@ -91,18 +91,26 @@ export async function getUserFromMention(mention: string) {
 
 export async function getDiscordUserFromMention(
   client: DiscordClient,
-  mention: string
+  mention: string,
+  forceCheck?: boolean
 ) {
   const matches = mention.matchAll(MessageMentions.USERS_PATTERN).next().value;
 
-  if (!matches)
+  if (!matches && forceCheck === true)
     try {
       return await client.users.fetch(mention);
     } catch (err) {
       return null;
     }
+  else if (!matches) return null;
   //return client.users.fetch(mention);
   return await client.users.fetch(matches[1]);
+}
+
+export async function getUserFromId(client: DiscordClient, mention: string) {
+  const matches = mention.matchAll(MessageMentions.USERS_PATTERN).next().value;
+
+  if (!matches) return;
 }
 
 export async function getGuildMemberFromMention(

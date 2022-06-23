@@ -5,36 +5,42 @@ import {
   fetchSearchTrack,
   fetchTrackInfo,
 } from '../../../api/lastfm';
+import UsernameCheck from '../../../checks/UsernameCheck';
+import NoUsernameSet from '../../../hooks/NoUsernameSet';
+import StartTyping from '../../../hooks/StartTyping';
 import Command from '../../../utils/base/command';
+import Command2 from '../../../utils/base/Command2';
 import DiscordClient from '../../../utils/client';
-import { updateUserById } from '../../../utils/database/User';
+import { getUser, updateUserById } from '../../../utils/database/User';
 import {
   fetchRecentAlbumInfo,
   fetchRecentTrackInfo,
   fetchSearchAlbumInfo,
   fetchSearchTrackInfo,
+  getTargetUserId,
   getUserFromMessage,
   hasUsernameSet,
 } from '../../../utils/fmHelpers';
 import { joinArgs } from '../../../utils/helpers';
 import { Album, PartialUser, RecentTrack, Track } from '../../../utils/types';
 
-export default class SetUsername extends Command {
+export default class PlaysAlbum extends Command2 {
   constructor() {
-    super('lf playsa', 'LastFM', [
-      'lf playsalbum',
-      'lf pa',
-      'lf ap',
-      'lf palbum',
-    ]);
+    super('lf playsa', {
+      aliases: ['lf playsalbum', 'lf pa', 'lf ap', 'lf palbum'],
+      requirments: {
+        custom: UsernameCheck,
+      },
+      hooks: {
+        preCommand: StartTyping,
+        postCheck: NoUsernameSet,
+      },
+      invalidUsage: 'Usage: ,lf playsa <albumname>(Optional)',
+    });
   }
 
-  async run(client: DiscordClient, message: Message, args: string[]) {
-    message.channel.sendTyping();
-
-    const user = await getUserFromMessage(message);
-    if (user.id !== message.author.id) args.shift();
-    if (!hasUsernameSet(message, user)) return;
+  async run(message: Message, args: string[]) {
+    const user = await getUser(getTargetUserId(message, args, true));
 
     let albumName: string;
     let artistName = null;

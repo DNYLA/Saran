@@ -105,13 +105,12 @@ export default class MessageEvent extends Event {
         commandName.startsWith('fm')
       ) {
         let newCommandName = `${commandName} ${args.shift()}`;
-        const newCommand = client.commands.get(newCommandName.toLowerCase());
-
+        const newCommand = client.commands2.get(newCommandName.toLowerCase());
         console.log(newCommandName);
 
         if (!newCommand) return;
         try {
-          newCommand.run(client, message, args, config);
+          newCommand.execute(client, message, args);
         } catch (err) {
           message.channel.send(
             'There was an error when attempting to execute this command'

@@ -2,7 +2,11 @@ import { PrismaClient } from '@prisma/client';
 import { channel } from 'diagnostics_channel';
 import { Message, MessageEmbed, Permissions } from 'discord.js';
 import { fetchTopTenTracks, Periods } from '../../../api/lastfm';
+import UsernameCheck from '../../../checks/UsernameCheck';
+import NoUsernameSet from '../../../hooks/NoUsernameSet';
+import StartTyping from '../../../hooks/StartTyping';
 import Command from '../../../utils/base/command';
+import Command2 from '../../../utils/base/Command2';
 import DiscordClient from '../../../utils/client';
 import { getUser } from '../../../utils/database/User';
 import {
@@ -23,14 +27,21 @@ import {
   Track,
 } from '../../../utils/types';
 
-const prisma = new PrismaClient();
-
-export default class NowPlaying extends Command {
+export default class TopTenTracks extends Command2 {
   constructor() {
-    super('lf ttt', 'LastFM', ['']);
+    super('lf ttt', {
+      requirments: {
+        custom: UsernameCheck,
+      },
+      hooks: {
+        preCommand: StartTyping,
+        postCheck: NoUsernameSet,
+      },
+      invalidUsage: 'Usage: ,lf ttt <period>(Optional)',
+    });
   }
 
-  async run(client: DiscordClient, message: Message, args: string[]) {
+  async run(message: Message, args: string[]) {
     getTopTenStats(message, args, SearchType.Track);
   }
 }

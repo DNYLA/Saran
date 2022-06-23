@@ -1,24 +1,34 @@
 import { Message, MessageEmbed } from 'discord.js';
 import { fetchAlbumInfo, fetchTrackInfo } from '../../../api/lastfm';
+import UsernameCheck from '../../../checks/UsernameCheck';
+import NoUsernameSet from '../../../hooks/NoUsernameSet';
+import StartTyping from '../../../hooks/StartTyping';
 import Command from '../../../utils/base/command';
+import Command2 from '../../../utils/base/Command2';
 import DiscordClient from '../../../utils/client';
-import { getGuildUsers } from '../../../utils/database/User';
+import { getGuildUsers, getUser } from '../../../utils/database/User';
 import {
   fetchRecentAlbumInfo,
+  getTargetUserId,
   getUserFromMessage,
   hasUsernameSet,
 } from '../../../utils/fmHelpers';
 
-export default class NowPlaying extends Command {
+export default class WhoKnowsAlbum extends Command2 {
   constructor() {
-    super('lf wka', 'LastFM', ['']);
+    super('lf wka', {
+      requirments: {
+        custom: UsernameCheck,
+      },
+      hooks: {
+        preCommand: StartTyping,
+        postCheck: NoUsernameSet,
+      },
+    });
   }
 
-  async run(client: DiscordClient, message: Message, args: string[]) {
-    message.channel.sendTyping();
-    const user = await getUserFromMessage(message);
-    if (user.id !== message.author.id) args.shift();
-    if (!hasUsernameSet(message, user)) return;
+  async run(message: Message, args: string[]) {
+    const user = await getUser(getTargetUserId(message, args, true));
 
     const guildUsers = await getGuildUsers(message.guildId);
 

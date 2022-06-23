@@ -33,7 +33,7 @@ export type Requirments = {
   userIDs?: ((message: Message) => string[]) | string[] | string;
   roleIDs?: () => string[] | string;
   roleNames?: () => string[] | string[];
-  custom?: (msg: Message) => Promise<boolean>;
+  custom?: (msg: Message, args: string[]) => Promise<boolean>;
   permissions?: Permissions;
 };
 
