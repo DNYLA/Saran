@@ -1,24 +1,31 @@
-import { PrismaClient } from '@prisma/client';
-import { Message, MessageEmbed, User } from 'discord.js';
-import Command from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
-import { AvatarType, getAvatarEmbed } from '../../utils/Helpers/Avatars';
-import {
-  GetGuildUserFromMessage,
-  GetUserFromMessage,
-  hasAdminPermissions,
-} from '../../utils/Helpers/Moderation';
+import { Message } from 'discord.js';
+import StartTyping from '../../hooks/StartTyping';
+import Command2 from '../../utils/base/Command2';
+import { getGuildMemberFromMention } from '../../utils/Helpers/Moderation';
 
-export default class Ban extends Command {
+export default class Kick extends Command2 {
   constructor() {
-    super('kick', 'Moderation', ['']);
+    super('kick', {
+      requirments: {
+        permissions: {
+          administrator: true,
+        },
+      },
+      invalidPermissions: 'You must be admin to use this!',
+      invalidUsage: `Do ,kick <UserMention> <Reason>(Optional)`,
+      hooks: {
+        preCommand: StartTyping,
+      },
+      arguments: {
+        required: true,
+        minAmount: 1,
+      },
+    });
   }
 
-  async run(client: DiscordClient, message: Message, args: string[]) {
-    message.channel.sendTyping();
-
-    const user = await GetGuildUserFromMessage(message, args);
-    if (!user) return;
+  async run(message: Message, args: string[]) {
+    const user = await getGuildMemberFromMention(message.guild, args[0]);
+    if (!user) return message.reply('Cant find guild member');
 
     let reason = '';
 
@@ -37,7 +44,9 @@ export default class Ban extends Command {
 
       message.reply(embedMessage);
     } catch (err) {
-      message.reply('Unable to kick user!');
+      return message.reply(
+        'Unable to kick user! This typically occurs when the user you are trying to kick has a role higher than the bot.'
+      );
     }
   }
 }

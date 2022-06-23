@@ -7,6 +7,7 @@ export enum RequirmentsType {
   Custom,
   Permissions,
   NotWhitelisted,
+  InvalidArguments,
   // InvalidRole,
 }
 
@@ -27,7 +28,10 @@ export default abstract class Command2 {
     return this.options.aliases;
   }
 
-  private async isValidRequirments(message: Message): Promise<{
+  private async isValidRequirments(
+    message: Message,
+    args: string[]
+  ): Promise<{
     valid: boolean;
     message?: string;
     type?: RequirmentsType;
@@ -36,10 +40,14 @@ export default abstract class Command2 {
       return { valid: true, message: null, type: null };
 
     const req = this.options.requirments;
+    const validPermissions = this.checkPermissions(message);
 
-    //Message is displayed in PostCheck if they chose to
-    if (req.custom && !(await req.custom(message)))
-      return { valid: false, message: null, type: RequirmentsType.Custom };
+    if (!validPermissions)
+      return {
+        valid: false,
+        message: this.options?.invalidPermissions,
+        type: RequirmentsType.Permissions,
+      };
 
     if (req.userIDs) {
       let ids = [];
@@ -57,14 +65,19 @@ export default abstract class Command2 {
         };
     }
 
-    const validPermissions = this.checkPermissions(message);
+    if (this.options?.arguments?.required) {
+      if (this.options.arguments.minAmount > args.length) {
+        return {
+          valid: false,
+          message: this.options.invalidUsage ?? 'Invalid Usage',
+          type: RequirmentsType.InvalidArguments,
+        };
+      }
+    }
 
-    if (!validPermissions)
-      return {
-        valid: false,
-        message: this.options?.invalidPermissions,
-        type: RequirmentsType.Permissions,
-      };
+    //Message is displayed in PostCheck if they chose to
+    if (req.custom && !(await req.custom(message)))
+      return { valid: false, message: null, type: RequirmentsType.Custom };
 
     return { valid: true, message: null, type: null };
   }
@@ -100,7 +113,7 @@ export default abstract class Command2 {
       valid: passedChecks,
       type,
       message: invalidMessage,
-    } = await this.isValidRequirments(message);
+    } = await this.isValidRequirments(message, args);
 
     if (!passedChecks && invalidMessage) message.reply(invalidMessage);
 
@@ -123,7 +136,7 @@ export default abstract class Command2 {
     hooks?.postExecution && hooks.postExecution(success);
 
     //Run PostCommand()
-    this.options?.hooks?.postCommand();
+    hooks?.postCommand && hooks.postCommand();
 
     //Delete command request After Executed?
     try {

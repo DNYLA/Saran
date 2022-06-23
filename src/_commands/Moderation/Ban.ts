@@ -6,6 +6,8 @@ import Command2 from '../../utils/base/Command2';
 import DiscordClient from '../../utils/client';
 import { AvatarType, getAvatarEmbed } from '../../utils/Helpers/Avatars';
 import {
+  getDiscordUserFromMention,
+  getUserFromMention,
   GetUserFromMessage,
   hasAdminPermissions,
 } from '../../utils/Helpers/Moderation';
@@ -19,66 +21,69 @@ export default class Ban extends Command2 {
         },
       },
       invalidPermissions: 'You must be admin to use this!',
+      invalidUsage: `Do ,ban <UserMention> <Reason>(Optional)`,
       hooks: {
         preCommand: StartTyping,
-        postCommand: () => console.log('Finished Executing'),
+      },
+      arguments: {
+        required: true,
+        minAmount: 1,
       },
     });
   }
 
   async run(message: Message, args: string[]) {
-    message.channel.sendTyping();
+    const user = await getDiscordUserFromMention(
+      message.client as DiscordClient,
+      args[0]
+    );
+    if (!user) return message.reply('User doesnt exist!');
 
-    // const user = await GetUserFromMessage(client, message, args);
-    // if (!user) return;
+    if (user.id === '827212859447705610') {
+      message.reply(
+        `I stayed awake and got rich
+      I'm ready to die like this
+      You fell asleep you missed it
+      I hope your time ain't missed
+      Life is a game this a glitch
+      And I couldn't simulate this
+      I'm gonna get what I want, and that's it, yeah
+      I'm ready to die like this, yeah
+      I'm ready to die like this
+      Yeah-yeah, yeah-yeah
+      I'm ready to die like this
+      I'm ready to die like this, yeah
+      Yeah-yeah, yeah-yeah
+      I'm ready to die like this
+      I'm ready to die like this`
+      );
+      return message.reply('Cant ban this guy because he is too powerfull!');
+    }
 
-    // if (user.id === '827212859447705610') {
-    //   message.reply(
-    //     `I stayed awake and got rich
-    //   I'm ready to die like this
-    //   You fell asleep you missed it
-    //   I hope your time ain't missed
-    //   Life is a game this a glitch
-    //   And I couldn't simulate this
-    //   I'm gonna get what I want, and that's it, yeah
-    //   I'm ready to die like this, yeah
-    //   I'm ready to die like this
-    //   Yeah-yeah, yeah-yeah
-    //   I'm ready to die like this
-    //   I'm ready to die like this, yeah
-    //   Yeah-yeah, yeah-yeah
-    //   I'm ready to die like this
-    //   I'm ready to die like this`
-    //   );
-    //   message.reply('Cant ban this guy because he is too powerfull!');
-    // }
+    let reason = '';
 
-    // let reason = '';
+    if (args.length > 1) {
+      args.shift();
+      reason = args.join(' ');
+    }
 
-    // if (args.length > 1) {
-    //   args.shift();
-    //   reason = args.join(' ');
-    // }
+    try {
+      const prevBan = await message.guild.bans.fetch({ user: user.id });
+      if (prevBan)
+        return message.reply(
+          `${user.username}#${user.discriminator} already banned for ${prevBan.reason}`
+        );
+    } catch (err) {}
 
-    // try {
-    //   const prevBan = await message.guild.bans.fetch({ user: user.id });
-    //   if (prevBan)
-    //     return message.reply(
-    //       `${user.username}#${user.discriminator} already banned for ${prevBan.reason}`
-    //     );
-    // } catch (err) {}
-
-    // try {
-    //   await message.guild.bans.create(user.id, { reason });
-
-    //   let embedMessage = `Successfully banned ${user.username}#${user.discriminator}`;
-    //   if (reason.length > 0) {
-    //     embedMessage += ` for ${reason}`;
-    //   }
-
-    //   message.reply(embedMessage);
-    // } catch (err) {
-    //   message.reply('Unable to ban user!');
-    // }
+    try {
+      await message.guild.bans.create(user.id, { reason });
+      let embedMessage = `Successfully banned ${user.username}#${user.discriminator}`;
+      if (reason.length > 0) {
+        embedMessage += ` for ${reason}`;
+      }
+      message.reply(embedMessage);
+    } catch (err) {
+      message.reply('Unable to ban user!');
+    }
   }
 }

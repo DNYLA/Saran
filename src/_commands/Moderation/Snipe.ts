@@ -1,23 +1,22 @@
-import { PrismaClient } from '@prisma/client';
-import { Message, MessageEmbed, User } from 'discord.js';
-import Command from '../../utils/base/command';
+import { Message, MessageEmbed } from 'discord.js';
+import StartTyping from '../../hooks/StartTyping';
+import Command2 from '../../utils/base/Command2';
 import DiscordClient from '../../utils/client';
-import { AvatarType, getAvatarEmbed } from '../../utils/Helpers/Avatars';
-import {
-  GetGuildUserFromMessage,
-  GetUserFromMessage,
-  hasAdminPermissions,
-} from '../../utils/Helpers/Moderation';
 
-export default class Ban extends Command {
+export default class Snipe extends Command2 {
   constructor() {
-    super('snipe', 'Moderation', ['s']);
+    super('snipe', {
+      aliases: ['s'],
+      hooks: {
+        preCommand: StartTyping,
+      },
+    });
   }
 
-  async run(client: DiscordClient, message: Message, args: string[]) {
-    message.channel.sendTyping();
-
+  async run(message: Message, args: string[]) {
+    const client = message.client as DiscordClient;
     const deletedMessage = client.getDeletedMessage(message.guildId);
+
     if (!deletedMessage) {
       return message.channel.send('No message recently deleted!');
     }

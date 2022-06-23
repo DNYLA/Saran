@@ -1,22 +1,18 @@
-import axios from 'axios';
-const cheerio = require('cheerio');
-import {
-  Message,
-  MessageActionRow,
-  MessageButton,
-  MessageEmbed,
-} from 'discord.js';
-import { fetchQueryImages } from '../../api/WebSearch';
-import Command from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
+import { Message } from 'discord.js';
+import StartTyping from '../../hooks/StartTyping';
+import Command2 from '../../utils/base/Command2';
 
-export default class GetAvatar extends Command {
+export default class Sanar extends Command2 {
   constructor() {
-    super('sanar', 'Tools', ['']);
+    super('sanar', {
+      invalidUsage: `Do ,av <UserMention>`,
+      hooks: {
+        preCommand: StartTyping,
+      },
+    });
   }
 
-  async run(client: DiscordClient, message: Message, args: string[]) {
-    message.channel.sendTyping();
+  async run(message: Message, args: string[]) {
     // if (args.length === 0) return message.reply('Provide a URL to scrape!');
     message.channel.send('Disabled');
     // const url = 'https://www.instagram.com/p/Cdc02LTD0Fo/';

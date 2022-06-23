@@ -1,5 +1,6 @@
-import { GuildMember, Message, User } from 'discord.js';
+import { GuildMember, Message, User, MessageMentions, Guild } from 'discord.js';
 import DiscordClient from '../client';
+import { getUser } from '../database/User';
 
 //This is added incase i decide to improve how permissions are handled.
 export function hasAdminPermissions(message: Message) {
@@ -79,4 +80,44 @@ export async function GetGuildUserFromMessage(
   }
 
   return user;
+}
+
+export async function getUserFromMention(mention: string) {
+  const matches = mention.matchAll(MessageMentions.USERS_PATTERN).next().value;
+
+  if (!matches) return null;
+  return await getUser(matches[1]);
+}
+
+export async function getDiscordUserFromMention(
+  client: DiscordClient,
+  mention: string
+) {
+  const matches = mention.matchAll(MessageMentions.USERS_PATTERN).next().value;
+
+  if (!matches)
+    try {
+      return await client.users.fetch(mention);
+    } catch (err) {
+      return null;
+    }
+  //return client.users.fetch(mention);
+  return await client.users.fetch(matches[1]);
+}
+
+export async function getGuildMemberFromMention(
+  guild: Guild,
+  mention: string
+): Promise<GuildMember> {
+  const matches = mention.matchAll(MessageMentions.USERS_PATTERN).next().value;
+
+  if (!matches)
+    try {
+      return await guild.members.fetch(mention);
+    } catch (err) {
+      return null;
+    }
+  // return await guild.members.fetch(mention).catch();
+
+  return await guild.members.fetch(matches[1]);
 }

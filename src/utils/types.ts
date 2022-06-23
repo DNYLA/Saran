@@ -6,13 +6,20 @@ export type CommandOptions = {
   module?: string;
   description?: string;
   errorMessage?: string; //Done
-  invalidUsage?: string | MessageEmbed;
+  invalidUsage?: string; //Done
   invalidPermissions?: string; //Done
   guildOnly?: boolean;
   deleteCommand?: boolean; //Done
   usage?: string[];
+  fetchUser?: boolean;
   requirments?: Requirments; //Done
   hooks?: Hooks; //Done
+  arguments?: ArgumentOptions;
+};
+
+export type ArgumentOptions = {
+  required: boolean;
+  minAmount: number;
 };
 
 export type Argument = {

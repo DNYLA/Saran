@@ -5,16 +5,27 @@ import {
   MessageEmbed,
 } from 'discord.js';
 import { fetchQueryImages } from '../../api/WebSearch';
+import StartTyping from '../../hooks/StartTyping';
 import Command from '../../utils/base/command';
+import Command2 from '../../utils/base/Command2';
 import DiscordClient from '../../utils/client';
 
-export default class GetAvatar extends Command {
+export default class ImageSearch extends Command2 {
   constructor() {
-    super('image', 'Tools', ['img']);
+    super('image', {
+      aliases: ['img'],
+      hooks: {
+        preCommand: StartTyping,
+      },
+      arguments: {
+        required: true,
+        minAmount: 1,
+      },
+    });
   }
 
-  async run(client: DiscordClient, message: Message, args: string[]) {
-    message.channel.sendTyping();
+  async run(message: Message, args: string[]) {
+    const client = message.client as DiscordClient;
     if (args.length === 0) return message.reply('Provide a query to search!');
     const query = args.join(' ');
 
