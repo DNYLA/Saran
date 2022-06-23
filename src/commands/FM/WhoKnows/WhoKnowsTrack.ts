@@ -57,7 +57,7 @@ export default class WhoKnowstrack extends Command {
           SearchType.Track
         );
         const item = {
-          displayName: member.guilds[0].displayName,
+          id: member.id,
           fmName: member.lastFMName,
         };
         if (cachedPlays) {
@@ -87,19 +87,23 @@ export default class WhoKnowstrack extends Command {
       }
     }
 
-    wkInfo
-      .sort((a, b) => b.plays - a.plays)
-      .slice(0, 10)
-      .map(({ displayName, fmName, plays }, i) => {
-        try {
-          sum += Number(plays);
-          return (description += `**${i + 1}. [${
-            i === 0 ? '👑' : ''
-          } ${displayName}](https://www.last.fm/user/${fmName})** has **${plays}** plays\n`);
-        } catch (err) {
-          console.log(err);
-        }
-      });
+    wkInfo.sort((a, b) => b.plays - a.plays).slice(0, 10);
+
+    for (let i = 0; i < wkInfo.length; i++) {
+      const { id, fmName, plays } = wkInfo[i];
+      console.log(id);
+      try {
+        const discordUser = await message.client.users.fetch(id);
+        if (!discordUser) return;
+        const formatted = `${discordUser.username}#${discordUser.discriminator}`;
+        sum += Number(plays);
+        description += `**${i + 1}. [${
+          i === 0 ? '👑' : ''
+        } ${formatted}](https://www.last.fm/user/${fmName})** has **${plays}** plays\n`;
+      } catch (err) {
+        console.log(err);
+      }
+    }
 
     try {
       const embed = new MessageEmbed()
