@@ -8,6 +8,7 @@ export type CommandOptions = {
   errorMessage?: string; //Done
   invalidUsage?: string; //Done
   invalidPermissions?: string; //Done
+  invalidRequirments?: string;
   guildOnly?: boolean;
   deleteCommand?: boolean; //Done
   usage?: string[];

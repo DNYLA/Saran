@@ -19,6 +19,10 @@ export type UserWithGuilds = User & {
   guilds?: GuildUser[];
 };
 
+export type GuildMemberWithUser = GuildUser & {
+  user: User;
+};
+
 export const getGuildUsers = async (
   serverId: string
 ): Promise<UserWithGuilds[]> => {
@@ -26,6 +30,44 @@ export const getGuildUsers = async (
     return await prisma.user.findMany({
       where: { lastFMName: { not: null }, guilds: { some: { serverId } } },
       include: { guilds: true },
+    });
+  } catch (err) {
+    return null;
+  }
+};
+
+export const getGuildUsersCustom = async (
+  serverId: string,
+  where?: any
+): Promise<GuildMemberWithUser[]> => {
+  try {
+    // return await prisma.user.findMany({
+    //   where: { lastFMName: { not: null } },
+    //   include: {
+    //     guilds: { where: { serverId } },
+    //   },
+    //   orderBy: [{ guilds: { xp: 'asc' } }],
+    // });
+
+    return await prisma.guildUser.findMany({
+      where: { serverId },
+      include: { user: true },
+      take: 10,
+      orderBy: { xp: 'desc' },
+    });
+  } catch (err) {
+    return null;
+  }
+};
+
+export const getGuildUser = async (
+  serverId: string,
+  userId: string
+): Promise<UserWithGuilds> => {
+  try {
+    return await prisma.user.findUnique({
+      where: { id: userId },
+      include: { guilds: { where: { serverId } } },
     });
   } catch (err) {
     return null;
@@ -42,20 +84,42 @@ export const getUsersWithUsername = async (): Promise<User[]> => {
   }
 };
 
-export const createGuildMember = async (member: GuildMember) => {
+export const createGuildMember = async (
+  member: GuildMember,
+  guildData?: any,
+  updateOnlyData?: any
+) => {
   try {
-    await prisma.user.update({
+    return await prisma.user.upsert({
       where: { id: member.id },
-      data: {
+      create: {
+        id: member.id,
         guilds: {
           create: {
             displayName: member.displayName,
             serverId: member.guild.id,
+            ...guildData,
+          },
+        },
+      },
+      update: {
+        guilds: {
+          upsert: {
+            where: {
+              userId_serverId: { userId: member.id, serverId: member.guild.id },
+            },
+            create: {
+              displayName: member.displayName,
+              serverId: member.guild.id,
+              ...guildData,
+            },
+            update: { ...guildData, ...updateOnlyData },
           },
         },
       },
     });
   } catch (err) {
+    console.log(err);
     //Most likely user doesnt exist
   }
 };

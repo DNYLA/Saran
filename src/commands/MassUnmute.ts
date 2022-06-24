@@ -30,6 +30,7 @@ export default class Ping extends Command {
     const guildUser = await guild.members.fetch(message.author.id);
 
     if (!guildUser) return message.reply('Not in guild');
+    message.reply('Test');
 
     await guildUser.timeout(0);
 

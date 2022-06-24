@@ -59,7 +59,7 @@ export default abstract class Command {
       if (!ids.includes(message.author.id))
         return {
           valid: false,
-          message: null,
+          message: this.options?.invalidPermissions,
           type: RequirmentsType.NotWhitelisted,
         };
     }
@@ -85,7 +85,6 @@ export default abstract class Command {
     if (!this.options?.requirments?.permissions) return true;
     const permsRequired = this.options.requirments.permissions;
     const authorId = message.author.id;
-
     if (authorId === message.guild.ownerId) return true;
     if (message.member.permissions.has('ADMINISTRATOR')) return true;
 
@@ -113,7 +112,6 @@ export default abstract class Command {
       type,
       message: invalidMessage,
     } = await this.isValidRequirments(message, args);
-
     if (!passedChecks && invalidMessage) message.reply(invalidMessage);
 
     //Run PostCheck()?

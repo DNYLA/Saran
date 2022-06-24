@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { Guild, Message } from 'discord.js';
 import Event from '../utils/base/event';
 import DiscordClient from '../utils/client';
-import { getUser } from '../utils/database/User';
+import { createGuildMember, getUser } from '../utils/database/User';
 import { getArgsFromMsg } from '../utils/helpers';
 const prisma = new PrismaClient();
 
@@ -13,7 +13,12 @@ export default class MessageEvent extends Event {
 
   async run(client: DiscordClient, message: Message) {
     if (message.author.bot) return;
-
+    const member = await message.guild.members.fetch(message.author.id);
+    const guildUser = await createGuildMember(
+      member,
+      {},
+      { xp: { increment: 5 } }
+    );
     if (message.content.includes('v/s')) {
       await message.react('◀️');
       await message.react('▶️');

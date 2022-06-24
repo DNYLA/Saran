@@ -1,12 +1,13 @@
-import { Collection, Message } from 'discord.js';
+import { Client, Collection, Message } from 'discord.js';
 import OwnerOnly from '../../checks/OwnerOnly';
 import StartTyping from '../../hooks/StartTyping';
 import Command from '../../utils/base/command';
+import { createGuildMember } from '../../utils/database/User';
 
 export default class IndexLevels extends Command {
   constructor() {
     super('indexlevels', {
-      aliases: ['levelsIndex'],
+      aliases: ['levelsIndex', 'il'],
       requirments: {
         userIDs: OwnerOnly,
       },
@@ -22,6 +23,7 @@ export default class IndexLevels extends Command {
     const guild = await message.guild.fetch();
     const channels = await guild.channels.fetch();
     const usersCollection = new Collection<string, number>();
+    const collectionKeys = [];
 
     await Promise.all(
       channels.map(async (channel) => {
@@ -48,12 +50,29 @@ export default class IndexLevels extends Command {
         }
 
         messages.forEach((msg: Message) => {
-          const xp = (usersCollection[msg.author.id] ?? 0) + 100 * 1.25;
+          if (msg.author.bot) return;
+
+          if (!collectionKeys.includes(msg.author.id))
+            collectionKeys.push(msg.author.id);
+          const xp = Math.floor(
+            (usersCollection[msg.author.id] ?? 0) + 10 * 1.2
+          );
           usersCollection[msg.author.id] = xp;
         });
       })
     );
 
-    console.log(usersCollection);
+    await Promise.all(
+      collectionKeys.map(async (key) => {
+        const item = usersCollection[key];
+        const member = await guild.members.fetch(key);
+        if (!member || !item) return;
+
+        console.log(`${key}:${item}`);
+        await createGuildMember(member, { xp: item });
+      })
+    );
+
+    message.reply('Indexed Levels');
   }
 }

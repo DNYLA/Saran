@@ -26,7 +26,6 @@ export default class UnMute extends Command {
   async run(message: Message, args: string[]) {
     const user = await getGuildMemberFromMention(message.guild, args[0]);
     if (!user) return message.reply('Unable to locate this user');
-
     try {
       const timeout = await user.timeout(0);
       return message.reply('Unmute d this persona');

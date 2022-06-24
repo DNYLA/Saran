@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "GuildUser" ADD COLUMN     "xp" INTEGER NOT NULL DEFAULT 0;

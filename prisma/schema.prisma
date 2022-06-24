@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = []
 }
 
 datasource db {
@@ -23,8 +24,8 @@ model GuildUser {
   serverId           String
   lastFMTag          String?
   reactionBoardScore Int     @default(0)
+  xp Int @default(0)
   user               User    @relation(fields: [userId], references: [id])
-
   @@id([userId, serverId])
 }
 
