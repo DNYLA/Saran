@@ -1,5 +1,6 @@
-import { Message } from 'discord.js';
+import { Message, MessageMentions } from 'discord.js';
 import { Periods } from '../api/lastfm';
+import { getUser } from './database/User';
 
 export function getArgsFromMsg(
   msg: string,
@@ -40,6 +41,20 @@ export function joinArgs(args: string[]) {
   }
 
   return [];
+}
+
+export async function getUserFromMention(mention: string) {
+  const userId = getIdFromMention(mention);
+  if (!userId) return null;
+  return await getUser(userId);
+}
+
+export function getIdFromMention(mention: string) {
+  const isMention = mention
+    .matchAll(MessageMentions.USERS_PATTERN)
+    .next().value;
+  if (isMention) return isMention[1];
+  else return null;
 }
 
 export function convertPeriodToText(period: Periods) {

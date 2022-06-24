@@ -31,10 +31,10 @@ export default class NowPlaying extends Command {
     const userId = getTargetUserId(message, args, true);
     const user = await getUser(userId);
     const username = user.lastFMName;
-    let normalEmbed = true;
+    let donatorEmbed = false;
 
-    if (args.includes('alt')) {
-      normalEmbed = false;
+    if (!args.includes('alt') && user.donator) {
+      donatorEmbed = true;
     }
 
     let track: Track;
@@ -75,20 +75,24 @@ export default class NowPlaying extends Command {
       SearchType.Track
     );
 
-    const albumInfo = await fetchAlbumInfo(username, albumName, artistName);
-    const artistInfo = await fetchArtistInfo(username, artistName);
-    const trackPlays = track?.userplaycount ?? 0;
-    const albumPlays = albumInfo?.userplaycount ?? 0;
-    const artistPlays = artistInfo?.stats?.userplaycount ?? 0;
-    const formatter = Intl.NumberFormat('en-uk');
-    const globalTrackplays = formatter.format(track?.playcount ?? 0);
-    const description = `>>> **${trackName}** ${'`x' + trackPlays + '`'}
+    let description = '';
+    let globalTrackplays = '0';
+    if (donatorEmbed) {
+      const albumInfo = await fetchAlbumInfo(username, albumName, artistName);
+      const artistInfo = await fetchArtistInfo(username, artistName);
+      const trackPlays = track?.userplaycount ?? 0;
+      const albumPlays = albumInfo?.userplaycount ?? 0;
+      const artistPlays = artistInfo?.stats?.userplaycount ?? 0;
+      const formatter = Intl.NumberFormat('en-uk');
+      globalTrackplays = formatter.format(track?.playcount ?? 0);
+      description = `>>> **${trackName}** ${'`x' + trackPlays + '`'}
     by **${artistName}** ${'`x' + artistPlays + '`'}
     on **${albumName}** ${'`x' + albumPlays + '`'}`;
+    }
 
     try {
       let messageEmbed;
-      if (!normalEmbed)
+      if (!donatorEmbed)
         messageEmbed = new MessageEmbed()
           .setColor('#4a5656')
           .setAuthor({

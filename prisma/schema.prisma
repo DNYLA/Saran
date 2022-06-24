@@ -15,6 +15,7 @@ model User {
   id         String      @id
   lastFMName String?
   lastFMTag  String?
+  donator Boolean @default(false)
   guilds     GuildUser[]
 }
 
