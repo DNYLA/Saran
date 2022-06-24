@@ -16,6 +16,7 @@ export default class IndexLevels extends Command {
         preCommand: StartTyping,
         postCommand: () => console.log('Finished Executing'),
       },
+      deleteCommand: true,
     });
   }
 
@@ -36,6 +37,7 @@ export default class IndexLevels extends Command {
           );
 
         while (message) {
+          console.log(messages.length);
           await channel.messages
             .fetch({ limit: 100, before: message.id })
             .then((messagePage) => {
@@ -65,11 +67,12 @@ export default class IndexLevels extends Command {
     await Promise.all(
       collectionKeys.map(async (key) => {
         const item = usersCollection[key];
-        const member = await guild.members.fetch(key);
-        if (!member || !item) return;
-
-        console.log(`${key}:${item}`);
-        await createGuildMember(member, { xp: item });
+        try {
+          const member = await guild.members.fetch(key);
+          if (!member || !item) return;
+          console.log(`${key}:${item}`);
+          await createGuildMember(member, { xp: item });
+        } catch (err) {}
       })
     );
 

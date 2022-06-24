@@ -54,13 +54,22 @@ export default class NowPlaying extends Command {
       message.reply('Cant scrobble view this track');
     }
 
-    if (!track || !recentTrack)
+    if (!track && !recentTrack)
       return message.reply('Unable to display this track!');
 
+    console.log(track);
+    console.log(recentTrack);
+
+    const baseUrl = 'https://www.last.fm/';
+    const trackName = recentTrack.name;
+    const artistName = track?.artist
+      ? track.artist.name
+      : recentTrack.artist['#text'];
+    const artistUrl = track?.artist ? track.artist.url : baseUrl;
     await setCachedPlays(
       user.lastFMName,
-      `${track.name}-${track.artist.name}`,
-      track.userplaycount,
+      `${trackName}-${artistName}`,
+      track?.userplaycount ?? 0,
       SearchType.Track
     );
 
@@ -80,17 +89,19 @@ export default class NowPlaying extends Command {
             // GenerateField('Track', value, true)
             {
               name: 'Track',
-              value: `[${recentTrack.name}](${recentTrack.url})`,
+              value: `[${trackName}](${recentTrack.url})`,
               inline: true,
             },
             {
               name: 'Artist',
-              value: `[${track.artist.name}](${track.artist.url})`,
+              value: `[${artistName}](${artistUrl})`,
               inline: true,
             }
           )
           .setFooter({
-            text: `Playcount: ${track.userplaycount}  ∙ Album: ${recentTrack.album['#text']}`,
+            text: `Playcount: ${track ? track.userplaycount : 0}  ∙ Album: ${
+              recentTrack.album['#text']
+            }`,
           });
       else
         messageEmbed = new MessageEmbed()
