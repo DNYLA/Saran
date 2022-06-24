@@ -1,4 +1,5 @@
 import { Message, MessageEmbed } from 'discord.js';
+import { fetchAlbumInfo, fetchArtistInfo } from '../../api/lastfm';
 import UsernameCheck from '../../checks/UsernameCheck';
 import NoUsernameSet from '../../hooks/NoUsernameSet';
 import StartTyping from '../../hooks/StartTyping';
@@ -29,7 +30,7 @@ export default class NowPlaying extends Command {
   async run(message: Message, args: string[]) {
     const userId = getTargetUserId(message, args, true);
     const user = await getUser(userId);
-
+    const username = user.lastFMName;
     let normalEmbed = true;
 
     if (args.includes('alt')) {
@@ -66,6 +67,7 @@ export default class NowPlaying extends Command {
       ? track.artist.name
       : recentTrack.artist['#text'];
     const artistUrl = track?.artist ? track.artist.url : baseUrl;
+    const albumName = track?.album?.title ?? recentTrack.album['#text'];
     await setCachedPlays(
       user.lastFMName,
       `${trackName}-${artistName}`,
@@ -73,9 +75,20 @@ export default class NowPlaying extends Command {
       SearchType.Track
     );
 
+    const albumInfo = await fetchAlbumInfo(username, albumName, artistName);
+    const artistInfo = await fetchArtistInfo(username, artistName);
+    const trackPlays = track?.userplaycount ?? 0;
+    const albumPlays = albumInfo?.userplaycount ?? 0;
+    const artistPlays = artistInfo?.stats?.userplaycount ?? 0;
+    const formatter = Intl.NumberFormat('en-uk');
+    const globalTrackplays = formatter.format(track?.playcount ?? 0);
+    const description = `>>> **${trackName}** ${'`x' + trackPlays + '`'}
+    by **${artistName}** ${'`x' + artistPlays + '`'}
+    on **${albumName}** ${'`x' + albumPlays + '`'}`;
+
     try {
       let messageEmbed;
-      if (normalEmbed)
+      if (!normalEmbed)
         messageEmbed = new MessageEmbed()
           .setColor('#4a5656')
           .setAuthor({
@@ -105,9 +118,9 @@ export default class NowPlaying extends Command {
           });
       else
         messageEmbed = new MessageEmbed()
-          .setColor('#4a5656')
-          .setTitle(recentTrack.name)
-          .setURL(recentTrack.url)
+          .setColor('#2F3136')
+          // .setTitle(recentTrack.name)
+          // .setURL(recentTrack.url)
           .setAuthor({
             name: user.lastFMName,
             url: `https://www.last.fm/user/${user.lastFMName}`,
@@ -115,20 +128,11 @@ export default class NowPlaying extends Command {
               'https://lastfm.freetls.fastly.net/i/u/avatar170s/a7ff67ef791aaba0c0c97e9c8a97bf04.png',
           })
           .setThumbnail(recentTrack.image[3]['#text'])
-          .addFields(
-            {
-              name: `[link](http://example.com)`,
-              value: `[${track.artist.name}](${track.artist.url}) ∙ [${track.album.title}](${track.album.url})`,
-              inline: true,
-            },
-            {
-              name: 'Plays',
-              value: `${track.userplaycount}`,
-              inline: true,
-            }
-          )
+          .setDescription(description)
           .setFooter({
-            text: `Jungaal has ${userInfo.total}  ∙ Album: ${recentTrack.album['#text']}`,
+            text: `Total Scrobbles: ${
+              userInfo?.total ?? 0
+            }  ∙ Global Plays: ${globalTrackplays}`,
           });
       const npMessage = await message.channel.send({
         embeds: [messageEmbed],
