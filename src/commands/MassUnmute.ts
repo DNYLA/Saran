@@ -9,9 +9,6 @@ export default class Ping extends Command {
   constructor() {
     super('unmuteRemote', {
       aliases: ['ur'],
-      requirments: {
-        userIDs: ['827212859447705610'],
-      },
       invalidPermissions: 'You must be admin to use this!',
       invalidUsage: 'do ,ur <guildId>',
       hooks: {
