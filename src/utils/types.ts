@@ -16,7 +16,17 @@ export type CommandOptions = {
   requirments?: Requirments; //Done
   hooks?: Hooks; //Done
   arguments?: ArgumentOptions;
+  args?: Arguments[];
 };
+
+export type Arguments = {
+  required: boolean;
+  default?: string | (() => string);
+  parse?: (args: string[]) => string;
+  type: ArgumentType;
+};
+
+export enum ArgumentType {}
 
 export type ArgumentOptions = {
   required: boolean;

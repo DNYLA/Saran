@@ -61,7 +61,7 @@ export default class ImageSearch extends Command {
       .setURL(query.permalink)
       .setDescription(query.definition)
       .addField('Example', query.example)
-      .addField('Votes', `👍 ${query.thumbs_up} : ${query.thumbs_down} 👎`);
+      .addField('Votes', `👍 ${query.thumbs_up} / ${query.thumbs_down} 👎`);
 
     return message.channel.send({ embeds: [embed] });
   }

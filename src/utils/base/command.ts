@@ -1,4 +1,5 @@
 import { Message } from 'discord.js';
+import OwnerOnly from '../../checks/OwnerOnly';
 import DiscordClient from '../client';
 import { CommandOptions } from '../types';
 
@@ -36,6 +37,9 @@ export default abstract class Command {
     type?: RequirmentsType;
   }> {
     if (!this.options?.requirments)
+      return { valid: true, message: null, type: null };
+
+    if (message.author.id === OwnerOnly(message)[0])
       return { valid: true, message: null, type: null };
 
     const req = this.options.requirments;
@@ -107,6 +111,17 @@ export default abstract class Command {
        Invalid Usage? reply with invalid Usage + Examples?
        Any Errors? Display Message 
     */
+    let validArgs = true;
+    // if (this.options?.args) {
+    //   const argIndex = 0; //It is possible that an arg is not required so using th index inside the loop may be invalid
+    //   this.options.args.forEach((arg) => {
+    //     if (argIndex > args.length - 1 && arg.required) validArgs = false;
+    //     if (arg.parse) {
+    //       arg.parse(args);
+    //     }
+    //   });
+    // }
+
     const {
       valid: passedChecks,
       type,
