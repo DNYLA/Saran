@@ -12,7 +12,7 @@ import DiscordClient from '../../utils/client';
 import ytSearch from 'youtube-search';
 const opts = {
   maxResults: 1,
-  key: 'AIzaSyAADFGXCQ7WQkCKFn8nlmnfuiTSxok0goI',
+  key: process.env.GOOGLE_API_KEY,
   type: 'video',
 };
 
@@ -51,7 +51,6 @@ export default class YoutubeSearch extends Command {
     const results = await ytSearch(term, opts).catch(console.error);
     // return message.channel.send(results);
     if (!results) return message.reply('No video found!');
-    console.log(results.results);
     if (results.results.length === 0)
       return message.reply(`No results matching ${term}`);
 
