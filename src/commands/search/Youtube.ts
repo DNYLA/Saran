@@ -43,9 +43,6 @@ export default class YoutubeSearch extends Command {
   }
 
   async run(message: Message, args: string[]) {
-    const client = message.client as DiscordClient;
-
-    const author = message.member;
     const term = args.join(' ');
 
     const results = await ytSearch(term, opts).catch(console.error);
