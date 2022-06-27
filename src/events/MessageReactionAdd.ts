@@ -24,7 +24,7 @@ export default class MessageReactionAdd extends Event {
 
     try {
       await message.guild.channels.fetch();
-      const channel = message.guild.channels.cache.get(
+      const channel = await message.guild.channels.fetch(
         config.reactionBoardChannel
       );
 
@@ -76,6 +76,7 @@ export default class MessageReactionAdd extends Event {
       channel.send({ embeds: [messageEmbed] });
     } catch (err) {
       console.log(err);
+      console.log('Caught Error');
     }
   }
 }

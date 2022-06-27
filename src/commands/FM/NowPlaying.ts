@@ -103,7 +103,8 @@ export default class NowPlaying extends Command {
       let messageEmbed;
       if (!donatorEmbed)
         messageEmbed = new MessageEmbed()
-          .setColor('#4a5656')
+          // .setColor('#4a5656')
+          .setColor('#0a090b')
           .setAuthor({
             name: user.lastFMName,
             url: `https://www.last.fm/user/${user.lastFMName}`,
@@ -131,7 +132,9 @@ export default class NowPlaying extends Command {
           });
       else
         messageEmbed = new MessageEmbed()
-          .setColor('#2F3136')
+          // .setColor('#2F3136')
+          .setColor('#0a090b')
+          // .setCo
           // .setTitle(recentTrack.name)
           // .setURL(recentTrack.url)
           .setAuthor({
