@@ -1,3 +1,4 @@
+import { xml } from 'cheerio';
 import { Message } from 'discord.js';
 import OwnerOnly from '../../checks/OwnerOnly';
 import DiscordClient from '../client';
@@ -35,25 +36,26 @@ export default abstract class Command {
     valid: boolean;
     message?: string;
     type?: RequirmentsType;
+    args: string[];
   }> {
     if (!this.options?.requirments)
-      return { valid: true, message: null, type: null };
+      return { valid: true, message: null, type: null, args };
 
-    if (message.author.id === OwnerOnly(message)[0])
-      return { valid: true, message: null, type: null };
+    const isBotOwner = message.author.id === OwnerOnly(message)[0];
 
     const req = this.options.requirments;
     const validPermissions = this.checkPermissions(message);
 
-    if (!validPermissions)
+    if (!validPermissions && !isBotOwner)
       return {
         valid: false,
         message: this.options?.invalidPermissions,
         type: RequirmentsType.Permissions,
+        args,
       };
 
     if (req.userIDs) {
-      let ids = [];
+      let ids = [OwnerOnly(message)[0]];
       if (typeof req.userIDs === 'function') {
         ids = req.userIDs(message);
       } else if (Array.isArray(req.userIDs)) {
@@ -65,6 +67,7 @@ export default abstract class Command {
           valid: false,
           message: this.options?.invalidPermissions,
           type: RequirmentsType.NotWhitelisted,
+          args,
         };
     }
 
@@ -74,15 +77,30 @@ export default abstract class Command {
           valid: false,
           message: this.options.invalidUsage ?? 'Invalid Usage',
           type: RequirmentsType.InvalidArguments,
+          args,
         };
       }
     }
 
+    const { valid: validArgs, parsedArgs } = this.isValidArgs(args, message);
+    if (!validArgs)
+      return {
+        valid: false,
+        message: this.options.invalidUsage ?? 'Invalid Usage',
+        type: RequirmentsType.InvalidArguments,
+        args,
+      };
+
     //Message is displayed in PostCheck if they chose to
     if (req.custom && !(await req.custom(message, args)))
-      return { valid: false, message: null, type: RequirmentsType.Custom };
+      return {
+        valid: false,
+        message: null,
+        type: RequirmentsType.Custom,
+        args,
+      };
 
-    return { valid: true, message: null, type: null };
+    return { valid: true, message: null, type: null, args: parsedArgs };
   }
 
   private checkPermissions(message: Message) {
@@ -100,6 +118,53 @@ export default abstract class Command {
     return true;
   }
 
+  private isValidArgs(args: string[], message: Message) {
+    let validArgs = true;
+    const parsedArgs: string[] = [];
+    if (this.options?.args) {
+      let argIndex = 0; //It is possible that an arg is not required so using th index inside the loop may be invalid
+      const parseDefault = (
+        argDefault: string | ((message: Message) => string),
+        msg: Message
+      ) => {
+        if (!argDefault) return null;
+        if (typeof argDefault === 'string') return argDefault;
+
+        return argDefault(msg);
+      };
+
+      this.options.args.map((arg, i) => {
+        if (args.length - 1 > this.options.args.length) return;
+        if (argIndex > args.length - 1) {
+          const isDefault = parseDefault(arg.default, message);
+          if (isDefault) parsedArgs.push(isDefault);
+          else if (!arg.optional) validArgs = false;
+
+          return;
+        }
+
+        if (!arg.parse) {
+          parsedArgs.push(args[argIndex]);
+          argIndex++;
+          return;
+        }
+
+        const parsedArg = arg.parse(message, args, argIndex);
+
+        if (!parsedArg) {
+          const defaultArg = parseDefault(arg.default, message);
+          if (defaultArg) parsedArgs.push(defaultArg);
+          else if (!arg.optional) validArgs = false;
+        } else {
+          parsedArgs.push(parsedArg);
+          argIndex++;
+        }
+      });
+    }
+
+    return { valid: validArgs, parsedArgs };
+  }
+
   async execute(client: DiscordClient, message: Message, args: string[]) {
     const hooks = this.options?.hooks;
 
@@ -111,14 +176,26 @@ export default abstract class Command {
        Invalid Usage? reply with invalid Usage + Examples?
        Any Errors? Display Message 
     */
-    let validArgs = true;
+
     // if (this.options?.args) {
     //   const argIndex = 0; //It is possible that an arg is not required so using th index inside the loop may be invalid
-    //   this.options.args.forEach((arg) => {
+    //   const newArgs = this.options.args.map((arg) => {
+    //     if (!validArgs) return;
     //     if (argIndex > args.length - 1 && arg.required) validArgs = false;
-    //     if (arg.parse) {
-    //       arg.parse(args);
+    //     if (!arg.parse && arg.default) return arg.default;
+    //     if (!arg.parse && arg.required) {
+    //       validArgs = false;
+    //       return;
     //     }
+
+    //     const parsedArg = arg.parse(message, args);
+    //     console.log(parsedArg);
+    //     if (!parsedArg && arg.required) {
+    //       validArgs = null;
+    //       return;
+    //     }
+
+    //     return parsedArg;
     //   });
     // }
 
@@ -126,6 +203,7 @@ export default abstract class Command {
       valid: passedChecks,
       type,
       message: invalidMessage,
+      args: parsedArgs,
     } = await this.isValidRequirments(message, args);
     if (!passedChecks && invalidMessage) message.reply(invalidMessage);
 
@@ -135,7 +213,7 @@ export default abstract class Command {
     //Run Command if checks passed
     let success = true;
     try {
-      if (passedChecks) await this.run(message, args);
+      if (passedChecks) await this.run(message, parsedArgs);
     } catch (err) {
       message.reply(
         this.options.errorMessage ??

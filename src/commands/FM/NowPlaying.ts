@@ -3,6 +3,7 @@ import { fetchAlbumInfo, fetchArtistInfo } from '../../api/lastfm';
 import UsernameCheck from '../../checks/UsernameCheck';
 import NoUsernameSet from '../../hooks/NoUsernameSet';
 import StartTyping from '../../hooks/StartTyping';
+import { MentionUserId, SelfUserId } from '../../utils/argsparser';
 import Command from '../../utils/base/command';
 import { setCachedPlays } from '../../utils/database/redisManager';
 import { getUser } from '../../utils/database/User';
@@ -24,14 +25,22 @@ export default class NowPlaying extends Command {
         preCommand: StartTyping,
         postCheck: NoUsernameSet,
       },
+      args: [
+        {
+          parse: MentionUserId,
+          default: SelfUserId,
+        },
+      ],
     });
   }
 
   async run(message: Message, args: string[]) {
-    const userId = getTargetUserId(message, args, true);
+    const userId = args[0];
     const user = await getUser(userId);
     const username = user.lastFMName;
     let donatorEmbed = false;
+
+    // if (!user.lastFMName) return
 
     if (!args.includes('alt') && user.donator) {
       donatorEmbed = true;
@@ -94,7 +103,8 @@ export default class NowPlaying extends Command {
       let messageEmbed;
       if (!donatorEmbed)
         messageEmbed = new MessageEmbed()
-          .setColor('#4a5656')
+          // .setColor('#4a5656')
+          .setColor('#0a090b')
           .setAuthor({
             name: user.lastFMName,
             url: `https://www.last.fm/user/${user.lastFMName}`,
@@ -122,7 +132,9 @@ export default class NowPlaying extends Command {
           });
       else
         messageEmbed = new MessageEmbed()
-          .setColor('#2F3136')
+          // .setColor('#2F3136')
+          .setColor('#0a090b')
+          // .setCo
           // .setTitle(recentTrack.name)
           // .setURL(recentTrack.url)
           .setAuthor({

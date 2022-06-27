@@ -1,4 +1,4 @@
-import { Message, MessageEmbed } from 'discord.js';
+import { GuildMember, Message, MessageEmbed, User } from 'discord.js';
 import { RequirmentsType } from './base/command';
 
 export type CommandOptions = {
@@ -20,13 +20,22 @@ export type CommandOptions = {
 };
 
 export type Arguments = {
-  required: boolean;
-  default?: string | (() => string);
-  parse?: (args: string[]) => string;
+  optional?: boolean;
+  default?: string | ((message: Message) => string);
+  parse?: (message: Message, args: string[], index: number) => string;
+  // type: ArgumentType;
+};
+
+export type Argument2 = {
+  value: string | string[] | User | GuildMember;
   type: ArgumentType;
 };
 
-export enum ArgumentType {}
+export enum ArgumentType {
+  UserMention,
+  String,
+  Word,
+}
 
 export type ArgumentOptions = {
   required: boolean;
