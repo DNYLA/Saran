@@ -9,7 +9,7 @@ export default class InteractionCreated extends Event {
   }
 
   async run(client: DiscordClient, member: GuildMember) {
-    const channels = member.guild.channels.fetch('986425541798293539');
+    // const channels = member.guild.channels.fetch('');
     // membe
   }
 }
