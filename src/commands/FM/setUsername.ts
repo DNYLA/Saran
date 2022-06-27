@@ -10,18 +10,11 @@ export default class SetUsername extends Command {
   constructor() {
     super('lf set', {
       aliases: ['lfset'],
-      requirments: {
-        custom: UsernameCheck,
-      },
       hooks: {
         preCommand: StartTyping,
-        postCheck: NoUsernameSet,
       },
       invalidUsage: 'Usage: ,lf set <username>',
-      arguments: {
-        required: true,
-        minAmount: 1,
-      },
+      args: [{}],
     });
   }
 
