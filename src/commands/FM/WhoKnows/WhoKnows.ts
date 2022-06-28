@@ -3,7 +3,8 @@ import { fetchArtistInfo } from '../../../api/lastfm';
 import UsernameCheck from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
-import Command from '../../../utils/base/command';
+import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
+import Command, { ArgumentTypes } from '../../../utils/base/command';
 import {
   getCachedPlays,
   setCachedPlays,
@@ -11,9 +12,11 @@ import {
 import { getGuildUsers, getUser } from '../../../utils/database/User';
 import {
   fetchRecentArtistInfo,
+  fetchSearchArtistInfo,
   getTargetUserId,
   SearchType,
 } from '../../../utils/fmHelpers';
+import { Artist, PartialUser } from '../../../utils/types';
 
 export default class WhoKnows extends Command {
   constructor() {
@@ -25,24 +28,46 @@ export default class WhoKnows extends Command {
         preCommand: StartTyping,
         postCheck: NoUsernameSet,
       },
+      args: [
+        {
+          parse: MentionUserId,
+          default: SelfUserId,
+          name: 'targetUserId',
+          type: ArgumentTypes.SINGLE,
+        },
+        {
+          name: 'artistName',
+          type: ArgumentTypes.FULL_SENTANCE,
+          optional: true,
+        },
+      ],
     });
   }
 
-  async run(message: Message, args: string[]) {
-    const user = await getUser(getTargetUserId(message, args, true));
+  async run(
+    message: Message,
+    args: string[],
+    argums: { targetUserId: string; artistName: string }
+  ) {
+    const user = await getUser(argums.targetUserId);
     const guildUsers = await getGuildUsers(message.guildId);
+
+    let artist: Artist;
+    let userInfo: PartialUser;
 
     if (!guildUsers || guildUsers.length === 0)
       return message.reply('Server hasnt been indexed use ,lf index');
 
-    const { artist, recentTrack } = await fetchRecentArtistInfo(
-      user.lastFMName
-    );
-
-    if (!artist || !recentTrack)
-      return message.reply(
-        'The current track you are listening to is not trackable!'
+    if (!argums.artistName) {
+      const { artist: recentArtist } = await fetchRecentArtistInfo(
+        user.lastFMName
       );
+      artist = recentArtist;
+    } else {
+      artist = await fetchSearchArtistInfo(user.lastFMName, argums.artistName);
+    }
+
+    if (!artist) return message.reply('Unable to find artist with name!');
 
     let sum = 0;
     let description = '';

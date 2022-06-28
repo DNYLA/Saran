@@ -14,7 +14,7 @@ import {
 } from '../../../utils/fmHelpers';
 import { PartialUser, Track } from '../../../utils/types';
 
-type PlaysTrackArguments = {
+export type SearchTrackArguments = {
   targetUserId: string;
   trackName: string;
   artistName: string;
@@ -54,7 +54,7 @@ export default class PlaysTrack extends Command {
     });
   }
 
-  async run(message: Message, args: string[], argums: PlaysTrackArguments) {
+  async run(message: Message, args: string[], argums: SearchTrackArguments) {
     const user = await getUser(argums.targetUserId);
 
     const { trackName, artistName } = argums;

@@ -9,6 +9,7 @@ export default (
   valid: boolean,
   type: RequirmentsType
 ): void => {
+  console.log(args.targetUserId);
   if (!args.targetUserId) {
     const unknownError = new MessageEmbed()
       .setColor('#cb0f0f')

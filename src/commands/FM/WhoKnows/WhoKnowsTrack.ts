@@ -5,7 +5,8 @@ import UsernameCheck, {
 } from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
-import Command from '../../../utils/base/command';
+import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
+import Command, { ArgumentTypes } from '../../../utils/base/command';
 import {
   getCachedPlays,
   setCachedPlays,
@@ -13,9 +14,12 @@ import {
 import { getGuildUsers, getUser } from '../../../utils/database/User';
 import {
   fetchRecentTrackInfo,
+  fetchSearchTrackInfo,
   getTargetUserId,
   SearchType,
 } from '../../../utils/fmHelpers';
+import { Track } from '../../../utils/types';
+import { SearchTrackArguments } from '../Plays/playsTrack';
 
 export default class WhoKnowstrack extends Command {
   constructor() {
@@ -27,20 +31,51 @@ export default class WhoKnowstrack extends Command {
         preCommand: StartTyping,
         postCheck: NoUsernameSet,
       },
+      args: [
+        {
+          parse: MentionUserId,
+          default: SelfUserId,
+          name: 'targetUserId',
+          type: ArgumentTypes.SINGLE,
+        },
+        {
+          name: 'trackName',
+          type: ArgumentTypes.DENOMENATED_WORD,
+          optional: true,
+        },
+        {
+          name: 'artistName',
+          type: ArgumentTypes.DENOMENATED_WORD,
+          optional: true,
+        },
+      ],
     });
   }
 
-  async run(message: Message, args: string[]) {
-    const user = await getUser(getTargetUserId(message, args, true));
+  async run(message: Message, args: string[], argums: SearchTrackArguments) {
+    const user = await getUser(argums.targetUserId);
 
     const guildUsers = await getGuildUsers(message.guildId);
+    let track: Track;
 
     if (!guildUsers || guildUsers.length === 0)
       return message.reply('Server hasnt been indexed use ,lf index');
 
-    const { track, recentTrack } = await fetchRecentTrackInfo(user.lastFMName);
+    if (!argums.trackName) {
+      const { track: recentTrack } = await fetchRecentTrackInfo(
+        user.lastFMName
+      );
 
-    if (!track || !recentTrack)
+      track = recentTrack;
+    } else {
+      track = await fetchSearchTrackInfo(
+        user.lastFMName,
+        argums.trackName,
+        argums.artistName
+      );
+    }
+
+    if (!track)
       return message.reply(
         'Unable to find recent track or track isnt valid to who knows!'
       );

@@ -3,7 +3,8 @@ import { fetchAlbumInfo } from '../../../api/lastfm';
 import UsernameCheck from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
-import Command from '../../../utils/base/command';
+import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
+import Command, { ArgumentTypes } from '../../../utils/base/command';
 import {
   getCachedPlays,
   setCachedPlays,
@@ -15,9 +16,12 @@ import {
 } from '../../../utils/database/User';
 import {
   fetchRecentAlbumInfo,
+  fetchRecentArtistInfo,
+  fetchSearchAlbumInfo,
   getTargetUserId,
   SearchType,
 } from '../../../utils/fmHelpers';
+import { Album, Artist } from '../../../utils/types';
 
 export default class GlobalWhoKnowsAlbum extends Command {
   constructor() {
@@ -29,22 +33,46 @@ export default class GlobalWhoKnowsAlbum extends Command {
         preCommand: StartTyping,
         postCheck: NoUsernameSet,
       },
+      args: [
+        {
+          parse: MentionUserId,
+          default: SelfUserId,
+          name: 'targetUserId',
+          type: ArgumentTypes.SINGLE,
+        },
+        {
+          name: 'albumName',
+          type: ArgumentTypes.DENOMENATED_WORD,
+          optional: true,
+        },
+      ],
     });
   }
 
-  async run(message: Message, args: string[]) {
-    const user = await getUser(getTargetUserId(message, args, true));
+  async run(
+    message: Message,
+    args: string[],
+    argums: { targetUserId: string; albumName: string }
+  ) {
+    const user = await getUser(argums.targetUserId);
     const guildUsers = await getUsersWithUsername();
+
+    let album: Album;
 
     if (!guildUsers || guildUsers.length === 0)
       return message.reply('Server hasnt been indexed use ,lf index');
 
-    const { album, recentTrack } = await fetchRecentAlbumInfo(user.lastFMName);
-
-    if (!album || !recentTrack)
-      return message.reply(
-        'The current album you are listening to is not trackable!'
+    if (!argums.albumName) {
+      const { album: recentAlbum } = await fetchRecentAlbumInfo(
+        user.lastFMName
       );
+
+      album = recentAlbum;
+    } else {
+      album = await fetchSearchAlbumInfo(user.lastFMName, argums.albumName);
+    }
+
+    if (!album) return message.reply('Unable to find album with name!');
 
     let sum = 0;
     let description = '';
