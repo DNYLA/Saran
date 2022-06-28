@@ -32,9 +32,7 @@ export default class ImageSearch extends Command {
 
   async run(message: Message, args: string[], argums: SearchQueryArgs) {
     const client = message.client as DiscordClient;
-    return message.reply(
-      'Command is disabled because <@801091354162626611> is a fucking autistic cunt'
-    );
+    return message.reply('Command is disabled');
     // if (args.length === 0) return message.reply('Provide a query to search!');
     // const { query } = argums;
 
