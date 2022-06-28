@@ -19,30 +19,26 @@ export default class JailSetup extends Command {
     });
   }
 
-  async run(message: Message, args: string[]) {
-    const user = await getGuildMemberFromMention(message.guild, args[0]);
-    if (!user) return message.reply('Cant find guild member');
-
-    let reason = '';
-
-    if (args.length > 1) {
-      args.shift();
-      reason = args.join(' ');
-    }
-
-    try {
-      await user.kick(reason);
-
-      let embedMessage = `Successfully kicked ${user.displayName}`;
-      if (reason.length > 0) {
-        embedMessage += ` for ${reason}`;
-      }
-
-      message.reply(embedMessage);
-    } catch (err) {
-      return message.reply(
-        'Unable to kick user! This typically occurs when the user you are trying to kick has a role higher than the bot.'
-      );
-    }
+  async run(message: Message) {
+    message.reply('Not available!');
+    // const user = await getGuildMemberFromMention(message.guild, args[0]);
+    // if (!user) return message.reply('Cant find guild member');
+    // let reason = '';
+    // if (args.length > 1) {
+    //   args.shift();
+    //   reason = args.join(' ');
+    // }
+    // try {
+    //   await user.kick(reason);
+    //   let embedMessage = `Successfully kicked ${user.displayName}`;
+    //   if (reason.length > 0) {
+    //     embedMessage += ` for ${reason}`;
+    //   }
+    //   message.reply(embedMessage);
+    // } catch (err) {
+    //   return message.reply(
+    //     'Unable to kick user! This typically occurs when the user you are trying to kick has a role higher than the bot.'
+    //   );
+    // }
   }
 }

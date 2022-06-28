@@ -25,7 +25,7 @@ export default class Ping extends Command {
     });
   }
 
-  async run(message: Message, args: string[]) {
+  async run(message: Message) {
     return message.reply('Pong');
   }
 }

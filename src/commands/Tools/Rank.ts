@@ -11,7 +11,7 @@ export default class Rank extends Command {
       hooks: {
         preCommand: StartTyping,
       },
-      args: [
+      arguments: [
         {
           parse: MentionUserId,
           default: SelfUserId,
@@ -22,14 +22,10 @@ export default class Rank extends Command {
     });
   }
 
-  async run(
-    message: Message,
-    args: string[],
-    argums: { targetUserId: string }
-  ) {
-    const guildUser = await message.guild.members.fetch(argums.targetUserId);
-    const user = await getGuildUser(message.guildId, argums.targetUserId);
-    const isSelf = argums.targetUserId === message.author.id;
+  async run(message: Message, args: { targetUserId: string }) {
+    const guildUser = await message.guild.members.fetch(args.targetUserId);
+    const user = await getGuildUser(message.guildId, args.targetUserId);
+    const isSelf = args.targetUserId === message.author.id;
     const targetText = isSelf ? 'You have' : guildUser.displayName + ' has';
 
     if (!user || user.guilds.length === 0)

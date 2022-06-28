@@ -18,7 +18,7 @@ export default class UnBan extends Command {
       hooks: {
         preCommand: StartTyping,
       },
-      args: [
+      arguments: [
         {
           parse: MentionIdOrArg,
           name: 'mentionedUserId',
@@ -28,12 +28,8 @@ export default class UnBan extends Command {
     });
   }
 
-  async run(
-    message: Message,
-    args: string[],
-    argums: { mentionedUserId: string }
-  ) {
-    const user = await message.client.users.fetch(argums.mentionedUserId);
+  async run(message: Message, args: { mentionedUserId: string }) {
+    const user = await message.client.users.fetch(args.mentionedUserId);
     if (!user) return message.reply('User doesnt exist!');
 
     try {

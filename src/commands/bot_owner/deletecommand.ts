@@ -27,7 +27,7 @@ export default class ArgsTest extends Command {
       hooks: {
         postCommand: () => console.log('Finished Executing'),
       },
-      args: [
+      arguments: [
         {
           name: 'messageID',
           type: ArgumentTypes.SINGLE,
@@ -36,11 +36,11 @@ export default class ArgsTest extends Command {
     });
   }
 
-  async run(message: Message, args: string[], argums: { messageID: string }) {
-    console.log(argums);
+  async run(message: Message, args: { messageID: string }) {
+    console.log(args);
     try {
       const messageToDelete = await message.channel.messages.fetch(
-        argums.messageID
+        args.messageID
       );
       await messageToDelete.delete();
     } catch (err) {

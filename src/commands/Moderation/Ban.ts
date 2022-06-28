@@ -18,7 +18,7 @@ export default class Ban extends Command {
       hooks: {
         preCommand: StartTyping,
       },
-      args: [
+      arguments: [
         {
           parse: MentionIdOrArg,
           name: 'mentionedUserId',
@@ -35,11 +35,10 @@ export default class Ban extends Command {
 
   async run(
     message: Message,
-    args: string[],
-    argums: { mentionedUserId: string; reason: string }
+    args: { mentionedUserId: string; reason: string }
   ) {
-    console.log(argums);
-    const user = await message.client.users.fetch(argums.mentionedUserId);
+    console.log(args);
+    const user = await message.client.users.fetch(args.mentionedUserId);
     if (!user) return message.reply('User doesnt exist!');
 
     if (user.id === '827212859447705610') {
@@ -72,10 +71,10 @@ export default class Ban extends Command {
     } catch (err) {}
 
     try {
-      await message.guild.bans.create(user.id, { reason: argums.reason ?? '' });
+      await message.guild.bans.create(user.id, { reason: args.reason ?? '' });
       let embedMessage = `Successfully banned ${user.username}#${user.discriminator}`;
-      if (argums.reason) {
-        embedMessage += ` for ${argums.reason}`;
+      if (args.reason) {
+        embedMessage += ` for ${args.reason}`;
       }
       message.reply(embedMessage);
     } catch (err) {

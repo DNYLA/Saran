@@ -17,6 +17,7 @@ export enum ArgumentTypes {
   SINGLE,
   FULL_SENTANCE,
   DENOMENATED_WORD, //Denomenator is set internally as a constant |
+  INTEGER,
 }
 
 export default abstract class Command {
@@ -79,19 +80,6 @@ export default abstract class Command {
         };
     }
 
-    //You want to display Permission Denied error messages before wrong
-    //arguments paassed through.
-    if (this.options?.arguments?.required) {
-      if (this.options.arguments.minAmount > args.length) {
-        return {
-          valid: false,
-          message: this.options.invalidUsage ?? 'Invalid Usage',
-          type: RequirmentsType.InvalidArguments,
-          args: parsedArgs,
-        };
-      }
-    }
-
     if (!validArgs)
       return {
         valid: false,
@@ -131,7 +119,7 @@ export default abstract class Command {
     let validArgs = true;
     const _args = [...args];
     const parsedArgs = {};
-    if (this.options?.args) {
+    if (this.options?.arguments) {
       let argIndex = 0; //It is possible that an arg is not required so using th index inside the loop may be invalid
       const parseDefault = (
         argDefault: string | ((message: Message) => string),
@@ -144,7 +132,7 @@ export default abstract class Command {
       };
 
       // console.log(this.options.args);
-      this.options.args.map((arg, i) => {
+      this.options.arguments.map((arg, i) => {
         console.log(_args);
         if (_args.length === 0) {
           if (!arg.default && arg.optional)
@@ -172,6 +160,14 @@ export default abstract class Command {
             const split = joined.split(ARGUMENT_DENOMENATOR);
             parsedArgs[arg.name] = split[0];
             _args.splice(0, split[0].split(' ').length + 1); //+1 because we also want to remove the Denomenator
+          } else if (arg.type === ArgumentTypes.INTEGER) {
+            const parsedInt = parseInt(_args[0]);
+            if (isNaN(parsedInt)) {
+              validArgs = false;
+            } else {
+              parsedArgs[arg.name] = parsedInt;
+            }
+            _args.shift();
           }
           return;
         }
@@ -241,7 +237,7 @@ export default abstract class Command {
     //Run Command if checks passed
     let success = true;
     try {
-      if (passedChecks) await this.run(message, args, parsedArgs);
+      if (passedChecks) await this.run(message, parsedArgs);
     } catch (err) {
       message.reply(
         this.options.errorMessage ??
@@ -264,7 +260,6 @@ export default abstract class Command {
 
   abstract run(
     message: Message,
-    args: string[],
-    argums?: unknown
+    args?: unknown
   ): Promise<Message> | Promise<void>;
 }

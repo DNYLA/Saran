@@ -22,7 +22,7 @@ export default class IndexGuild extends Command {
     });
   }
 
-  async run(message: Message, args: string[]) {
+  async run(message: Message) {
     const members = await message.guild.members.fetch();
     const userIds = await fetchUserIdsWithUsername();
 

@@ -17,7 +17,7 @@ export default class SetUsername extends Command {
         preCommand: StartTyping,
       },
       invalidUsage: 'Usage: ,lf set <username>',
-      args: [
+      arguments: [
         {
           name: 'username',
           type: ArgumentTypes.SINGLE,
@@ -26,10 +26,10 @@ export default class SetUsername extends Command {
     });
   }
 
-  async run(message: Message, args: string[], argums: { username: string }) {
-    console.log(argums);
-    if (updateUserById(message.author.id, { lastFMName: argums.username })) {
-      return message.reply(`Successfully set name to ${argums.username}`);
+  async run(message: Message, args: { username: string }) {
+    console.log(args);
+    if (updateUserById(message.author.id, { lastFMName: args.username })) {
+      return message.reply(`Successfully set name to ${args.username}`);
     } else {
       message.reply('Error Occured whilst trying to set your username.');
     }

@@ -26,7 +26,7 @@ export default class Plays extends Command {
         postCheck: NoUsernameSet,
       },
       invalidUsage: 'Usage: ,lf plays <artist>(Optional)',
-      args: [
+      arguments: [
         {
           parse: MentionUserId,
           default: SelfUserId,
@@ -44,20 +44,19 @@ export default class Plays extends Command {
 
   async run(
     message: Message,
-    args: string[],
-    argums: { targetUserId: string; artistName: string }
+    args: { targetUserId: string; artistName: string }
   ) {
-    const user = await getUser(argums.targetUserId);
+    const user = await getUser(args.targetUserId);
 
     let artist: Artist;
     let userInfo: PartialUser;
 
-    if (!argums.artistName) {
+    if (!args.artistName) {
       const artistInfo = await fetchRecentArtistInfo(user.lastFMName);
       artist = artistInfo.artist;
       userInfo = artistInfo.user;
     } else {
-      artist = await fetchSearchArtistInfo(user.lastFMName, argums.artistName);
+      artist = await fetchSearchArtistInfo(user.lastFMName, args.artistName);
     }
 
     if (!artist) return message.reply('No artist found!');

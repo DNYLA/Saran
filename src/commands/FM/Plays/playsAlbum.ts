@@ -27,7 +27,7 @@ export default class PlaysAlbum extends Command {
         postCheck: NoUsernameSet,
       },
       invalidUsage: 'Usage: ,lf playsa <albumname>(Optional)',
-      args: [
+      arguments: [
         {
           parse: MentionUserId,
           default: SelfUserId,
@@ -45,20 +45,19 @@ export default class PlaysAlbum extends Command {
 
   async run(
     message: Message,
-    args: string[],
-    argums: { targetUserId: string; albumName: string }
+    args: { targetUserId: string; albumName: string }
   ) {
-    const user = await getUser(argums.targetUserId);
+    const user = await getUser(args.targetUserId);
 
     let album: Album;
     let userInfo: PartialUser;
 
-    if (!argums.albumName) {
+    if (!args.albumName) {
       const albumInfo = await fetchRecentAlbumInfo(user.lastFMName);
       album = albumInfo.album;
       userInfo = albumInfo.user;
     } else {
-      album = await fetchSearchAlbumInfo(user.lastFMName, argums.albumName);
+      album = await fetchSearchAlbumInfo(user.lastFMName, args.albumName);
     }
 
     if (!album) return message.reply('No album found!');

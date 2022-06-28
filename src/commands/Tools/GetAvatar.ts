@@ -12,7 +12,7 @@ export default class GetAvatar extends Command {
       hooks: {
         preCommand: StartTyping,
       },
-      args: [
+      arguments: [
         {
           parse: MentionUserId,
           default: SelfUserId,
@@ -23,19 +23,11 @@ export default class GetAvatar extends Command {
     });
   }
 
-  async run(
-    message: Message,
-    args: string[],
-    argums: { targetUserId: string }
-  ) {
+  async run(message: Message, args: { targetUserId: string }) {
     try {
       message.channel.send({
         embeds: [
-          await getAvatarEmbed(
-            AvatarType.Profile,
-            message,
-            argums.targetUserId
-          ),
+          await getAvatarEmbed(AvatarType.Profile, message, args.targetUserId),
         ],
       });
     } catch (err) {

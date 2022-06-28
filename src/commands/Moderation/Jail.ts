@@ -17,7 +17,7 @@ export default class Jail extends Command {
       hooks: {
         preCommand: StartTyping,
       },
-      args: [
+      arguments: [
         {
           parse: MentionIdOrArg,
           name: 'mentionedUserId',
@@ -27,6 +27,12 @@ export default class Jail extends Command {
           name: 'time',
           type: ArgumentTypes.SINGLE,
           optional: true,
+          default: '5m',
+        },
+        {
+          name: 'reason',
+          type: ArgumentTypes.FULL_SENTANCE,
+          optional: true,
         },
       ],
     });
@@ -34,32 +40,9 @@ export default class Jail extends Command {
 
   async run(
     message: Message,
-    args: string[],
-    argums: { mentionedUserId: string; time: string }
+    args: { mentionedUserId: string; time: string; reason: string }
   ) {
-    const user = await message.guild.members.fetch(argums.mentionedUserId);
+    const user = await message.guild.members.fetch(args.mentionedUserId);
     if (!user) return message.reply('Cant find guild member');
-
-    let reason = '';
-
-    if (args.length > 1) {
-      args.shift();
-      reason = args.join(' ');
-    }
-
-    try {
-      await user.kick(reason);
-
-      let embedMessage = `Successfully kicked ${user.displayName}`;
-      if (reason.length > 0) {
-        embedMessage += ` for ${reason}`;
-      }
-
-      message.reply(embedMessage);
-    } catch (err) {
-      return message.reply(
-        'Unable to kick user! This typically occurs when the user you are trying to kick has a role higher than the bot.'
-      );
-    }
   }
 }

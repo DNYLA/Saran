@@ -14,7 +14,7 @@ export default class RankLeaderboard extends Command {
     });
   }
 
-  async run(message: Message, args: string[]) {
+  async run(message: Message) {
     const users = await getGuildUsersCustom(message.guildId);
     // const user = users.find((u) => u.userId === message.member.id);
     const user = await message.guild.members.fetch(message.author.id);

@@ -17,7 +17,7 @@ export default class Mute extends Command {
       hooks: {
         preCommand: StartTyping,
       },
-      args: [
+      arguments: [
         {
           parse: MentionIdOrArg,
           name: 'mentionedUserId',
@@ -38,22 +38,18 @@ export default class Mute extends Command {
 
   async run(
     message: Message,
-    args: string[],
-    argums: { mentionedUserId: string; time: string; reason?: string }
+    args: { mentionedUserId: string; time: string; reason?: string }
   ) {
-    const user = await message.guild.members.fetch(argums.mentionedUserId);
+    const user = await message.guild.members.fetch(args.mentionedUserId);
     if (!user) return;
 
     let amount = 0;
 
-    amount = parseInt(argums.time);
+    amount = parseInt(args.time);
     if (isNaN(amount)) return message.reply('Add an number amount please!!!');
 
     try {
-      const timeout = await user.timeout(
-        amount * 60 * 1000,
-        argums.reason ?? ''
-      );
+      const timeout = await user.timeout(amount * 60 * 1000, args.reason ?? '');
       console.log(timeout);
       return message.reply('He got timeouted out or she');
     } catch (err) {

@@ -33,7 +33,7 @@ export default class PlaysTrack extends Command {
       },
       invalidUsage:
         'Usage: ,lf playst <trackname>(Optional) | <artistname>(Optional)',
-      args: [
+      arguments: [
         {
           parse: MentionUserId,
           default: SelfUserId,
@@ -54,10 +54,9 @@ export default class PlaysTrack extends Command {
     });
   }
 
-  async run(message: Message, args: string[], argums: SearchTrackArguments) {
-    const user = await getUser(argums.targetUserId);
-
-    const { trackName, artistName } = argums;
+  async run(message: Message, args: SearchTrackArguments) {
+    const user = await getUser(args.targetUserId);
+    const { trackName, artistName } = args;
 
     let track: Track;
     let userInfo: PartialUser;

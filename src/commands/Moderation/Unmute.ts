@@ -17,7 +17,7 @@ export default class UnMute extends Command {
       hooks: {
         preCommand: StartTyping,
       },
-      args: [
+      arguments: [
         {
           parse: MentionIdOrArg,
           name: 'mentionedUserId',
@@ -27,12 +27,8 @@ export default class UnMute extends Command {
     });
   }
 
-  async run(
-    message: Message,
-    args: string[],
-    argums: { mentionedUserId: string }
-  ) {
-    const user = await message.guild.members.fetch(argums.mentionedUserId);
+  async run(message: Message, args: { mentionedUserId: string }) {
+    const user = await message.guild.members.fetch(args.mentionedUserId);
     if (!user) return message.reply('Unable to locate this user');
     try {
       const timeout = await user.timeout(0);

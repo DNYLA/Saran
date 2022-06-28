@@ -17,7 +17,7 @@ export default class Kick extends Command {
       hooks: {
         preCommand: StartTyping,
       },
-      args: [
+      arguments: [
         {
           parse: MentionIdOrArg,
           name: 'mentionedUserId',
@@ -34,18 +34,17 @@ export default class Kick extends Command {
 
   async run(
     message: Message,
-    args: string[],
-    argums: { mentionedUserId: string; reason: string }
+    args: { mentionedUserId: string; reason: string }
   ) {
-    const user = await message.guild.members.fetch(argums.mentionedUserId);
+    const user = await message.guild.members.fetch(args.mentionedUserId);
     if (!user) return message.reply('Cant find guild member');
 
     try {
-      await user.kick(argums.reason ?? '');
+      await user.kick(args.reason ?? '');
 
       let embedMessage = `Successfully kicked ${user.displayName}`;
-      if (argums.reason) {
-        embedMessage += ` for ${argums.reason}`;
+      if (args.reason) {
+        embedMessage += ` for ${args.reason}`;
       }
 
       message.reply(embedMessage);

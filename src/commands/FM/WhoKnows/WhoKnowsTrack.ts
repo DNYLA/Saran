@@ -31,7 +31,7 @@ export default class WhoKnowstrack extends Command {
         preCommand: StartTyping,
         postCheck: NoUsernameSet,
       },
-      args: [
+      arguments: [
         {
           parse: MentionUserId,
           default: SelfUserId,
@@ -52,8 +52,8 @@ export default class WhoKnowstrack extends Command {
     });
   }
 
-  async run(message: Message, args: string[], argums: SearchTrackArguments) {
-    const user = await getUser(argums.targetUserId);
+  async run(message: Message, args: SearchTrackArguments) {
+    const user = await getUser(args.targetUserId);
 
     const guildUsers = await getGuildUsers(message.guildId);
     let track: Track;
@@ -61,7 +61,7 @@ export default class WhoKnowstrack extends Command {
     if (!guildUsers || guildUsers.length === 0)
       return message.reply('Server hasnt been indexed use ,lf index');
 
-    if (!argums.trackName) {
+    if (!args.trackName) {
       const { track: recentTrack } = await fetchRecentTrackInfo(
         user.lastFMName
       );
@@ -70,8 +70,8 @@ export default class WhoKnowstrack extends Command {
     } else {
       track = await fetchSearchTrackInfo(
         user.lastFMName,
-        argums.trackName,
-        argums.artistName
+        args.trackName,
+        args.artistName
       );
     }
 

@@ -37,7 +37,7 @@ export default class YoutubeSearch extends Command {
         preCommand: StartTyping,
       },
       invalidUsage: 'Do ,yt <word>',
-      args: [
+      arguments: [
         {
           name: 'query',
           type: ArgumentTypes.FULL_SENTANCE,
@@ -46,8 +46,8 @@ export default class YoutubeSearch extends Command {
     });
   }
 
-  async run(message: Message, args: string[], argums: SearchQueryArgs) {
-    const { query: term } = argums;
+  async run(message: Message, args: SearchQueryArgs) {
+    const { query: term } = args;
 
     const results = await ytSearch(term, opts).catch(console.error);
     // return message.channel.send(results);

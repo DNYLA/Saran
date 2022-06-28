@@ -17,7 +17,7 @@ export default class SetTag extends Command {
         postCheck: NoUsernameSet,
       },
       invalidUsage: 'Usage: ,lf tag <custom_tag>',
-      args: [
+      arguments: [
         {
           name: 'newTag',
           type: ArgumentTypes.SINGLE,
@@ -26,9 +26,9 @@ export default class SetTag extends Command {
     });
   }
 
-  async run(message: Message, args: string[], argums: { newTag: string }) {
-    if (updateUserById(message.author.id, { lastFMTag: argums.newTag })) {
-      message.reply(`Successfully set custom tag to ${argums.newTag}`);
+  async run(message: Message, args: { newTag: string }) {
+    if (updateUserById(message.author.id, { lastFMTag: args.newTag })) {
+      message.reply(`Successfully set custom tag to ${args.newTag}`);
     } else {
       message.reply('Error Occured whilst trying to set your custom tag.');
     }

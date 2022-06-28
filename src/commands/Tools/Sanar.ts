@@ -4,7 +4,7 @@ import Command from '../../utils/base/command';
 
 export default class Sanar extends Command {
   constructor() {
-    super('sanar', {
+    super('saran', {
       invalidUsage: `Do ,av <UserMention>`,
       hooks: {
         preCommand: StartTyping,
@@ -12,7 +12,7 @@ export default class Sanar extends Command {
     });
   }
 
-  async run(message: Message, args: string[]) {
+  async run(message: Message) {
     // if (args.length === 0) return message.reply('Provide a URL to scrape!');
     message.channel.send('Disabled');
     // const url = 'https://www.instagram.com/p/Cdc02LTD0Fo/';

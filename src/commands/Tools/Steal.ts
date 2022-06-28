@@ -15,7 +15,7 @@ export default class StealEmote extends Command {
       hooks: {
         preCommand: StartTyping,
       },
-      args: [
+      arguments: [
         {
           name: 'emojiText',
           type: ArgumentTypes.SINGLE,
@@ -24,7 +24,7 @@ export default class StealEmote extends Command {
     });
   }
 
-  async run(message: Message, args: string[], argums: { emojiText: string }) {
+  async run(message: Message, args: { emojiText: string }) {
     // for (const emojiText of args) {
     //   const emoji = Util.parseEmoji(emojiText);
     //   if (emoji.id) {
@@ -38,7 +38,7 @@ export default class StealEmote extends Command {
     //   }
     // }
 
-    const emoji = Util.parseEmoji(argums.emojiText);
+    const emoji = Util.parseEmoji(args.emojiText);
     if (emoji.id) {
       const type = emoji.animated ? '.gif' : '.png';
       console.log(emoji.id);

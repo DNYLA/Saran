@@ -11,7 +11,7 @@ export default class GetBanner extends Command {
       hooks: {
         preCommand: StartTyping,
       },
-      args: [
+      arguments: [
         {
           parse: MentionUserId,
           default: SelfUserId,
@@ -22,14 +22,10 @@ export default class GetBanner extends Command {
     });
   }
 
-  async run(
-    message: Message,
-    args: string[],
-    argums: { targetUserId: string }
-  ) {
+  async run(message: Message, args: { targetUserId: string }) {
     message.channel.send({
       embeds: [
-        await getAvatarEmbed(AvatarType.Banner, message, argums.targetUserId),
+        await getAvatarEmbed(AvatarType.Banner, message, args.targetUserId),
       ],
     });
   }

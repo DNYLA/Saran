@@ -1,7 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 import { Message } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
-import Command from '../../utils/base/command';
+import { ChannelMentionIdOrArg } from '../../utils/argsparser';
+import Command, { ArgumentTypes } from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
 
 const prisma = new PrismaClient();
@@ -20,35 +21,31 @@ export default class SetReactionBoardChannel extends Command {
       hooks: {
         preCommand: StartTyping,
       },
-      arguments: {
-        required: true,
-        minAmount: 2,
-      },
+      arguments: [
+        {
+          parse: ChannelMentionIdOrArg,
+          name: 'channelId',
+          type: ArgumentTypes.SINGLE,
+        },
+        {
+          name: 'limit',
+          type: ArgumentTypes.INTEGER, //Add Integer
+          optional: true,
+        },
+      ],
     });
   }
 
-  async run(message: Message, args: string[]) {
-    const boardChannel = message.mentions.channels.first();
+  async run(message: Message, args: { channelId: string; limit: number }) {
     const client = message.client as DiscordClient;
-    if (!boardChannel)
-      return message.reply('Provide a channel with the message');
+    const boardChannel = await message.guild.channels
+      .fetch(args.channelId)
+      .catch(console.error);
 
-    let reactionLimit = NaN;
-    try {
-      reactionLimit = parseInt(args[1]);
-      if (isNaN(reactionLimit)) {
-        return message.channel.send(
-          'Provide a number for the 2nd paramter. ,rb <#channel> <reaction_limit>'
-        );
-      }
+    if (!boardChannel) return message.reply('Invalid channel provided');
 
-      if (reactionLimit <= 0) {
-        return message.channel.send('Provide a number greater than 0.');
-      }
-    } catch (err) {
-      return message.channel.send(
-        'Provide a number for the 2nd paramter. ,rb <#channel> <reaction_limit>'
-      );
+    if (args.limit <= 0) {
+      return message.reply('Provide a number greater than 0!');
     }
 
     try {
@@ -56,11 +53,13 @@ export default class SetReactionBoardChannel extends Command {
         where: { id: message.guildId },
         data: {
           reactionBoardChannel: boardChannel.id,
-          reactionBoardLimit: reactionLimit,
+          reactionBoardLimit: args.limit,
         },
       });
       client.setConfig(config);
-      message.channel.send(`Successfully set ${args[0]} as reaction board.`);
+      message.channel.send(
+        `Successfully set <#${args.channelId}> as reaction board with a minimum of ${args.limit} :sob: reactions.`
+      );
     } catch (err) {
       message.reply(
         'An Error occured when attempting to set the reaction board channel.'

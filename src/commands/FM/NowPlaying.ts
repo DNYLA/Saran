@@ -25,7 +25,7 @@ export default class NowPlaying extends Command {
         preCommand: StartTyping,
         postCheck: NoUsernameSet,
       },
-      args: [
+      arguments: [
         {
           parse: MentionUserId,
           default: SelfUserId,
@@ -36,18 +36,15 @@ export default class NowPlaying extends Command {
     });
   }
 
-  async run(
-    message: Message,
-    args: string[],
-    argums: { targetUserId: string }
-  ) {
-    const user = await getUser(argums.targetUserId);
+  async run(message: Message, args: { targetUserId: string }) {
+    const user = await getUser(args.targetUserId);
     const username = user.lastFMName;
     let donatorEmbed = false;
 
     // if (!user.lastFMName) return
 
-    if (!args.includes('alt') && user.donator) {
+    // if !args.includes('alt') &&
+    if (user.donator) {
       donatorEmbed = true;
     }
 

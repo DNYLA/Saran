@@ -15,8 +15,7 @@ export type CommandOptions = {
   fetchUser?: boolean;
   requirments?: Requirments; //Done
   hooks?: Hooks; //Done
-  arguments?: ArgumentOptions;
-  args?: Arguments[];
+  arguments?: Arguments[];
 };
 
 export type Arguments = {

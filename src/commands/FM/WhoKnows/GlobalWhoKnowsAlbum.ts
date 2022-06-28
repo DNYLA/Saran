@@ -33,7 +33,7 @@ export default class GlobalWhoKnowsAlbum extends Command {
         preCommand: StartTyping,
         postCheck: NoUsernameSet,
       },
-      args: [
+      arguments: [
         {
           parse: MentionUserId,
           default: SelfUserId,
@@ -51,10 +51,9 @@ export default class GlobalWhoKnowsAlbum extends Command {
 
   async run(
     message: Message,
-    args: string[],
-    argums: { targetUserId: string; albumName: string }
+    args: { targetUserId: string; albumName: string }
   ) {
-    const user = await getUser(argums.targetUserId);
+    const user = await getUser(args.targetUserId);
     const guildUsers = await getUsersWithUsername();
 
     let album: Album;
@@ -62,14 +61,14 @@ export default class GlobalWhoKnowsAlbum extends Command {
     if (!guildUsers || guildUsers.length === 0)
       return message.reply('Server hasnt been indexed use ,lf index');
 
-    if (!argums.albumName) {
+    if (!args.albumName) {
       const { album: recentAlbum } = await fetchRecentAlbumInfo(
         user.lastFMName
       );
 
       album = recentAlbum;
     } else {
-      album = await fetchSearchAlbumInfo(user.lastFMName, argums.albumName);
+      album = await fetchSearchAlbumInfo(user.lastFMName, args.albumName);
     }
 
     if (!album) return message.reply('Unable to find album with name!');

@@ -18,7 +18,7 @@ export default class TopAlbums extends Command {
         postCheck: NoUsernameSet,
       },
       invalidUsage: 'Usage: ,lf tta <period>(Optional)',
-      args: [
+      arguments: [
         {
           parse: MentionUserId,
           default: SelfUserId,
@@ -35,7 +35,7 @@ export default class TopAlbums extends Command {
     });
   }
 
-  async run(message: Message, args: string[], argums: TopTenArguments) {
-    getTopTenStats(message, argums, SearchType.Album);
+  async run(message: Message, args: TopTenArguments) {
+    getTopTenStats(message, args, SearchType.Album);
   }
 }

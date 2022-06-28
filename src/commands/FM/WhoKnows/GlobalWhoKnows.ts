@@ -33,7 +33,7 @@ export default class GlobalWhoKnows extends Command {
         postCheck: NoUsernameSet,
       },
       invalidUsage: ',lf wk <artistName>(Optional)',
-      args: [
+      arguments: [
         {
           parse: MentionUserId,
           default: SelfUserId,
@@ -51,10 +51,9 @@ export default class GlobalWhoKnows extends Command {
 
   async run(
     message: Message,
-    args: string[],
-    argums: { targetUserId: string; artistName: string }
+    args: { targetUserId: string; artistName: string }
   ) {
-    const user = await getUser(argums.targetUserId);
+    const user = await getUser(args.targetUserId);
     const guildUsers = await getUsersWithUsername();
 
     let artist: Artist;
@@ -63,13 +62,13 @@ export default class GlobalWhoKnows extends Command {
     if (!guildUsers || guildUsers.length === 0)
       return message.reply('Server hasnt been indexed use ,lf index');
 
-    if (!argums.artistName) {
+    if (!args.artistName) {
       const { artist: recentArtist } = await fetchRecentArtistInfo(
         user.lastFMName
       );
       artist = recentArtist;
     } else {
-      artist = await fetchSearchArtistInfo(user.lastFMName, argums.artistName);
+      artist = await fetchSearchArtistInfo(user.lastFMName, args.artistName);
     }
 
     if (!artist) return message.reply('Unable to find artist with name!');

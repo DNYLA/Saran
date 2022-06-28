@@ -20,7 +20,7 @@ export default class IndexLevels extends Command {
     });
   }
 
-  async run(message: Message, args: string[]) {
+  async run(message: Message) {
     const guild = await message.guild.fetch();
     const channels = await guild.channels.fetch();
     const usersCollection = new Collection<string, number>();

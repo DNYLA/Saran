@@ -12,7 +12,7 @@ export default class MemberCount extends Command {
     });
   }
 
-  async run(message: Message, args: string[]) {
+  async run(message: Message) {
     const memberCount = message.guild.memberCount;
 
     message.reply(`This guild has ${memberCount} member(s)`);

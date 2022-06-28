@@ -30,7 +30,7 @@ export default class ArgsTest extends Command {
         postCheck: NoUsernameSet,
         postCommand: () => console.log('Finished Executing'),
       },
-      args: [
+      arguments: [
         {
           parse: MentionUserId,
           default: SelfUserId,
@@ -50,9 +50,9 @@ export default class ArgsTest extends Command {
     });
   }
 
-  async run(message: Message, args: string[], argums: ArgsTestArguments) {
-    console.log(argums);
-    if (!argums.test2) {
+  async run(message: Message, args: ArgsTestArguments) {
+    console.log(args);
+    if (!args.test2) {
       console.log('Invalid');
     }
     return message.reply('Pong');

@@ -21,7 +21,7 @@ export default class TopArtists extends Command {
         postCheck: NoUsernameSet,
       },
       invalidUsage: 'Usage: ,lf tar <period>(Optional)',
-      args: [
+      arguments: [
         {
           parse: MentionUserId,
           default: SelfUserId,
@@ -38,7 +38,7 @@ export default class TopArtists extends Command {
     });
   }
 
-  async run(message: Message, args: string[], argums: TopTenArguments) {
-    getTopTenStats(message, argums, SearchType.Artist);
+  async run(message: Message, args: TopTenArguments) {
+    getTopTenStats(message, args, SearchType.Artist);
   }
 }

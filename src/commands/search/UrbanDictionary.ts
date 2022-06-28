@@ -31,7 +31,7 @@ export default class ImageSearch extends Command {
         preCommand: StartTyping,
       },
       invalidUsage: 'Do ,ud <word>',
-      args: [
+      arguments: [
         {
           name: 'query',
           type: ArgumentTypes.FULL_SENTANCE,
@@ -40,11 +40,11 @@ export default class ImageSearch extends Command {
     });
   }
 
-  async run(message: Message, args: string[], argums: SearchQueryArgs) {
+  async run(message: Message, args: SearchQueryArgs) {
     const client = message.client as DiscordClient;
 
     const author = message.member;
-    const { query: term } = argums;
+    const { query: term } = args;
     const { data } = await axios.get(
       `https://api.urbandictionary.com/v0/define?term=${term}`
     );

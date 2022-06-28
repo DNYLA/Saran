@@ -21,7 +21,7 @@ export default class ImageSearch extends Command {
         preCommand: StartTyping,
       },
       invalidUsage: 'Do ,img <Query>',
-      // args: [
+      // arguments: [
       //   {
       //     name: 'query',
       //     type: ArgumentTypes.FULL_SENTANCE,
@@ -30,11 +30,11 @@ export default class ImageSearch extends Command {
     });
   }
 
-  async run(message: Message, args: string[], argums: SearchQueryArgs) {
+  async run(message: Message, args: SearchQueryArgs) {
     const client = message.client as DiscordClient;
     return message.reply('Command is disabled');
     // if (args.length === 0) return message.reply('Provide a query to search!');
-    // const { query } = argums;
+    // const { query } = args;
 
     // let results = client.getImage(query);
 

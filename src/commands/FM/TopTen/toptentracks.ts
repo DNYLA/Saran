@@ -18,7 +18,7 @@ export default class TopTracks extends Command {
         postCheck: NoUsernameSet,
       },
       invalidUsage: 'Usage: ,lf ttt <period>(Optional)',
-      args: [
+      arguments: [
         {
           parse: MentionUserId,
           default: SelfUserId,
@@ -35,7 +35,7 @@ export default class TopTracks extends Command {
     });
   }
 
-  async run(message: Message, args: string[], argums: TopTenArguments) {
-    getTopTenStats(message, argums, SearchType.Track);
+  async run(message: Message, args: TopTenArguments) {
+    getTopTenStats(message, args, SearchType.Track);
   }
 }

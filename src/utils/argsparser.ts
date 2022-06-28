@@ -36,6 +36,23 @@ export const MentionIdOrArg = (
   return args[index];
 };
 
+export const ChannelMentionIdOrArg = (
+  message: Message,
+  args: string[],
+  index: number
+) => {
+  if (args.length > 0) {
+    const isMention = args[index]
+      .matchAll(MessageMentions.CHANNELS_PATTERN)
+      .next().value;
+    if (isMention) {
+      return isMention[1];
+    }
+  }
+
+  return args[index];
+};
+
 export const SelfUserId = (message: Message) => {
   return message.author.id;
 };

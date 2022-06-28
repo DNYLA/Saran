@@ -13,7 +13,7 @@ export default class Snipe extends Command {
     });
   }
 
-  async run(message: Message, args: string[]) {
+  async run(message: Message) {
     const client = message.client as DiscordClient;
     const deletedMessage = client.getDeletedMessage(message.guildId);
 
