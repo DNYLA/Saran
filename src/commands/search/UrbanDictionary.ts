@@ -7,8 +7,9 @@ import {
 } from 'discord.js';
 import { fetchQueryImages } from '../../api/WebSearch';
 import StartTyping from '../../hooks/StartTyping';
-import Command from '../../utils/base/command';
+import Command, { ArgumentTypes } from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
+import { SearchQueryArgs } from './ImageSearch';
 
 export type UrbanDictionaryLookup = {
   definition: string;
@@ -29,18 +30,21 @@ export default class ImageSearch extends Command {
       hooks: {
         preCommand: StartTyping,
       },
-      arguments: {
-        required: true,
-        minAmount: 1,
-      },
+      invalidUsage: 'Do ,ud <word>',
+      args: [
+        {
+          name: 'query',
+          type: ArgumentTypes.FULL_SENTANCE,
+        },
+      ],
     });
   }
 
-  async run(message: Message, args: string[]) {
+  async run(message: Message, args: string[], argums: SearchQueryArgs) {
     const client = message.client as DiscordClient;
 
     const author = message.member;
-    const term = args.join(' ');
+    const { query: term } = argums;
     const { data } = await axios.get(
       `https://api.urbandictionary.com/v0/define?term=${term}`
     );
@@ -50,7 +54,7 @@ export default class ImageSearch extends Command {
     if (responses.length === 0)
       return message.reply(`No lookup found for term ${term}`);
 
-    const query = responses[0];
+    const res = responses[0];
     const embed = new MessageEmbed()
       .setColor('#008efb')
       .setAuthor({
@@ -58,10 +62,10 @@ export default class ImageSearch extends Command {
         iconURL: author.displayAvatarURL({ dynamic: true }),
       })
       .setTitle(term)
-      .setURL(query.permalink)
-      .setDescription(query.definition)
-      .addField('Example', query.example)
-      .addField('Votes', `👍 ${query.thumbs_up} / ${query.thumbs_down} 👎`);
+      .setURL(res.permalink)
+      .setDescription(res.definition)
+      .addField('Example', res.example)
+      .addField('Votes', `👍 ${res.thumbs_up} / ${res.thumbs_down} 👎`);
 
     return message.channel.send({ embeds: [embed] });
   }

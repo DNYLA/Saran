@@ -6,8 +6,12 @@ import {
 } from 'discord.js';
 import { fetchQueryImages } from '../../api/WebSearch';
 import StartTyping from '../../hooks/StartTyping';
-import Command from '../../utils/base/command';
+import Command, { ArgumentTypes } from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
+
+export type SearchQueryArgs = {
+  query: string;
+};
 
 export default class ImageSearch extends Command {
   constructor() {
@@ -16,17 +20,20 @@ export default class ImageSearch extends Command {
       hooks: {
         preCommand: StartTyping,
       },
-      arguments: {
-        required: true,
-        minAmount: 1,
-      },
+      invalidUsage: 'Do ,img <Query>',
+      args: [
+        {
+          name: 'query',
+          type: ArgumentTypes.FULL_SENTANCE,
+        },
+      ],
     });
   }
 
-  async run(message: Message, args: string[]) {
+  async run(message: Message, args: string[], argums: SearchQueryArgs) {
     const client = message.client as DiscordClient;
     if (args.length === 0) return message.reply('Provide a query to search!');
-    const query = args.join(' ');
+    const { query } = argums;
 
     let results = client.getImage(query);
 
@@ -35,7 +42,7 @@ export default class ImageSearch extends Command {
         const data = await fetchQueryImages(query, 1);
         results = {
           images: data,
-          query,
+          query: query,
           currentPos: 0,
           requester: message.author.id,
         };

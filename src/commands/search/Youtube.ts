@@ -7,9 +7,10 @@ import {
 } from 'discord.js';
 import { fetchQueryImages } from '../../api/WebSearch';
 import StartTyping from '../../hooks/StartTyping';
-import Command from '../../utils/base/command';
+import Command, { ArgumentTypes } from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
 import ytSearch from 'youtube-search';
+import { SearchQueryArgs } from './ImageSearch';
 const opts = {
   maxResults: 1,
   key: process.env.GOOGLE_API_KEY,
@@ -35,15 +36,18 @@ export default class YoutubeSearch extends Command {
       hooks: {
         preCommand: StartTyping,
       },
-      arguments: {
-        required: true,
-        minAmount: 1,
-      },
+      invalidUsage: 'Do ,yt <word>',
+      args: [
+        {
+          name: 'query',
+          type: ArgumentTypes.FULL_SENTANCE,
+        },
+      ],
     });
   }
 
-  async run(message: Message, args: string[]) {
-    const term = args.join(' ');
+  async run(message: Message, args: string[], argums: SearchQueryArgs) {
+    const { query: term } = argums;
 
     const results = await ytSearch(term, opts).catch(console.error);
     // return message.channel.send(results);
