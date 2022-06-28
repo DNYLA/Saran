@@ -2,7 +2,8 @@ import { Message, MessageEmbed } from 'discord.js';
 import UsernameCheck from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
-import Command from '../../../utils/base/command';
+import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
+import Command, { ArgumentTypes } from '../../../utils/base/command';
 import { setCachedPlays } from '../../../utils/database/redisManager';
 import { getUser } from '../../../utils/database/User';
 import {
@@ -12,6 +13,12 @@ import {
   SearchType,
 } from '../../../utils/fmHelpers';
 import { PartialUser, Track } from '../../../utils/types';
+
+type PlaysTrackArguments = {
+  targetUserId: string;
+  trackName: string;
+  artistName: string;
+};
 
 export default class PlaysTrack extends Command {
   constructor() {
@@ -26,24 +33,31 @@ export default class PlaysTrack extends Command {
       },
       invalidUsage:
         'Usage: ,lf playst <trackname>(Optional) | <artistname>(Optional)',
+      args: [
+        {
+          parse: MentionUserId,
+          default: SelfUserId,
+          name: 'targetUserId',
+          type: ArgumentTypes.SINGLE,
+        },
+        {
+          name: 'trackName',
+          type: ArgumentTypes.DENOMENATED_WORD,
+          optional: true,
+        },
+        {
+          name: 'artistName',
+          type: ArgumentTypes.DENOMENATED_WORD,
+          optional: true,
+        },
+      ],
     });
   }
 
-  async run(message: Message, args: string[]) {
-    const user = await getUser(getTargetUserId(message, args, true));
+  async run(message: Message, args: string[], argums: PlaysTrackArguments) {
+    const user = await getUser(argums.targetUserId);
 
-    let trackName: string;
-    let artistName = null;
-
-    if (args.length > 0) {
-      trackName = args.join(' ');
-
-      const trackDetails = trackName.split(' | ');
-      if (trackDetails.length > 0) {
-        trackName = trackDetails[0];
-        artistName = trackDetails[1];
-      }
-    }
+    const { trackName, artistName } = argums;
 
     let track: Track;
     let userInfo: PartialUser;

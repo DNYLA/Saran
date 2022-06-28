@@ -2,7 +2,8 @@ import { Message, MessageEmbed } from 'discord.js';
 import UsernameCheck from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
-import Command from '../../../utils/base/command';
+import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
+import Command, { ArgumentTypes } from '../../../utils/base/command';
 import { setCachedPlays } from '../../../utils/database/redisManager';
 import { getUser } from '../../../utils/database/User';
 import {
@@ -26,31 +27,38 @@ export default class PlaysAlbum extends Command {
         postCheck: NoUsernameSet,
       },
       invalidUsage: 'Usage: ,lf playsa <albumname>(Optional)',
+      args: [
+        {
+          parse: MentionUserId,
+          default: SelfUserId,
+          name: 'targetUserId',
+          type: ArgumentTypes.SINGLE,
+        },
+        {
+          name: 'albumName',
+          type: ArgumentTypes.FULL_SENTANCE,
+          optional: true,
+        },
+      ],
     });
   }
 
-  async run(message: Message, args: string[]) {
-    const user = await getUser(getTargetUserId(message, args, true));
-
-    let albumName: string;
-    let artistName = null;
-
-    const joinedArgs = joinArgs(args);
-
-    if (joinedArgs.length > 0) {
-      albumName = joinedArgs[0];
-      if (joinedArgs.length > 1) artistName = joinedArgs[1];
-    }
+  async run(
+    message: Message,
+    args: string[],
+    argums: { targetUserId: string; albumName: string }
+  ) {
+    const user = await getUser(argums.targetUserId);
 
     let album: Album;
     let userInfo: PartialUser;
 
-    if (!albumName) {
+    if (!argums.albumName) {
       const albumInfo = await fetchRecentAlbumInfo(user.lastFMName);
       album = albumInfo.album;
       userInfo = albumInfo.user;
     } else {
-      album = await fetchSearchAlbumInfo(user.lastFMName, albumName);
+      album = await fetchSearchAlbumInfo(user.lastFMName, argums.albumName);
     }
 
     if (!album) return message.reply('No album found!');
