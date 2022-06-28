@@ -1,6 +1,7 @@
 import { Message } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
-import Command from '../../utils/base/command';
+import { MentionUserId, SelfUserId } from '../../utils/argsparser';
+import Command, { ArgumentTypes } from '../../utils/base/command';
 import { getGuildUser } from '../../utils/database/User';
 
 export default class Rank extends Command {
@@ -10,15 +11,30 @@ export default class Rank extends Command {
       hooks: {
         preCommand: StartTyping,
       },
+      args: [
+        {
+          parse: MentionUserId,
+          default: SelfUserId,
+          name: 'targetUserId',
+          type: ArgumentTypes.SINGLE,
+        },
+      ],
     });
   }
 
-  async run(message: Message, args: string[]) {
-    const user = await getGuildUser(message.guildId, message.author.id);
+  async run(
+    message: Message,
+    args: string[],
+    argums: { targetUserId: string }
+  ) {
+    const guildUser = await message.guild.members.fetch(argums.targetUserId);
+    const user = await getGuildUser(message.guildId, argums.targetUserId);
+    const isSelf = argums.targetUserId === message.author.id;
+    const targetText = isSelf ? 'You have' : guildUser.displayName + ' has';
 
     if (!user || user.guilds.length === 0)
-      return message.reply('You have 0 XP');
-    else return message.reply(`You have ${user.guilds[0].xp} xp`);
+      return message.reply(`${targetText} 0 XP`);
+    else return message.reply(`${targetText} ${user.guilds[0].xp} xp`);
     // if (args.length === 0) return message.reply('Provide a URL to scrape!');
     // const url = 'https://www.instagram.com/p/Cdc02LTD0Fo/';
 

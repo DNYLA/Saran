@@ -1,6 +1,6 @@
 import { Message, Util } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
-import Command from '../../utils/base/command';
+import Command, { ArgumentTypes } from '../../utils/base/command';
 
 export default class StealEmote extends Command {
   constructor() {
@@ -15,25 +15,38 @@ export default class StealEmote extends Command {
       hooks: {
         preCommand: StartTyping,
       },
-      arguments: {
-        required: true,
-        minAmount: 1,
-      },
+      args: [
+        {
+          name: 'emojiText',
+          type: ArgumentTypes.SINGLE,
+        },
+      ],
     });
   }
 
-  async run(message: Message, args: string[]) {
-    for (const emojiText of args) {
-      const emoji = Util.parseEmoji(emojiText);
-      if (emoji.id) {
-        const type = emoji.animated ? '.gif' : '.png';
-        console.log(emoji.id);
-        const url = `https://cdn.discordapp.com/emojis/${emoji.id + type}`;
-        await message.guild.emojis.create(url, emoji.name);
-        message.reply(`Created emoji :${emoji.name}:`);
-      } else {
-        message.reply('Invalid Emoji');
-      }
+  async run(message: Message, args: string[], argums: { emojiText: string }) {
+    // for (const emojiText of args) {
+    //   const emoji = Util.parseEmoji(emojiText);
+    //   if (emoji.id) {
+    //     const type = emoji.animated ? '.gif' : '.png';
+    //     console.log(emoji.id);
+    //     const url = `https://cdn.discordapp.com/emojis/${emoji.id + type}`;
+    //     await message.guild.emojis.create(url, emoji.name);
+    //     message.reply(`Created emoji :${emoji.name}:`);
+    //   } else {
+    //     message.reply('Invalid Emoji');
+    //   }
+    // }
+
+    const emoji = Util.parseEmoji(argums.emojiText);
+    if (emoji.id) {
+      const type = emoji.animated ? '.gif' : '.png';
+      console.log(emoji.id);
+      const url = `https://cdn.discordapp.com/emojis/${emoji.id + type}`;
+      await message.guild.emojis.create(url, emoji.name);
+      message.reply(`Created emoji :${emoji.name}:`);
+    } else {
+      message.reply('Invalid Emoji');
     }
   }
 }

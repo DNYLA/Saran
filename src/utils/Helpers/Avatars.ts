@@ -1,4 +1,4 @@
-import { GuildMember, Message, MessageEmbed, User } from 'discord.js';
+import { Client, GuildMember, Message, MessageEmbed, User } from 'discord.js';
 
 export enum AvatarType {
   Profile,
@@ -9,47 +9,38 @@ export enum AvatarType {
 
 export async function getAvatarEmbed(
   type: AvatarType,
-  message: Message
+  message: Message,
+  targetUserId: string
 ): Promise<MessageEmbed> {
-  const mention = message.mentions.users.first();
+  const requestedUser = await message.client.users.fetch(targetUserId);
+  const guildProfile = await message.guild.members.fetch(targetUserId);
 
-  let requestedUser: User = message.author;
-  let guildProfile = await message.guild.members.fetch(message.author.id);
+  await requestedUser.fetch(true);
+  await guildProfile.fetch(true);
+
+  const avatarUrl = requestedUser.displayAvatarURL({ dynamic: true });
+  const guildAvUrl = guildProfile.avatarURL({ dynamic: true });
+  const bannerUrl = requestedUser.bannerURL({ dynamic: true });
+
   let requestedText = '';
 
-  if (mention) {
-    requestedUser = mention;
+  if (targetUserId !== message.author.id) {
     requestedText = `Requested by ${message.author.username}`;
-  } else if (mention && (AvatarType.GuildProfile || AvatarType.GuildBanner)) {
-    guildProfile = await message.guild.members.fetch(mention.id);
   }
 
-  await requestedUser.fetch();
-
   if (type === AvatarType.Profile) {
-    const avatarUrl = requestedUser.displayAvatarURL({ dynamic: true });
     return new MessageEmbed()
       .setImage(`${avatarUrl}?size=1024`)
       .setFooter({ text: requestedText });
   } else if (type === AvatarType.Banner) {
-    const bannerUrl = requestedUser.bannerURL({ dynamic: true });
     if (!bannerUrl)
       return new MessageEmbed().setAuthor({ name: 'No Banner Set' });
     return new MessageEmbed()
       .setImage(`${bannerUrl}?size=1024`)
       .setFooter({ text: requestedText });
   } else if (type === AvatarType.GuildProfile) {
-    let avatarUrl = guildProfile.avatarURL({ dynamic: true });
-
-    if (avatarUrl)
-      return new MessageEmbed()
-        .setImage(`${avatarUrl}?size=1024`)
-        .setFooter({ text: requestedText });
-    else {
-      avatarUrl = requestedUser.displayAvatarURL({ dynamic: true });
-      return new MessageEmbed()
-        .setImage(`${avatarUrl}?size=1024`)
-        .setFooter({ text: requestedText });
-    }
+    return new MessageEmbed()
+      .setImage(`${guildAvUrl ?? avatarUrl}?size=1024`)
+      .setFooter({ text: requestedText });
   }
 }

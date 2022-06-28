@@ -1,6 +1,7 @@
 import { Message } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
-import Command from '../../utils/base/command';
+import { MentionUserId, SelfUserId } from '../../utils/argsparser';
+import Command, { ArgumentTypes } from '../../utils/base/command';
 import { AvatarType, getAvatarEmbed } from '../../utils/Helpers/Avatars';
 
 export default class GetBanner extends Command {
@@ -10,16 +11,26 @@ export default class GetBanner extends Command {
       hooks: {
         preCommand: StartTyping,
       },
-      arguments: {
-        required: true,
-        minAmount: 1,
-      },
+      args: [
+        {
+          parse: MentionUserId,
+          default: SelfUserId,
+          name: 'targetUserId',
+          type: ArgumentTypes.SINGLE,
+        },
+      ],
     });
   }
 
-  async run(message: Message, args: string[]) {
+  async run(
+    message: Message,
+    args: string[],
+    argums: { targetUserId: string }
+  ) {
     message.channel.send({
-      embeds: [await getAvatarEmbed(AvatarType.Banner, message)],
+      embeds: [
+        await getAvatarEmbed(AvatarType.Banner, message, argums.targetUserId),
+      ],
     });
   }
 }
