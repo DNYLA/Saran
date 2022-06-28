@@ -4,7 +4,7 @@ import UsernameCheck from '../../checks/UsernameCheck';
 import NoUsernameSet from '../../hooks/NoUsernameSet';
 import StartTyping from '../../hooks/StartTyping';
 import { MentionUserId, SelfUserId } from '../../utils/argsparser';
-import Command from '../../utils/base/command';
+import Command, { ArgumentTypes } from '../../utils/base/command';
 import { setCachedPlays } from '../../utils/database/redisManager';
 import { getUser } from '../../utils/database/User';
 import {
@@ -29,6 +29,8 @@ export default class NowPlaying extends Command {
         {
           parse: MentionUserId,
           default: SelfUserId,
+          name: 'test',
+          type: ArgumentTypes.SINGLE,
         },
       ],
     });

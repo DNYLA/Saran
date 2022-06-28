@@ -25,6 +25,8 @@ export default class Ban extends Command {
   }
 
   async run(message: Message, args: string[]) {
+    console.log(args);
+
     const user = await getDiscordUserFromMention(
       message.client as DiscordClient,
       args[0]

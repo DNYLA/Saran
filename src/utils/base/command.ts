@@ -2,6 +2,7 @@ import { xml } from 'cheerio';
 import { Message } from 'discord.js';
 import OwnerOnly from '../../checks/OwnerOnly';
 import DiscordClient from '../client';
+import { ARGUMENT_DENOMENATOR } from '../constants';
 import { CommandOptions } from '../types';
 
 export enum RequirmentsType {
@@ -10,6 +11,12 @@ export enum RequirmentsType {
   NotWhitelisted,
   InvalidArguments,
   // InvalidRole,
+}
+
+export enum ArgumentTypes {
+  SINGLE,
+  FULL_SENTANCE,
+  DENOMENATED_WORD, //Denomenator is set internally as a constant |
 }
 
 export default abstract class Command {
@@ -36,7 +43,7 @@ export default abstract class Command {
     valid: boolean;
     message?: string;
     type?: RequirmentsType;
-    args: string[];
+    args: unknown;
   }> {
     if (!this.options?.requirments)
       return { valid: true, message: null, type: null, args };
@@ -71,6 +78,8 @@ export default abstract class Command {
         };
     }
 
+    //You want to display Permission Denied error messages before wrong
+    //arguments paassed through.
     if (this.options?.arguments?.required) {
       if (this.options.arguments.minAmount > args.length) {
         return {
@@ -120,7 +129,8 @@ export default abstract class Command {
 
   private isValidArgs(args: string[], message: Message) {
     let validArgs = true;
-    const parsedArgs: string[] = [];
+    const _args = [...args];
+    const parsedArgs = {};
     if (this.options?.args) {
       let argIndex = 0; //It is possible that an arg is not required so using th index inside the loop may be invalid
       const parseDefault = (
@@ -133,30 +143,57 @@ export default abstract class Command {
         return argDefault(msg);
       };
 
+      // console.log(this.options.args);
       this.options.args.map((arg, i) => {
-        if (args.length - 1 > this.options.args.length) return;
-        if (argIndex > args.length - 1) {
+        console.log(_args);
+        if (_args.length === 0) {
+          if (!arg.default && arg.optional)
+            return (parsedArgs[arg.name] = null);
+          else if (!arg.default && !arg.optional) return (validArgs = false);
           const isDefault = parseDefault(arg.default, message);
-          if (isDefault) parsedArgs.push(isDefault);
+          if (isDefault) parsedArgs[arg.name] = isDefault;
           else if (!arg.optional) validArgs = false;
 
           return;
         }
 
         if (!arg.parse) {
-          parsedArgs.push(args[argIndex]);
-          argIndex++;
+          const curArgs = [..._args];
+          console.log(curArgs);
+          console.log('Here?');
+          if (arg.type === ArgumentTypes.SINGLE) {
+            parsedArgs[arg.name] = _args[0];
+            // argIndex++;
+            _args.shift();
+          } else if (arg.type === ArgumentTypes.FULL_SENTANCE) {
+            //Join remainder of arg into one string
+            parsedArgs[arg.name] = curArgs.join(' ');
+            _args.splice(curArgs.length - 1);
+            argIndex += curArgs.length;
+          } else if (arg.type === ArgumentTypes.DENOMENATED_WORD) {
+            //Parse String Denomanted Via Denomentatror
+            const joined = curArgs.join(' ');
+            const split = joined.split(ARGUMENT_DENOMENATOR);
+            parsedArgs[arg.name] = split[0];
+            console.log('Splity');
+            console.log(split[0].split(' ').length + 1);
+            // argIndex += split[0].split(' ').length;
+            _args.splice(0, split[0].split(' ').length + 1); //+1 because we also want to remove the Denomenator
+
+            // parsedArgs[arg.name] = curArgs.join(' ');
+          }
           return;
         }
 
-        const parsedArg = arg.parse(message, args, argIndex);
+        const parsedArg = arg.parse(message, _args, 0);
 
         if (!parsedArg) {
           const defaultArg = parseDefault(arg.default, message);
-          if (defaultArg) parsedArgs.push(defaultArg);
+          if (defaultArg) parsedArgs[arg.name] = defaultArg;
           else if (!arg.optional) validArgs = false;
         } else {
-          parsedArgs.push(parsedArg);
+          parsedArgs[arg.name] = parsedArg;
+          _args.shift();
           argIndex++;
         }
       });
@@ -213,7 +250,7 @@ export default abstract class Command {
     //Run Command if checks passed
     let success = true;
     try {
-      if (passedChecks) await this.run(message, parsedArgs);
+      if (passedChecks) await this.run(message, args, parsedArgs);
     } catch (err) {
       message.reply(
         this.options.errorMessage ??
@@ -236,6 +273,7 @@ export default abstract class Command {
 
   abstract run(
     message: Message,
-    args: string[]
+    args: string[],
+    argums?: unknown
   ): Promise<Message> | Promise<void>;
 }

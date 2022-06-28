@@ -17,7 +17,7 @@ export default class SetTag extends Command {
         postCheck: NoUsernameSet,
       },
       invalidUsage: 'Usage: ,lf tag <custom_tag>',
-      args: [{}],
+      // args: [{}],
     });
   }
 

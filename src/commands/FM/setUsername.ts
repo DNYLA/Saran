@@ -14,7 +14,7 @@ export default class SetUsername extends Command {
         preCommand: StartTyping,
       },
       invalidUsage: 'Usage: ,lf set <username>',
-      args: [{}],
+      // args: [{}],
     });
   }
 

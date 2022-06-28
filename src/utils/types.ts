@@ -1,5 +1,5 @@
 import { GuildMember, Message, MessageEmbed, User } from 'discord.js';
-import { RequirmentsType } from './base/command';
+import { ArgumentTypes, RequirmentsType } from './base/command';
 
 export type CommandOptions = {
   aliases?: string[]; //Done
@@ -23,6 +23,8 @@ export type Arguments = {
   optional?: boolean;
   default?: string | ((message: Message) => string);
   parse?: (message: Message, args: string[], index: number) => string;
+  name: string;
+  type: ArgumentTypes; //Type is required however
   // type: ArgumentType;
 };
 
