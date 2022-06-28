@@ -16,10 +16,6 @@ export default class JailSetup extends Command {
       hooks: {
         preCommand: StartTyping,
       },
-      arguments: {
-        required: true,
-        minAmount: 1,
-      },
     });
   }
 

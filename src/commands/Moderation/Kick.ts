@@ -1,6 +1,7 @@
 import { Message } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
-import Command from '../../utils/base/command';
+import { MentionIdOrArg } from '../../utils/argsparser';
+import Command, { ArgumentTypes } from '../../utils/base/command';
 import { getGuildMemberFromMention } from '../../utils/Helpers/Moderation';
 
 export default class Kick extends Command {
@@ -16,30 +17,35 @@ export default class Kick extends Command {
       hooks: {
         preCommand: StartTyping,
       },
-      arguments: {
-        required: true,
-        minAmount: 1,
-      },
+      args: [
+        {
+          parse: MentionIdOrArg,
+          name: 'mentionedUserId',
+          type: ArgumentTypes.SINGLE,
+        },
+        {
+          name: 'reason',
+          type: ArgumentTypes.FULL_SENTANCE,
+          optional: true,
+        },
+      ],
     });
   }
 
-  async run(message: Message, args: string[]) {
-    const user = await getGuildMemberFromMention(message.guild, args[0]);
+  async run(
+    message: Message,
+    args: string[],
+    argums: { mentionedUserId: string; reason: string }
+  ) {
+    const user = await message.guild.members.fetch(argums.mentionedUserId);
     if (!user) return message.reply('Cant find guild member');
 
-    let reason = '';
-
-    if (args.length > 1) {
-      args.shift();
-      reason = args.join(' ');
-    }
-
     try {
-      await user.kick(reason);
+      await user.kick(argums.reason ?? '');
 
       let embedMessage = `Successfully kicked ${user.displayName}`;
-      if (reason.length > 0) {
-        embedMessage += ` for ${reason}`;
+      if (argums.reason) {
+        embedMessage += ` for ${argums.reason}`;
       }
 
       message.reply(embedMessage);

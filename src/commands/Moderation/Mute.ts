@@ -1,6 +1,7 @@
 import { Message } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
-import Command from '../../utils/base/command';
+import { MentionIdOrArg } from '../../utils/argsparser';
+import Command, { ArgumentTypes } from '../../utils/base/command';
 import { getGuildMemberFromMention } from '../../utils/Helpers/Moderation';
 
 export default class Mute extends Command {
@@ -12,35 +13,47 @@ export default class Mute extends Command {
         },
       },
       invalidPermissions: 'You must be admin to use this!',
-      invalidUsage: `Do ,mute <UserMention> <Time in Minutes>`,
+      invalidUsage: `Do ,mute <UserMention> <Time in Minutes> <reason>(Optional)`,
       hooks: {
         preCommand: StartTyping,
       },
-      arguments: {
-        required: true,
-        minAmount: 2,
-      },
+      args: [
+        {
+          parse: MentionIdOrArg,
+          name: 'mentionedUserId',
+          type: ArgumentTypes.SINGLE,
+        },
+        {
+          name: 'time',
+          type: ArgumentTypes.SINGLE,
+        },
+        {
+          name: 'reason',
+          type: ArgumentTypes.FULL_SENTANCE,
+          optional: true,
+        },
+      ],
     });
   }
 
-  async run(message: Message, args: string[]) {
-    const user = await getGuildMemberFromMention(message.guild, args[0]);
+  async run(
+    message: Message,
+    args: string[],
+    argums: { mentionedUserId: string; time: string; reason?: string }
+  ) {
+    const user = await message.guild.members.fetch(argums.mentionedUserId);
     if (!user) return;
 
-    const guildUser = await message.guild.members.fetch(user.id);
-    let reason = '';
     let amount = 0;
 
-    if (args.length > 1) {
-      args.shift();
-      amount = parseInt(args[0]);
-      if (isNaN(amount)) return message.reply('Add an number amount please!!!');
-      args.shift();
-      reason = args.join(' ');
-    } else return message.reply('Give time in minutes to timeout');
+    amount = parseInt(argums.time);
+    if (isNaN(amount)) return message.reply('Add an number amount please!!!');
 
     try {
-      const timeout = await guildUser.timeout(amount * 60 * 1000, reason);
+      const timeout = await user.timeout(
+        amount * 60 * 1000,
+        argums.reason ?? ''
+      );
       console.log(timeout);
       return message.reply('He got timeouted out or she');
     } catch (err) {

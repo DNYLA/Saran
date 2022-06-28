@@ -1,6 +1,7 @@
 import { Message } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
-import Command from '../../utils/base/command';
+import { MentionIdOrArg, MentionUserId } from '../../utils/argsparser';
+import Command, { ArgumentTypes } from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
 import { getDiscordUserFromMention } from '../../utils/Helpers/Moderation';
 
@@ -17,20 +18,28 @@ export default class Ban extends Command {
       hooks: {
         preCommand: StartTyping,
       },
-      arguments: {
-        required: true,
-        minAmount: 1,
-      },
+      args: [
+        {
+          parse: MentionIdOrArg,
+          name: 'mentionedUserId',
+          type: ArgumentTypes.SINGLE,
+        },
+        {
+          name: 'reason',
+          type: ArgumentTypes.FULL_SENTANCE,
+          optional: true,
+        },
+      ],
     });
   }
 
-  async run(message: Message, args: string[]) {
-    console.log(args);
-
-    const user = await getDiscordUserFromMention(
-      message.client as DiscordClient,
-      args[0]
-    );
+  async run(
+    message: Message,
+    args: string[],
+    argums: { mentionedUserId: string; reason: string }
+  ) {
+    console.log(argums);
+    const user = await message.client.users.fetch(argums.mentionedUserId);
     if (!user) return message.reply('User doesnt exist!');
 
     if (user.id === '827212859447705610') {
@@ -54,13 +63,6 @@ export default class Ban extends Command {
       return message.reply('Cant ban this guy because he is too powerfull!');
     }
 
-    let reason = '';
-
-    if (args.length > 1) {
-      args.shift();
-      reason = args.join(' ');
-    }
-
     try {
       const prevBan = await message.guild.bans.fetch({ user: user.id });
       if (prevBan)
@@ -70,10 +72,10 @@ export default class Ban extends Command {
     } catch (err) {}
 
     try {
-      await message.guild.bans.create(user.id, { reason });
+      await message.guild.bans.create(user.id, { reason: argums.reason ?? '' });
       let embedMessage = `Successfully banned ${user.username}#${user.discriminator}`;
-      if (reason.length > 0) {
-        embedMessage += ` for ${reason}`;
+      if (argums.reason) {
+        embedMessage += ` for ${argums.reason}`;
       }
       message.reply(embedMessage);
     } catch (err) {

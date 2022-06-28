@@ -1,6 +1,7 @@
-import { Message } from 'discord.js';
+import { Client, Message } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
-import Command from '../../utils/base/command';
+import { MentionIdOrArg } from '../../utils/argsparser';
+import Command, { ArgumentTypes } from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
 import { getDiscordUserFromMention } from '../../utils/Helpers/Moderation';
 
@@ -17,18 +18,22 @@ export default class UnBan extends Command {
       hooks: {
         preCommand: StartTyping,
       },
-      arguments: {
-        required: true,
-        minAmount: 1,
-      },
+      args: [
+        {
+          parse: MentionIdOrArg,
+          name: 'mentionedUserId',
+          type: ArgumentTypes.SINGLE,
+        },
+      ],
     });
   }
 
-  async run(message: Message, args: string[]) {
-    const user = await getDiscordUserFromMention(
-      message.client as DiscordClient,
-      args[0]
-    );
+  async run(
+    message: Message,
+    args: string[],
+    argums: { mentionedUserId: string }
+  ) {
+    const user = await message.client.users.fetch(argums.mentionedUserId);
     if (!user) return message.reply('User doesnt exist!');
 
     try {
