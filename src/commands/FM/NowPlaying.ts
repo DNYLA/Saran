@@ -29,16 +29,19 @@ export default class NowPlaying extends Command {
         {
           parse: MentionUserId,
           default: SelfUserId,
-          name: 'test',
+          name: 'targetUserId',
           type: ArgumentTypes.SINGLE,
         },
       ],
     });
   }
 
-  async run(message: Message, args: string[]) {
-    const userId = args[0];
-    const user = await getUser(userId);
+  async run(
+    message: Message,
+    args: string[],
+    argums: { targetUserId: string }
+  ) {
+    const user = await getUser(argums.targetUserId);
     const username = user.lastFMName;
     let donatorEmbed = false;
 

@@ -9,16 +9,15 @@ export default (
   valid: boolean,
   type: RequirmentsType
 ): void => {
-  console.log(args.targetUserId);
-  if (!args.targetUserId) {
-    const unknownError = new MessageEmbed()
-      .setColor('#cb0f0f')
-      .setDescription(
-        `ErrorID: {error_id}, if this issue continues join Saran disocrd and create a ticket`
-      );
-    message.channel.send({ embeds: [unknownError] });
-  }
   if (!valid && type === RequirmentsType.Custom) {
+    if (!args.targetUserId) {
+      const unknownError = new MessageEmbed()
+        .setColor('#cb0f0f')
+        .setDescription(
+          `ErrorID: {error_id}, if this issue continues join Saran disocrd and create a ticket`
+        );
+      message.channel.send({ embeds: [unknownError] });
+    }
     const userId = args.targetUserId;
 
     const usernameNotSetEmbed = new MessageEmbed()

@@ -45,8 +45,10 @@ export default abstract class Command {
     type?: RequirmentsType;
     args: unknown;
   }> {
-    if (!this.options?.requirments)
-      return { valid: true, message: null, type: null, args };
+    const { valid: validArgs, parsedArgs } = this.isValidArgs(args, message);
+    console.log(validArgs);
+    if (!this.options?.requirments && validArgs)
+      return { valid: true, message: null, type: null, args: parsedArgs };
 
     const isBotOwner = message.author.id === OwnerOnly(message)[0];
 
@@ -58,10 +60,10 @@ export default abstract class Command {
         valid: false,
         message: this.options?.invalidPermissions,
         type: RequirmentsType.Permissions,
-        args,
+        args: parsedArgs,
       };
 
-    if (req.userIDs) {
+    if (req && req.userIDs) {
       let ids = [OwnerOnly(message)[0]];
       if (typeof req.userIDs === 'function') {
         ids = req.userIDs(message);
@@ -74,7 +76,7 @@ export default abstract class Command {
           valid: false,
           message: this.options?.invalidPermissions,
           type: RequirmentsType.NotWhitelisted,
-          args,
+          args: parsedArgs,
         };
     }
 
@@ -86,18 +88,17 @@ export default abstract class Command {
           valid: false,
           message: this.options.invalidUsage ?? 'Invalid Usage',
           type: RequirmentsType.InvalidArguments,
-          args,
+          args: parsedArgs,
         };
       }
     }
 
-    const { valid: validArgs, parsedArgs } = this.isValidArgs(args, message);
     if (!validArgs)
       return {
         valid: false,
         message: this.options.invalidUsage ?? 'Invalid Usage',
         type: RequirmentsType.InvalidArguments,
-        args,
+        args: parsedArgs,
       };
 
     //Message is displayed in PostCheck if they chose to
@@ -106,7 +107,7 @@ export default abstract class Command {
         valid: false,
         message: null,
         type: RequirmentsType.Custom,
-        args,
+        args: parsedArgs,
       };
 
     return { valid: true, message: null, type: null, args: parsedArgs };

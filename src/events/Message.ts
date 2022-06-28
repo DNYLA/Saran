@@ -60,7 +60,7 @@ export default class MessageEvent extends Event {
 
           if (command) {
             try {
-              command.run(message, args);
+              command.execute(client, message, args);
             } catch (err) {
               message.channel.send(
                 'There was an error when attempting to execute this command'
