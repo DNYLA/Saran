@@ -5,12 +5,20 @@ import { mentionUser } from '../utils/helpers';
 
 export default (
   message: Message,
-  args: string[],
+  args: { targetUserId: string },
   valid: boolean,
   type: RequirmentsType
 ): void => {
+  if (!args.targetUserId) {
+    const unknownError = new MessageEmbed()
+      .setColor('#cb0f0f')
+      .setDescription(
+        `ErrorID: {error_id}, if this issue continues join Saran disocrd and create a ticket`
+      );
+    message.channel.send({ embeds: [unknownError] });
+  }
   if (!valid && type === RequirmentsType.Custom) {
-    const userId = getTargetUserId(message, args);
+    const userId = args.targetUserId;
 
     const usernameNotSetEmbed = new MessageEmbed()
       .setColor('#cb0f0f')

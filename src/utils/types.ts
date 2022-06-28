@@ -68,7 +68,7 @@ export type Hooks = {
   preCommand?: (msg: Message, args: string[]) => void;
   postCheck?: (
     msg: Message,
-    args: string[],
+    args: unknown,
     valid: boolean,
     type: RequirmentsType
   ) => void;

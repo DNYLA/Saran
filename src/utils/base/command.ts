@@ -159,28 +159,19 @@ export default abstract class Command {
 
         if (!arg.parse) {
           const curArgs = [..._args];
-          console.log(curArgs);
-          console.log('Here?');
           if (arg.type === ArgumentTypes.SINGLE) {
             parsedArgs[arg.name] = _args[0];
-            // argIndex++;
             _args.shift();
           } else if (arg.type === ArgumentTypes.FULL_SENTANCE) {
             //Join remainder of arg into one string
             parsedArgs[arg.name] = curArgs.join(' ');
             _args.splice(curArgs.length - 1);
-            argIndex += curArgs.length;
           } else if (arg.type === ArgumentTypes.DENOMENATED_WORD) {
             //Parse String Denomanted Via Denomentatror
             const joined = curArgs.join(' ');
             const split = joined.split(ARGUMENT_DENOMENATOR);
             parsedArgs[arg.name] = split[0];
-            console.log('Splity');
-            console.log(split[0].split(' ').length + 1);
-            // argIndex += split[0].split(' ').length;
             _args.splice(0, split[0].split(' ').length + 1); //+1 because we also want to remove the Denomenator
-
-            // parsedArgs[arg.name] = curArgs.join(' ');
           }
           return;
         }
@@ -194,7 +185,6 @@ export default abstract class Command {
         } else {
           parsedArgs[arg.name] = parsedArg;
           _args.shift();
-          argIndex++;
         }
       });
     }
@@ -245,7 +235,8 @@ export default abstract class Command {
     if (!passedChecks && invalidMessage) message.reply(invalidMessage);
 
     //Run PostCheck()?
-    hooks?.postCheck && hooks.postCheck(message, args, passedChecks, type);
+    hooks?.postCheck &&
+      hooks.postCheck(message, parsedArgs, passedChecks, type);
 
     //Run Command if checks passed
     let success = true;
