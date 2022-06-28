@@ -23,7 +23,7 @@ export default abstract class Command {
   constructor(private name: string, private options?: CommandOptions) {}
 
   getName(): string {
-    return this.name;
+    return this.name.toLowerCase(); //Return lowercased command name
   }
 
   getOptions(): CommandOptions {
@@ -32,8 +32,7 @@ export default abstract class Command {
 
   getAliases(): string[] {
     if (!this.options || !this.options.aliases) return [];
-
-    return this.options.aliases;
+    return this.options.aliases.map((alias) => alias.toLowerCase()); //Return lowercases alias
   }
 
   private async isValidRequirments(
@@ -96,7 +95,7 @@ export default abstract class Command {
     if (!validArgs)
       return {
         valid: false,
-        message: this.options.invalidUsage ?? 'Invalid Usage',
+        message: this.options.invalidUsage ?? null,
         type: RequirmentsType.InvalidArguments,
         args: parsedArgs,
       };

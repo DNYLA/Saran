@@ -17,7 +17,7 @@ type ArgsTestArguments = {
 
 export default class ArgsTest extends Command {
   constructor() {
-    super('deletemessage', {
+    super('deleteMessage', {
       aliases: ['dm'],
       deleteCommand: true,
       requirments: {
@@ -25,7 +25,6 @@ export default class ArgsTest extends Command {
       },
       invalidPermissions: 'You must be admin to use this!',
       hooks: {
-        preCommand: StartTyping,
         postCommand: () => console.log('Finished Executing'),
       },
       args: [
