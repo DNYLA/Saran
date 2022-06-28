@@ -2,9 +2,14 @@ import { Message } from 'discord.js';
 import UsernameCheck from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
-import Command from '../../../utils/base/command';
+import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
+import Command, { ArgumentTypes } from '../../../utils/base/command';
 import { getTopTenStats, SearchType } from '../../../utils/fmHelpers';
 
+export type TopTenArguments = {
+  targetUserId: string;
+  period: string;
+};
 export default class TopArtists extends Command {
   constructor() {
     super('lf tar', {
@@ -16,10 +21,24 @@ export default class TopArtists extends Command {
         postCheck: NoUsernameSet,
       },
       invalidUsage: 'Usage: ,lf tar <period>(Optional)',
+      args: [
+        {
+          parse: MentionUserId,
+          default: SelfUserId,
+          name: 'targetUserId',
+          type: ArgumentTypes.SINGLE,
+        },
+        {
+          name: 'period',
+          type: ArgumentTypes.SINGLE,
+          optional: true,
+          default: 'overall',
+        },
+      ],
     });
   }
 
-  async run(message: Message, args: string[]) {
-    getTopTenStats(message, args, SearchType.Artist);
+  async run(message: Message, args: string[], argums: TopTenArguments) {
+    getTopTenStats(message, argums, SearchType.Artist);
   }
 }

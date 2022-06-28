@@ -19,6 +19,7 @@ import {
   fetchTrackInfo,
   Periods,
 } from '../api/lastfm';
+import { TopTenArguments } from '../commands/FM/TopTen/topartists';
 import { setCachedPlays } from './database/redisManager';
 import { getUser } from './database/User';
 import { convertPeriodToText, mentionUser } from './helpers';
@@ -50,13 +51,11 @@ export async function getUserFromMessage(
   return await getUser(userId);
 }
 
-export function getPeriodFromArg(args: string[]): Periods {
+export function getPeriodFromString(arg: string): Periods {
   let period: Periods = Periods['overall'];
 
-  if (args.length > 0) {
-    const validPeriod = Periods[args[0].toLowerCase()];
-    if (validPeriod) period = validPeriod;
-  }
+  const validPeriod = Periods[arg.toLowerCase()];
+  if (validPeriod) period = validPeriod;
 
   return period;
 }
@@ -157,12 +156,13 @@ export enum SearchType {
 
 export async function getTopTenStats(
   message: Message,
-  args: string[],
+  args: TopTenArguments,
   type: SearchType
 ) {
-  const user = await getUser(getTargetUserId(message, args, true));
+  const user = await getUser(args.targetUserId);
 
-  const period: Periods = getPeriodFromArg(args);
+  console.log(args.period);
+  const period: Periods = getPeriodFromString(args.period);
   let topStats: TopTrack[] | TopArtist[] | TopAlbum[];
 
   try {
