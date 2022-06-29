@@ -57,9 +57,12 @@ export default class ImageSearch extends Command {
         return message.channel.send('Daily free image search quota reached');
       }
 
-    if (results.images.length === 0)
-      return message.reply({ content: 'Cant Find any images!' });
-
+    try {
+      if (!results || results.images.length === 0)
+        return message.reply({ content: 'Cant Find any images!' });
+    } catch (err) {
+      return message.reply({ content: 'Cant FInd image' });
+    }
     client.setImage(results);
     const firstImage = results.images[0];
     const imageEmbed = new MessageEmbed()
