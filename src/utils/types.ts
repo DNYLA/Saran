@@ -203,13 +203,13 @@ export type GoogleImagesSearch = {
   query: string;
   currentPos: number;
   requester: string;
-  images: GoogleImageScrape[];
+  images: WebSearchImage[];
 };
 
 export type WebSearchImage = {
-  url: string;
-  thumbnail: string;
+  link: string;
   snippet: string;
+  title: string;
 };
 
 export type GoogleImageScrape = {

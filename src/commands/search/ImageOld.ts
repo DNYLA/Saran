@@ -16,8 +16,8 @@ export type SearchQueryArgs = {
 
 export default class ImageSearch extends Command {
   constructor() {
-    super('image2', {
-      aliases: ['img2'],
+    super('image', {
+      aliases: ['img'],
       hooks: {
         preCommand: StartTyping,
       },
@@ -37,63 +37,62 @@ export default class ImageSearch extends Command {
   async run(message: Message, args: SearchQueryArgs) {
     const client = message.client as DiscordClient;
     const { query } = args;
-    // let results;
-    // if (!results)
-    //   try {
-    //     const data = await fetchQueryImages(query, 1);
-    //     results = {
-    //       images: data,
-    //       query: query,
-    //       currentPos: 0,
-    //       requester: message.author.id,
-    //     };
-    //   } catch (err) {
-    //     console.log(err);
-    //     return message.channel.send('Daily free image search quota reached');
-    //   }
+    let results = client.getImage(query);
+    if (!results)
+      try {
+        const imageSearch = new GoogleCSESearch(
+          process.env.GOOGLE_API_KEY,
+          process.env.GOOGLE_CSE_ID
+        );
 
-    const imageSearch = new GoogleCSESearch(
-      process.env.GOOGLE_API_KEY,
-      process.env.GOOGLE_CSE_ID
+        const data = await imageSearch.search(query);
+        results = {
+          images: data,
+          query: query,
+          currentPos: 0,
+          requester: message.author.id,
+        };
+      } catch (err) {
+        console.log(err);
+        return message.channel.send('Daily free image search quota reached');
+      }
+
+    if (results.images.length === 0)
+      return message.reply({ content: 'Cant Find any images!' });
+
+    client.setImage(results);
+    const firstImage = results.images[0];
+    const imageEmbed = new MessageEmbed()
+      .setImage(firstImage.link)
+      // .setAuthor({ name: firstImage.title, url: firstImage.url })
+      .setTitle(firstImage.snippet)
+      .setURL(firstImage.link)
+      .setFooter({
+        text: `Page 1/${results.images.length} ∙ Requested by ${message.author.username}`,
+      });
+
+    const row = new MessageActionRow().addComponents(
+      new MessageButton()
+        .setCustomId(`image-backward-${query}`)
+        .setLabel('<')
+        .setStyle('PRIMARY'),
+      new MessageButton()
+        .setCustomId(`image-forward-${query}`)
+        .setLabel('>')
+        .setStyle('PRIMARY'),
+      new MessageButton()
+        .setCustomId(`image-delete-${query}`)
+        .setLabel('X')
+        .setStyle('DANGER')
     );
 
-    imageSearch.search(query);
+    const imgMessage = await message.channel.send({
+      embeds: [imageEmbed],
+      components: [row],
+    });
 
-    // if (results.images.length === 0)
-    //   return message.reply({ content: 'Cant Find any images!' });
-    // client.setImage(results);
-    // const firstImage = results.images[0];
-    // const imageEmbed = new MessageEmbed()
-    //   .setImage(firstImage.url)
-    //   // .setAuthor({ name: firstImage.title, url: firstImage.url })
-    //   .setTitle(firstImage.snippet)
-    //   .setURL(firstImage.url)
-    //   .setFooter({
-    //     text: `Page 1/${results.images.length} ∙ Requested by ${message.author.username}`,
-    //   });
-
-    // const row = new MessageActionRow().addComponents(
-    //   new MessageButton()
-    //     .setCustomId(`image-backward-${query}`)
-    //     .setLabel('<')
-    //     .setStyle('PRIMARY'),
-    //   new MessageButton()
-    //     .setCustomId(`image-forward-${query}`)
-    //     .setLabel('>')
-    //     .setStyle('PRIMARY'),
-    //   new MessageButton()
-    //     .setCustomId(`image-delete-${query}`)
-    //     .setLabel('X')
-    //     .setStyle('DANGER')
-    // );
-
-    // const imgMessage = await message.channel.send({
-    //   embeds: [imageEmbed],
-    //   components: [row],
-    // });
-
-    // setTimeout(() => {
-    //   imgMessage.edit({ components: [] });
-    // }, 60000);
+    setTimeout(() => {
+      imgMessage.edit({ components: [] });
+    }, 60000);
   }
 }

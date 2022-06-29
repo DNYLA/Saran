@@ -39,7 +39,10 @@ export class GoogleCSESearch {
     if (!apiKey || !cseKey) throw new Error('Provide a CSE or API Key');
   }
 
-  async search(query: string, options?: GoogleCSEOptions) {
+  async search(
+    query: string,
+    options?: GoogleCSEOptions
+  ): Promise<WebSearchImage[]> {
     query = query.replace(/\s/g, '+');
     // options.safeSearch = true;
     // options.searchType = 'image';
@@ -56,10 +59,10 @@ export class GoogleCSESearch {
     try {
       const { data } = await axios.get(uri);
       console.log(data);
-      return data;
+      return data.items ?? [];
     } catch (err) {
       console.log(err);
-      return null;
+      return [];
     }
   }
 
