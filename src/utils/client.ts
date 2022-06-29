@@ -3,12 +3,12 @@ import { Client, ClientOptions, Collection, Message } from 'discord.js';
 import Command from './base/command';
 import command from './base/command';
 import Event from './base/event';
-import { WebSearchImage, WebSearchImages } from './types';
+import { WebSearchImage, GoogleImagesSearch } from './types';
 
 export default class DiscordClient extends Client {
   private _commands = new Collection<string, Command>();
   private _events = new Collection<string, Event>();
-  private _images = new Collection<string, WebSearchImages>();
+  private _images = new Collection<string, GoogleImagesSearch>();
   private _configs = new Array<GuildConfig>();
   private _deletedMessages = new Collection<string, Message>();
   constructor(options?: ClientOptions) {
@@ -23,12 +23,12 @@ export default class DiscordClient extends Client {
     return this._events;
   }
 
-  getImage(name: string): WebSearchImages {
+  getImage(name: string): GoogleImagesSearch {
     return this._images[name];
     // return this._images.find((image) => image.query === name);
   }
 
-  setImage(images: WebSearchImages) {
+  setImage(images: GoogleImagesSearch) {
     this._images[images.query] = images;
   }
 

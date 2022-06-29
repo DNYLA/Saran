@@ -3,6 +3,7 @@ import axios from 'axios';
 import {
   Channel,
   Message,
+  MessageAttachment,
   MessageEmbed,
   MessageMentions,
   TextChannel,
@@ -198,13 +199,10 @@ export async function getTopTenStats(
 
 export async function getTopTenStatsNoEmbed(
   message: Message,
-  args: TopTenArguments,
+  user: User,
+  period: Periods,
   type: SearchType
 ) {
-  const user = await getUser(args.targetUserId);
-
-  console.log(args.period);
-  const period: Periods = getPeriodFromString(args.period);
   let topStats: TopTrack[] | TopArtist[] | TopAlbum[];
 
   try {
@@ -227,32 +225,6 @@ export async function getTopTenStatsNoEmbed(
   }
   if (period === Periods.overall)
     await cacheTopTenStats(user.lastFMName, topStats, type);
-
-  const imageUrls = [];
-  const imgbuffers = [];
-  for (let i = 0; i < topStats.length; i++) {
-    if (i === 9) continue;
-    const item = topStats[i];
-    try {
-      const url = item.image[3]['#text'];
-      imageUrls.push(url);
-      const response = await axios.get(url, { responseType: 'arraybuffer' });
-      const buffer = Buffer.from(response.data, 'utf-8');
-      imgbuffers.push(buffer);
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  createCollage(imageUrls, 900).then((imageBuffer) => {
-    const embedTitle = `${user.lastFMName} ${convertPeriodToText(
-      period
-    )} top alums`;
-    const embed = new MessageEmbed()
-      .setTitle(embedTitle)
-      .setImage('attachment://file.jpg');
-    message.channel.send({ embeds: [embed], files: [imageBuffer] });
-  });
 
   return topStats;
 }

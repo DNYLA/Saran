@@ -199,15 +199,21 @@ type FMImage = {
   '#text': string;
 };
 
-export type WebSearchImages = {
+export type GoogleImagesSearch = {
   query: string;
   currentPos: number;
   requester: string;
-  images: WebSearchImage[];
+  images: GoogleImageScrape[];
 };
 
 export type WebSearchImage = {
   url: string;
   thumbnail: string;
   snippet: string;
+};
+
+export type GoogleImageScrape = {
+  url: string;
+  source: string;
+  title: string;
 };
