@@ -1,4 +1,5 @@
 import { User } from '@prisma/client';
+import axios from 'axios';
 import {
   Channel,
   Message,
@@ -34,6 +35,8 @@ import {
   TopTrack,
   Track,
 } from './types';
+const { createCollage } = require('@wylie39/image-collage');
+const fs = require('fs');
 
 //Returns either the author id or if a mention exists the mentioned users id
 export async function getUserFromMessage(
@@ -191,6 +194,67 @@ export async function getTopTenStats(
 
   if (embed) message.channel.send({ embeds: [embed] });
   else message.reply('Unable to display top tracks!');
+}
+
+export async function getTopTenStatsNoEmbed(
+  message: Message,
+  args: TopTenArguments,
+  type: SearchType
+) {
+  const user = await getUser(args.targetUserId);
+
+  console.log(args.period);
+  const period: Periods = getPeriodFromString(args.period);
+  let topStats: TopTrack[] | TopArtist[] | TopAlbum[];
+
+  try {
+    if (type === SearchType.Track) {
+      topStats = await fetchTopTenTracks(user.lastFMName, period);
+    } else if (type === SearchType.Artist) {
+      topStats = await fetchTopArtists(user.lastFMName, period);
+    } else if (type === SearchType.Album) {
+      topStats = await fetchTopTenAlbums(user.lastFMName, period);
+    }
+  } catch (err) {
+    console.log(err);
+    message.channel.send('Unable to process request');
+    return [];
+  }
+
+  if (topStats.length === 0) {
+    sendNoDataEmbed(message);
+    return [];
+  }
+  if (period === Periods.overall)
+    await cacheTopTenStats(user.lastFMName, topStats, type);
+
+  const imageUrls = [];
+  const imgbuffers = [];
+  for (let i = 0; i < topStats.length; i++) {
+    if (i === 9) continue;
+    const item = topStats[i];
+    try {
+      const url = item.image[3]['#text'];
+      imageUrls.push(url);
+      const response = await axios.get(url, { responseType: 'arraybuffer' });
+      const buffer = Buffer.from(response.data, 'utf-8');
+      imgbuffers.push(buffer);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  createCollage(imageUrls, 900).then((imageBuffer) => {
+    const embedTitle = `${user.lastFMName} ${convertPeriodToText(
+      period
+    )} top alums`;
+    const embed = new MessageEmbed()
+      .setTitle(embedTitle)
+      .setImage('attachment://file.jpg');
+    message.channel.send({ embeds: [embed], files: [imageBuffer] });
+  });
+
+  return topStats;
 }
 
 export async function fetchRecentTrackInfo(
