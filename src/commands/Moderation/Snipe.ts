@@ -1,4 +1,4 @@
-import { Message, MessageEmbed } from 'discord.js';
+import { Message, MessageAttachment, MessageEmbed } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import Command from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
@@ -20,6 +20,12 @@ export default class Snipe extends Command {
     if (!deletedMessage) {
       return message.channel.send('No message recently deleted!');
     }
+
+    let attachmentUrl;
+    if (deletedMessage.attachments.size > 0) {
+      attachmentUrl = deletedMessage.attachments.first().url;
+    }
+
     const embed = new MessageEmbed()
       .setAuthor({
         name: deletedMessage.member.displayName,
@@ -28,6 +34,8 @@ export default class Snipe extends Command {
       .setDescription(deletedMessage.content)
       .setFooter({ text: `Sniped by ${message.member.displayName}` })
       .setTimestamp();
+
+    if (attachmentUrl) embed.setImage(attachmentUrl);
     message.channel.send({ embeds: [embed] });
   }
 }
