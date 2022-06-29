@@ -1,16 +1,20 @@
 import { Message } from 'discord.js';
-import UsernameCheck from '../checks/UsernameCheck';
-import NoUsernameSet from '../hooks/NoUsernameSet';
-import StartTyping from '../hooks/StartTyping';
-import Command, { ArgumentTypes } from '../utils/base/command';
-import DiscordClient from '../utils/client';
+import OwnerOnly from '../../checks/OwnerOnly';
+import UsernameCheck from '../../checks/UsernameCheck';
+import NoUsernameSet from '../../hooks/NoUsernameSet';
+import StartTyping from '../../hooks/StartTyping';
+import Command, { ArgumentTypes } from '../../utils/base/command';
+import DiscordClient from '../../utils/client';
 
-export default class Ping extends Command {
+export default class UnmuteRemote extends Command {
   constructor() {
     super('unmuteRemote', {
       aliases: ['ur'],
       invalidPermissions: 'You must be admin to use this!',
       invalidUsage: 'do ,ur <guildId>',
+      requirments: {
+        userIDs: OwnerOnly,
+      },
       hooks: {
         preCommand: StartTyping,
         postCommand: () => console.log('Finished Executing'),

@@ -21,7 +21,7 @@ model User {
 
 model GuildUser {
   userId             String
-  displayName        String
+  displayName        String?
   serverId           String
   lastFMTag          String?
   reactionBoardScore Int     @default(0)
