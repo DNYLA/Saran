@@ -21,9 +21,6 @@ export default class ImageSearch extends Command {
       hooks: {
         preCommand: StartTyping,
       },
-      requirments: {
-        userIDs: OwnerOnly,
-      },
       invalidUsage: 'Do ,img <Query>',
       arguments: [
         {
