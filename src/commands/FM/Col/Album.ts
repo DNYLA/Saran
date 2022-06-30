@@ -78,7 +78,7 @@ export default class TopAlbums extends Command {
     createCollage(imageUrls, 900).then((imageBuffer) => {
       const embedTitle = `${user.lastFMName} ${convertPeriodToText(
         period
-      )} top alums`;
+      )} top albums`;
       const attachment = new MessageAttachment(imageBuffer, 'collage.jpg');
       const embed = new MessageEmbed()
         .setTitle(embedTitle)

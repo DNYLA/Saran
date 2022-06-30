@@ -16,7 +16,6 @@ export default class Donator extends Command {
       requirments: {
         userIDs: OwnerOnly,
       },
-      invalidPermissions: 'Only bot owner can access this command!',
       invalidUsage: ',donater <add | remove> <userid>',
       hooks: {
         preCommand: StartTyping,

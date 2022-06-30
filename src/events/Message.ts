@@ -2,7 +2,8 @@ import { PrismaClient } from '@prisma/client';
 import { Guild, Message } from 'discord.js';
 import Event from '../utils/base/event';
 import DiscordClient from '../utils/client';
-import { createGuildMember, getUser, SaranGuild } from '../utils/database/User';
+import { SaranGuild } from '../utils/database/Guild';
+import { createGuildMember, getUser } from '../utils/database/User';
 import { getArgsFromMsg } from '../utils/helpers';
 const prisma = new PrismaClient();
 

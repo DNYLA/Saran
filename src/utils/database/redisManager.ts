@@ -46,6 +46,10 @@ export async function setCachedPlays(
   );
 }
 
+export async function deleteCache(key: string) {
+  return await redis.del(key);
+}
+
 const setExpire = async (key, time) => {
   await redis.expire(key, time);
 };
