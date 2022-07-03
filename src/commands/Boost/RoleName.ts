@@ -47,7 +47,7 @@ export default class BoosterRoleName extends Command {
         'This guild is not level 2 so this feature cannot be accessed!'
       );
     }
-    // if (!guildUser.premiumSince) return message.reply('You gotta be booster!');
+    if (!guildUser.premiumSince) return message.reply('You gotta be booster!');
 
     const storedUser = await new SaranGuildUser(user.id, guild.id).fetch();
 
