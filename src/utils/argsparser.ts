@@ -1,6 +1,15 @@
 import { Message, MessageMentions } from 'discord.js';
 import { ArgumentType } from './types';
 
+export const StringToColour = (
+  message: Message,
+  args: string[],
+  index: number
+) => {
+  if (args.length > 0) return args[0].toUpperCase();
+  else return null;
+};
+
 export const ImageUrlOrAttachment = (
   message: Message,
   args: string[],

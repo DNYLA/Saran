@@ -1,39 +1,40 @@
-import { Message, Role } from 'discord.js';
+import { ColorResolvable, Message, Role } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import {
   ImageUrlOrAttachment,
   MentionIdOrArg,
   MentionUserId,
+  StringToColour,
 } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
 import { SaranGuildUser } from '../../utils/database/Guild';
 import { getDiscordUserFromMention } from '../../utils/Helpers/Moderation';
 
-export default class BoosterRole extends Command {
+export default class BoosterRoleColour extends Command {
   constructor() {
-    super('boost', {
+    super('boostcol', {
       requirments: {
         permissions: {
           administrator: false,
         },
       },
       invalidPermissions: 'You must be admin to use this!',
-      invalidUsage: `Do ,boost <imageurl>`,
+      invalidUsage: `Do ,boostcol <#hex>`,
       hooks: {
         preCommand: StartTyping,
       },
       arguments: [
         {
-          name: 'iconLink',
-          type: ArgumentTypes.FULL_SENTANCE,
-          parse: ImageUrlOrAttachment,
+          name: 'colour',
+          type: ArgumentTypes.SINGLE,
+          parse: StringToColour,
         },
       ],
     });
   }
 
-  async run(message: Message, args: { iconLink: string }) {
+  async run(message: Message, args: { colour: string }) {
     console.log('running');
     const user = await message.client.users.fetch(message.author.id);
     if (!user) return message.reply('User doesnt exist!');
@@ -76,15 +77,14 @@ export default class BoosterRole extends Command {
       }
     }
 
-    if (!args.iconLink)
-      return message.reply(
-        'Currenty you can only pass through a image URL link as attachments do not work!'
-      );
+    if (!args.colour) return message.reply('Pass through a valid colour');
 
     try {
       // guildUser.roles.premiumSubscriberRole
       // console.log(guildUser.roles.premiumSubscriberRole);
-      await boosterRole.setIcon(args.iconLink);
+      // await boosterRole.setIcon(args.iconLink);
+
+      await boosterRole.setColor(args.colour as ColorResolvable);
       if (storedUser.self.customBoostRoleId !== boosterRole.id)
         await storedUser.update({ customBoostRoleId: boosterRole.id });
       await guildUser.roles.add(boosterRole);
@@ -92,7 +92,7 @@ export default class BoosterRole extends Command {
       // guild.roles.premiumSubscriberRole.setIcon(args.iconLink);
     } catch (err) {
       console.log(err);
-      return message.reply('Unable to set that image as Icon');
+      return message.reply('Invalid Colour Passed');
     }
 
     return message.reply('Succesfully set Icon');
