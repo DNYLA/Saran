@@ -1,4 +1,3 @@
-import { xml } from 'cheerio';
 import { Message } from 'discord.js';
 import OwnerOnly from '../../checks/OwnerOnly';
 import DiscordClient from '../client';

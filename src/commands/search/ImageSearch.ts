@@ -4,7 +4,7 @@ import {
   MessageButton,
   MessageEmbed,
 } from 'discord.js';
-import { fetchQueryImages, GoogleCSESearch } from '../../api/WebSearch';
+import { GoogleCSESearch } from '../../api/WebSearch';
 import OwnerOnly from '../../checks/OwnerOnly';
 import StartTyping from '../../hooks/StartTyping';
 import Command, { ArgumentTypes } from '../../utils/base/command';

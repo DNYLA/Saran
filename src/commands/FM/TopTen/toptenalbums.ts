@@ -10,6 +10,7 @@ import { TopTenArguments } from './topartists';
 export default class TopAlbums extends Command {
   constructor() {
     super('lf tta', {
+      aliases: ['lf topalbums'],
       requirments: {
         custom: UsernameCheck,
       },

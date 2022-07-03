@@ -1,13 +1,10 @@
 import { Message } from 'discord.js';
-import { FastAverageColor } from 'fast-average-color';
 import OwnerOnly from '../../checks/OwnerOnly';
 import UsernameCheck from '../../checks/UsernameCheck';
 import NoUsernameSet from '../../hooks/NoUsernameSet';
 import StartTyping from '../../hooks/StartTyping';
 import { MentionUserId, SelfUserId } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
-import { ArgumentType } from '../../utils/types';
-var color = require('dominant-color');
 
 type ArgsTestArguments = {
   targetUserId: string;

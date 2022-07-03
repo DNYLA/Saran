@@ -5,7 +5,6 @@ import {
   MessageButton,
   MessageEmbed,
 } from 'discord.js';
-import { fetchQueryImages } from '../../api/WebSearch';
 import StartTyping from '../../hooks/StartTyping';
 import Command, { ArgumentTypes } from '../../utils/base/command';
 import DiscordClient from '../../utils/client';

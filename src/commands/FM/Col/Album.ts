@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { Message, MessageAttachment, MessageEmbed } from 'discord.js';
-import joinImages from 'join-images';
 import UsernameCheck from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
@@ -23,6 +22,7 @@ var request = require('request');
 export default class TopAlbums extends Command {
   constructor() {
     super('lf col', {
+      aliases: ['lf collage'],
       requirments: {
         custom: UsernameCheck,
       },
