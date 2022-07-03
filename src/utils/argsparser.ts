@@ -1,6 +1,26 @@
 import { Message, MessageMentions } from 'discord.js';
 import { ArgumentType } from './types';
 
+export const ImageUrlOrAttachment = (
+  message: Message,
+  args: string[],
+  index: number
+) => {
+  console.log('does this get ran?');
+  console.log(message.attachments);
+  if (message.attachments.size > 0) {
+    console.log('Test');
+
+    return message.attachments.first().url;
+  }
+
+  console.log('Test');
+
+  if (args.length > 0) return args[0];
+
+  return null;
+};
+
 export const MentionUserId = (
   message: Message,
   args: string[],

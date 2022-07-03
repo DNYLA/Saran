@@ -134,6 +134,11 @@ export default abstract class Command {
       this.options.arguments.map((arg, i) => {
         console.log(_args);
         if (_args.length === 0) {
+          // if (arg.parse && !arg.optional) {
+          //   const parsed = arg.parse(message, _args, 0);
+          //   if (!parsed) return (validArgs = false);
+          //   parsedArgs[arg.name] = parsed;
+          // }
           if (!arg.default && arg.optional)
             return (parsedArgs[arg.name] = null);
           else if (!arg.default && !arg.optional) return (validArgs = false);

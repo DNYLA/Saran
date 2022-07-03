@@ -163,7 +163,7 @@ export class SaranGuildUser {
   /**
    *
    */
-  private self: GuildUser;
+  public self: GuildUser;
   //Unique Identifier for GuildUser => UserId + ServerId
   constructor(
     private userId: string,
@@ -186,6 +186,19 @@ export class SaranGuildUser {
     } catch (err) {
       console.log(err);
     }
+
+    return this;
+  }
+
+  async update(update: Prisma.GuildUserUpdateInput): Promise<SaranGuildUser> {
+    const user = await prisma.guildUser.update({
+      where: {
+        userId_serverId: { userId: this.userId, serverId: this.serverId },
+      },
+      data: update,
+    });
+
+    this.self = user;
 
     return this;
   }
