@@ -1,4 +1,5 @@
 import { GuildChannel, Message } from 'discord.js';
+import { OverwriteTypes } from 'discord.js/typings/enums';
 import StartTyping from '../../hooks/StartTyping';
 import { MentionIdOrArg } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
@@ -22,10 +23,12 @@ export default class Mute extends Command {
   async run(message: Message) {
     const channel = (await message.channel.fetch()) as GuildChannel;
 
-    await channel.permissionOverwrites.create(channel.guild.roles.everyone, {
-      SEND_MESSAGES: true,
-    });
+    await Promise.all(
+      channel.permissionOverwrites.cache.map(async (overwrite) => {
+        await overwrite.edit({ SEND_MESSAGES: true });
+      })
+    );
 
-    message.reply('The channel has been LOCKED DOWN!');
+    message.reply('The channel has been UNLOCKED DOWN!');
   }
 }

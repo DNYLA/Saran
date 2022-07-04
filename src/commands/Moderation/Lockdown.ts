@@ -22,10 +22,12 @@ export default class Mute extends Command {
   async run(message: Message) {
     const channel = (await message.channel.fetch()) as GuildChannel;
 
-    await channel.permissionOverwrites.create(channel.guild.roles.everyone, {
-      SEND_MESSAGES: false,
-    });
+    await Promise.all(
+      channel.permissionOverwrites.cache.map(async (overwrite) => {
+        await overwrite.edit({ SEND_MESSAGES: false });
+      })
+    );
 
-    message.reply('The channel has been UN-LOCKED DOWN!');
+    message.reply('The channel has been LOCKED DOWN!');
   }
 }
