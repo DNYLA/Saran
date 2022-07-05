@@ -116,8 +116,11 @@ export default class WhoKnowsAlbum extends Command {
 
     wkInfo.sort((a, b) => b.plays - a.plays).slice(0, 10);
 
-    for (let i = 0; i < wkInfo.length; i++) {
+    for (let i = 0; i < 10; i++) {
+      if (i > wkInfo.length - 1) break;
       const { id, fmName, plays } = wkInfo[i];
+      if (plays <= 0) continue;
+
       console.log(id);
       try {
         const discordUser = await message.client.users.fetch(id);
