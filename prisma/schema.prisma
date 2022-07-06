@@ -41,12 +41,13 @@ model GuildConfig {
 }
 
 model ReactionBoardMessages {
-  id           String
+  messageId           String
   serverId     String
+  embedMessageId String
   reactionName String
-  reactions    Int
+  reactions    Int @default(0)
   userId       String
   guild        GuildConfig @relation(fields: [serverId], references: [id])
 
-  @@id([id, serverId])
+  @@id([messageId, serverId])
 }
