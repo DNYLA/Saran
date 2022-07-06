@@ -40,13 +40,14 @@ export default class MessageEvent extends Event {
     );
 
     if (user.info.afkTime) {
-      const formattedTime = 'time';
+      const timeAfk = moment(user.info.afkTime).fromNow();
+
       const afkembed = new MessageEmbed()
         .setColor('#49b166')
         .setDescription(
-          `Welcome <@${
-            message.author.id
-          }> you were away for ${formattedTime}: ${user.info.afkMessage ?? ''}`
+          `Welcome <@${message.author.id}> you were away for ${timeAfk}: ${
+            user.info.afkMessage ?? ''
+          }`
         );
       await message.channel.send({ embeds: [afkembed] });
       await user.update({ afkMessage: null, afkTime: null });
