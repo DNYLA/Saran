@@ -1,4 +1,4 @@
-import { Message, MessageEmbed, Role } from 'discord.js';
+import { Message, MessageEmbed } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import { MentionIdOrArg } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
@@ -8,14 +8,14 @@ import { getGuildMemberFromMention } from '../../utils/Helpers/Moderation';
 
 export default class Jail extends Command {
   constructor() {
-    super('jail', {
+    super('unjail', {
       requirments: {
         permissions: {
           administrator: true,
         },
       },
       invalidPermissions: 'You must be admin to use this!',
-      invalidUsage: `Do ,jail <UserMention> <Time>(Optional Doesnt work right now)`,
+      invalidUsage: `Do ,unjail <UserMention>`,
       hooks: {
         preCommand: StartTyping,
       },
@@ -25,21 +25,13 @@ export default class Jail extends Command {
           name: 'mentionedUserId',
           type: ArgumentTypes.SINGLE,
         },
-        {
-          name: 'reason',
-          type: ArgumentTypes.FULL_SENTANCE,
-          optional: true,
-        },
       ],
     });
   }
 
-  async run(
-    message: Message,
-    args: { mentionedUserId: string; time: string; reason: string }
-  ) {
+  async run(message: Message, args: { mentionedUserId: string }) {
     const storedGuild = await new SaranGuild(message.guildId).fetch();
-    if (!storedGuild.config.jailChannel)
+    if (!storedGuild.config.jailRole)
       return message.reply('Use ,jailsetup to setup the jail');
 
     const guild = await message.guild.fetch();
@@ -52,49 +44,34 @@ export default class Jail extends Command {
       message.guildId
     ).fetch();
 
-    const roleIds = [];
-    const roles = user.roles.cache;
+    if (!user.roles.cache.has(storedGuild.config.jailRole)) {
+      return message.reply('user is not jailed');
+    }
 
-    await Promise.all(
-      user.roles.cache.map(async (role) => {
-        console.log(role);
+    const roleIds = guildMember.self.preJailedRoles;
 
-        if (role.id === guild.roles.everyone.id) return;
-        roleIds.push(role.id);
-        await user.roles.remove(role.id);
-      })
-    );
-    // for (let i = 0; i < roles.size; i++) {
-    //   const role: Role = roles[i];
-    //   console.log(role);
+    await user.roles.remove(storedGuild.config.jailRole).catch(console.error);
 
-    //   if (role.id === guild.roles.everyone.id) continue;
-    //   roleIds.push(role.id);
-    //   await user.roles.remove(role.id);
-    // }
+    for (let i = 0; i < roleIds.length; i++) {
+      const id = roleIds[i];
+      try {
+        await user.roles.add(id);
+      } catch (err) {} //Role might not exist anymores
+    }
 
     await guildMember.update({
       displayName: user.displayName,
-      preJailedRoles: roleIds,
+      preJailedRoles: [],
     });
 
     const embed = new MessageEmbed({
-      title: `${user.displayName} Jailed`,
-      color: 16736088,
+      title: `${user.displayName} Un-Jailed`,
+      color: 3993982,
       fields: [
         {
-          name: 'Jailer',
+          name: 'Moderator',
           value: `<@${message.author.id}>`,
           inline: true,
-        },
-        {
-          name: 'Time',
-          value: 'Indefinate',
-          inline: true,
-        },
-        {
-          name: 'Reason',
-          value: args.reason ?? 'N/A',
         },
       ],
       author: {
@@ -115,12 +92,6 @@ export default class Jail extends Command {
       // if (logChannel);
     } catch (err) {}
 
-    try {
-      await user.roles.add(storedGuild.config.jailRole);
-    } catch (err) {
-      return message.reply('Jail Role Doesnt exist');
-    }
-
-    return message.reply('Succesfully Jailed User!');
+    return message.reply('Succesfully Unjailed User!');
   }
 }

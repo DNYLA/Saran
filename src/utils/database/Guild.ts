@@ -57,7 +57,7 @@ export class SaranGuild {
     return this;
   }
 
-  async update(data: Prisma.GuildConfigUpdateArgs): Promise<SaranGuild> {
+  async update(data: Prisma.GuildConfigUpdateInput): Promise<SaranGuild> {
     this._config = await prisma.guildConfig.update({
       where: { id: this.serverId },
       data,
