@@ -1,10 +1,11 @@
 import { PrismaClient } from '@prisma/client';
-import { Guild, Message } from 'discord.js';
+import { Guild, Message, MessageEmbed } from 'discord.js';
+import moment from 'moment';
 import Event from '../utils/base/event';
 import DiscordClient from '../utils/client';
 import { SaranGuild } from '../utils/database/Guild';
-import { createGuildMember, getUser } from '../utils/database/User';
-import { getArgsFromMsg } from '../utils/helpers';
+import { createGuildMember, getUser, SaranUser } from '../utils/database/User';
+import { getArgsFromMsg, mentionUser } from '../utils/helpers';
 const prisma = new PrismaClient();
 
 export default class MessageEvent extends Event {
@@ -17,7 +18,39 @@ export default class MessageEvent extends Event {
     const member = await message.guild.members.fetch(message.author.id);
     const guildd = await new SaranGuild(message.guildId).fetch();
     const gUser = await guildd.fetchUser(message.author.id);
+    const user = await new SaranUser(message.author.id).fetch();
 
+    await Promise.all(
+      message.mentions.members.map(async (member) => {
+        const mentionedUser = await new SaranUser(member.id).fetch();
+
+        if (!mentionedUser.info.afkTime) return;
+
+        const timeAfk = moment(mentionedUser.info.afkTime).fromNow();
+        const reason = mentionedUser.info.afkMessage ?? '😴';
+
+        const afkembed = new MessageEmbed()
+          .setColor('#49b166')
+          .setDescription(
+            `😴 <@${mentionedUser.info.id}> has been AFK since ${timeAfk}: ${reason}`
+          );
+
+        await message.channel.send({ embeds: [afkembed] });
+      })
+    );
+
+    if (user.info.afkTime) {
+      const formattedTime = 'time';
+      const afkembed = new MessageEmbed()
+        .setColor('#49b166')
+        .setDescription(
+          `Welcome <@${
+            message.author.id
+          }> you were away for ${formattedTime}: ${user.info.afkMessage ?? ''}`
+        );
+      await message.channel.send({ embeds: [afkembed] });
+      await user.update({ afkMessage: null, afkTime: null });
+    }
     // guildd.updateMember(member, {}, { xp: { increment: 5 } });
     const guildUser = await createGuildMember(
       member,

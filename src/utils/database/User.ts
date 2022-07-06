@@ -77,6 +77,18 @@ export class SaranUser {
     return this.user;
   }
 
+  async update(data: Prisma.UserUpdateInput): Promise<SaranUser> {
+    try {
+      this.user = await prisma.user.update({
+        where: { id: this.userId },
+        data,
+      });
+    } catch (err) {
+      console.log(err);
+    }
+    return this;
+  }
+
   // async fetchGuildUser(serverId: string): Promise<SaranUser> {
   //   const guildUser = await prisma.user.findUnique({
   //     where: { id: lastFMName: { not: null }, guilds: { some: { serverId } } },

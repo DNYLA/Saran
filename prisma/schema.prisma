@@ -17,6 +17,8 @@ model User {
   lastFMTag  String?
   donator Boolean @default(false)
   guilds     GuildUser[]
+  afkTime DateTime?
+  afkMessage String?
 }
 
 model GuildUser {
