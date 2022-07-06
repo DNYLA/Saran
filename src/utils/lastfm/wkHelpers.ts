@@ -1,4 +1,4 @@
-import { Message } from 'discord.js';
+import { Message, MessageEmbed } from 'discord.js';
 import { getCachedPlays, setCachedPlays } from '../database/redisManager';
 import {
   getGuildUsers,
@@ -150,3 +150,25 @@ export async function FormatWhoKnowsArray(
 
   return { sum, description, totalListeners };
 }
+
+// export function createWkEmbed(
+//   username: string,
+//   title: string,
+//   description: string,
+//   totalListeners: number,
+//   sum: number
+// ) {
+//   return new MessageEmbed()
+//     .setColor('#2F3136')
+//     .setAuthor({
+//       name: `Requested by ${username}`,
+//       url: `https://www.last.fm/user/${username}`,
+//       iconURL:
+//         'https://lastfm.freetls.fastly.net/i/u/avatar170s/a7ff67ef791aaba0c0c97e9c8a97bf04.png',
+//     })
+//     .setTitle(title)
+//     .setDescription(description)
+//     .setFooter({
+//       text: `Total Listeners: ${totalListeners} ∙ Total Plays: ${sum}`,
+//     });
+// }

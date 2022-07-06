@@ -92,6 +92,8 @@ export default class GlobalWhoKnowsAlbum extends Command {
       wkInfo
     );
 
+    let wkEmbed;
+
     try {
       const embed = new MessageEmbed()
         .setColor('#2F3136')
@@ -112,24 +114,5 @@ export default class GlobalWhoKnowsAlbum extends Command {
       console.log(err);
       return null;
     }
-
-    //This is glitched
-    // guildUsers.forEach(async (member) => {
-    //   if (!member.lastFMTag) return; //This shouldnt occur but checked anyways
-    //   try {
-    //     const trackInfo = await fetchTrackInfoWrapper(
-    //       member.lastFMName,
-    //       track.name,
-    //       track.artist.name
-    //     );
-    //     console.log(member);
-    //     if (!trackInfo) return;
-    //     if (trackInfo.userplaycount === 0) return;
-
-    //     wkInfo.push({ member, plays: trackInfo.userplaycount });
-    //   } catch (err) {
-    //     console.log(err);
-    //   }
-    // });
   }
 }
