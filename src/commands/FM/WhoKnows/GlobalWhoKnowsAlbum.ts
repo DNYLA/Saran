@@ -21,6 +21,11 @@ import {
   getTargetUserId,
   SearchType,
 } from '../../../utils/fmHelpers';
+import {
+  FormatWhoKnowsArray,
+  GetWhoKnowsInfo,
+  GetWhoKnowsListeners,
+} from '../../../utils/lastfm/wkHelpers';
 import { Album, Artist } from '../../../utils/types';
 
 export default class GlobalWhoKnowsAlbum extends Command {
@@ -53,93 +58,39 @@ export default class GlobalWhoKnowsAlbum extends Command {
     message: Message,
     args: { targetUserId: string; albumName: string }
   ) {
-    const user = await getUser(args.targetUserId);
-    const guildUsers = await getUsersWithUsername();
+    const { user, users, recent, indexed } = await GetWhoKnowsInfo(
+      message,
+      args.targetUserId,
+      !args.albumName,
+      SearchType.Album,
+      true
+    );
+    if (!indexed) return;
 
-    let album: Album;
+    let album = recent as Album;
 
-    if (!guildUsers || guildUsers.length === 0)
-      return message.reply('Server hasnt been indexed use ,lf index');
-
-    if (!args.albumName) {
-      const { album: recentAlbum } = await fetchRecentAlbumInfo(
-        user.lastFMName
-      );
-
-      album = recentAlbum;
-    } else {
+    if (!album) {
       album = await fetchSearchAlbumInfo(user.lastFMName, args.albumName);
     }
-
     if (!album) return message.reply('Unable to find album with name!');
+    const fetchTrack = async (username: string) => {
+      const data = await fetchAlbumInfo(username, album.name, album.artist);
 
-    let sum = 0;
-    let description = '';
-    const wkInfo = [];
-    for (let i = 0; i < guildUsers.length; i++) {
-      const member = guildUsers[i];
-      if (!member.lastFMName) continue; //This shouldnt occur but checked anyways
-      try {
-        const cachedPlays = await getCachedPlays(
-          member.lastFMName,
-          `${album.name}-${album.artist}`,
-          SearchType.Album
-        );
+      //Return 0 as returning null will be handled the same way
+      if (!data) return 0;
+      else return Number(data.userplaycount);
+    };
 
-        const item = {
-          id: member.id,
-          fmName: member.lastFMName,
-        };
-        if (cachedPlays) {
-          wkInfo.push({ ...item, plays: cachedPlays });
-          continue;
-        }
-
-        const albumInfo = await fetchAlbumInfo(
-          member.lastFMName,
-          album.name,
-          album.artist
-        );
-
-        if (!albumInfo) continue;
-        if (albumInfo.userplaycount === 0) continue;
-
-        wkInfo.push({
-          ...item,
-          plays: albumInfo.userplaycount,
-        });
-
-        await setCachedPlays(
-          member.lastFMName,
-          `${album.name}-${album.artist}`,
-          albumInfo.userplaycount,
-          SearchType.Album
-        );
-      } catch (err) {
-        console.log(err);
-      }
-    }
-
-    const sortedArray = wkInfo.sort((a, b) => b.plays - a.plays).slice(0, 10);
-
-    for (let i = 0; i < 10; i++) {
-      if (i > wkInfo.length - 1) break;
-      const { id, fmName, plays } = sortedArray[i];
-      if (plays <= 0) continue;
-
-      console.log(id);
-      try {
-        const discordUser = await message.client.users.fetch(id);
-        if (!discordUser) return;
-        const formatted = `${discordUser.username}#${discordUser.discriminator}`;
-        sum += Number(plays);
-        description += `**${i + 1}. [${
-          i === 0 ? '👑' : ''
-        } ${formatted}](https://www.last.fm/user/${fmName})** has **${plays}** plays\n`;
-      } catch (err) {
-        console.log(err);
-      }
-    }
+    const wkInfo = await GetWhoKnowsListeners(
+      users,
+      `${album.name}-${album.artist}`,
+      SearchType.Album,
+      fetchTrack
+    );
+    const { description, sum, totalListeners } = await FormatWhoKnowsArray(
+      message,
+      wkInfo
+    );
 
     try {
       const embed = new MessageEmbed()
@@ -153,7 +104,7 @@ export default class GlobalWhoKnowsAlbum extends Command {
         .setTitle(`Top Listeners for ${album.name} by ${album.artist}`)
         .setDescription(description)
         .setFooter({
-          text: `Total Listeners: ${wkInfo.length} ∙ Total Plays: ${sum}`,
+          text: `Total Listeners: ${totalListeners} ∙ Total Plays: ${sum}`,
         });
 
       return message.channel.send({ embeds: [embed] });
