@@ -25,19 +25,21 @@ export default class GetAvatar extends Command {
 
   async run(message: Message, args: { targetUserId: string }) {
     const guild = await message.guild.fetch();
-    const bannerUrl = guild.bannerURL({ size: 1024 });
-    if (!bannerUrl)
+
+    if (!guild.banner)
       return message.channel.send({
         embeds: [
           new MessageEmbed().setAuthor({ name: 'No Server Banner Set' }),
         ],
       });
 
+    const bannerUrl = `https://cdn.discordapp.com/banners/${guild.id}/${guild.banner}?size=4096`;
+
     try {
       message.channel.send({
         embeds: [
           new MessageEmbed()
-            .setImage(`${bannerUrl}?size=1024`)
+            .setImage(`${bannerUrl}`)
             .setFooter({ text: `Requested by ${message.author.username}` }),
         ],
       });
