@@ -26,23 +26,31 @@ export default class Sanar extends Command {
     let links: InstagramLinkType = await instagramGetUrl(args.videoUrl);
     console.log(links);
 
-    if (links.url_list.length === 0) return message.reply('No Media found');
+    if (links.url_list.length === 0)
+      return message.reply(
+        'No Media found (If this is a valid link then this error can occur when instagram rate limits requests)'
+      );
     const url = links.url_list[0];
-    const { data, headers } = await axios.get(links.url_list[0]);
+    const { data, headers } = await axios.get(links.url_list[0], {
+      responseType: 'arraybuffer',
+    });
+    const buffer = Buffer.from(data, 'utf-8');
     const contentType = headers['content-type'];
 
     if (!contentType || !contentType.includes('image'))
       return message.reply('No Media found!');
 
     if (contentType.includes('image')) {
-      const fileType = contentType.includes('jpeg') ? '.jpeg' : '.png';
-      const title = url.substring(url.indexOf('https://www.instagram.com/p/'));
+      const fileType = contentType.includes('jpeg') ? 'jpg' : 'png';
+      const title = `image.${fileType}`;
 
-      const attachment = new MessageAttachment(data, `image${fileType}'`);
+      const attachment = new MessageAttachment(buffer, title);
       const embed = new MessageEmbed()
         .setTitle(title)
-        .setImage(`attachment://image${fileType}`);
-      message.channel.send({ embeds: [embed], files: [attachment] });
+        .setImage(`attachment://${title}`);
+      await message.channel.send({ embeds: [embed], files: [attachment] });
+      message.channel.delete();
+    } else {
     }
     console.log(contentType);
     // if (args.length === 0) return message.reply('Provide a URL to scrape!');
