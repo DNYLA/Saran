@@ -45,7 +45,6 @@ export default abstract class Command {
     args: unknown;
   }> {
     const { valid: validArgs, parsedArgs } = this.isValidArgs(args, message);
-    console.log(validArgs);
     if (!this.options?.requirments && validArgs)
       return { valid: true, message: null, type: null, args: parsedArgs };
 
@@ -132,7 +131,6 @@ export default abstract class Command {
 
       // console.log(this.options.args);
       this.options.arguments.map((arg, i) => {
-        console.log(_args);
         if (_args.length === 0) {
           // if (arg.parse && !arg.optional) {
           //   const parsed = arg.parse(message, _args, 0);
