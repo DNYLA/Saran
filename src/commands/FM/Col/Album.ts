@@ -66,14 +66,17 @@ export default class TopAlbums extends Command {
       const item = topTen[i];
       try {
         const url = item.image[3]['#text'];
+        if (!url) continue;
         imageUrls.push(url);
-        const response = await axios.get(url, { responseType: 'arraybuffer' });
-        const buffer = Buffer.from(response.data, 'utf-8');
-        imgbuffers.push(buffer);
+        // const response = await axios.get(url, { responseType: 'arraybuffer' });
+        // const buffer = Buffer.from(response.data, 'utf-8');
+        // imgbuffers.push(buffer);
       } catch (err) {
         console.log(err);
       }
     }
+
+    console.log(imageUrls);
 
     createCollage(imageUrls, 900).then((imageBuffer) => {
       const embedTitle = `${user.lastFMName} ${convertPeriodToText(
