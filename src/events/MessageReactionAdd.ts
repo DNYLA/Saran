@@ -13,6 +13,7 @@ import DiscordClient from '../utils/client';
 import {
   createReactionBoardInfo,
   getReactionBoardInfo,
+  SaranGuild,
   updateReactionBoardInfo,
 } from '../utils/database/Guild';
 
@@ -22,7 +23,9 @@ export default class MessageReactionAdd extends Event {
   }
 
   async run(client: DiscordClient, reaction: MessageReaction, user: User) {
-    const config = client.getConfig(reaction.message.guildId);
+    // const config = client.getConfig(reaction.message.guildId);
+    const storedGuild = await new SaranGuild(reaction.message.guildId).fetch();
+    const config = storedGuild.config;
     if (!config) return; //Configs should auto be fetched whenever a message is sent
     if (!config.reactionBoardChannel) return;
     const guild = reaction.message.guild;
