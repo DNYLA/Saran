@@ -16,5 +16,9 @@ export default class InteractionCreated extends Event {
     if (user.self.inactive) {
       await user.update({ inactive: false });
     }
+
+    //WasMuted?
+
+    //WasJailed?
   }
 }

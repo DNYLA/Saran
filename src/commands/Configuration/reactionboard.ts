@@ -56,7 +56,6 @@ export default class SetReactionBoardChannel extends Command {
           reactionBoardLimit: args.limit,
         },
       });
-      client.setConfig(config);
       message.channel.send(
         `Successfully set <#${args.channelId}> as reaction board with a minimum of ${args.limit} :sob: reactions.`
       );

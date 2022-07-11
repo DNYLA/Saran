@@ -9,7 +9,7 @@ export default class DiscordClient extends Client {
   private _commands = new Collection<string, Command>();
   private _events = new Collection<string, Event>();
   private _images = new Collection<string, GoogleImagesSearch>();
-  private _configs = new Array<GuildConfig>();
+  // private _configs = new Array<GuildConfig>();
   private _deletedMessages = new Collection<string, Message>();
   constructor(options?: ClientOptions) {
     super(options);
@@ -32,16 +32,16 @@ export default class DiscordClient extends Client {
     this._images[images.query] = images;
   }
 
-  getConfig(id: string): GuildConfig {
-    return this._configs.find((config) => config.id === id);
-  }
+  // getConfig(id: string): GuildConfig {
+  //   return this._configs.find((config) => config.id === id);
+  // }
 
-  setConfig(config: GuildConfig) {
-    const index = this._configs.findIndex((c) => c.id === config.id);
+  // setConfig(config: GuildConfig) {
+  //   const index = this._configs.findIndex((c) => c.id === config.id);
 
-    if (index != -1) this._configs[index] = config;
-    else this._configs.push(config);
-  }
+  //   if (index != -1) this._configs[index] = config;
+  //   else this._configs.push(config);
+  // }
 
   getDeletedMessage(serverId: string): Message {
     return this._deletedMessages[serverId];

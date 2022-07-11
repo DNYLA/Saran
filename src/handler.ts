@@ -30,6 +30,7 @@ export async function registerCommands(client: DiscordClient, dir = '') {
 
 export async function registerEvents(client: DiscordClient, dir = '') {
   if (dir === '') dir = './events';
+
   const filePath = path.join(__dirname, dir);
   const files = await fs.promises.readdir(filePath);
 
@@ -37,12 +38,10 @@ export async function registerEvents(client: DiscordClient, dir = '') {
     if ((await fs.promises.lstat(path.join(filePath, file))).isDirectory())
       registerEvents(client, path.join(dir, file));
 
-    if (file.endsWith('.d.ts')) {
-      continue;
-    }
-
+    if (file.endsWith('.d.ts')) continue;
     if (file.endsWith('.ts') || file.endsWith('.js')) {
-      const { default: Event } = await import(`${dir}/${file}`);
+      const newPathFileName = path.join(`./${dir}/${file}`).replace(/\\/g, '/');
+      const { default: Event } = await import(`./${newPathFileName}`);
       const event = new Event();
       client.events.set(event.name, event);
       client.on(event.getName(), event.run.bind(event, client));
