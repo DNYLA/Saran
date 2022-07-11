@@ -6,15 +6,20 @@ import { WebSearchImage } from '../utils/types';
 
 export default class InteractionCreated extends Event {
   constructor() {
-    super('guildMemberAdd');
+    super('guildMemberRemove');
   }
 
   async run(client: DiscordClient, member: GuildMember) {
-    const user = await new SaranGuildUser(member.id, member.guild.id).fetch();
+    // const channels = member.guild.channels.fetch('');
+    // membe
 
-    //if user has already been apart of the guild.
-    if (user.self.inactive) {
-      await user.update({ inactive: false });
+    console.log(member.user.username);
+    try {
+      const user = await new SaranGuildUser(member.id, member.guild.id).fetch();
+      await user.update({ inactive: true });
+    } catch (err) {
+      console.log(err);
+      //Log this somewhere
     }
   }
 }

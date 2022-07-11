@@ -23,7 +23,7 @@ import {
 } from '../api/lastfm';
 import { TopTenArguments } from '../commands/FM/TopTen/topartists';
 import { setCachedPlays } from './database/redisManager';
-import { getUser } from './database/User';
+import { SaranUser } from './database/User';
 import { convertPeriodToText, mentionUser } from './helpers';
 import {
   Album,
@@ -36,7 +36,6 @@ import {
   TopTrack,
   Track,
 } from './types';
-const { createCollage } = require('@wylie39/image-collage');
 const fs = require('fs');
 
 //Returns either the author id or if a mention exists the mentioned users id
@@ -52,7 +51,7 @@ export async function getUserFromMessage(
     userId = mention.id;
   }
 
-  return await getUser(userId);
+  return await new SaranUser(userId).fetch();
 }
 
 export function getPeriodFromString(arg: string): Periods {
@@ -163,7 +162,7 @@ export async function getTopTenStats(
   args: TopTenArguments,
   type: SearchType
 ) {
-  const user = await getUser(args.targetUserId);
+  const user = (await new SaranUser(args.targetUserId).fetch()).info;
 
   console.log(args.period);
   const period: Periods = getPeriodFromString(args.period);

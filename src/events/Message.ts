@@ -1,10 +1,10 @@
-import { PrismaClient } from '@prisma/client';
+import { GuildConfig, PrismaClient } from '@prisma/client';
 import { Guild, Message, MessageEmbed } from 'discord.js';
 import moment from 'moment';
 import Event from '../utils/base/event';
 import DiscordClient from '../utils/client';
 import { SaranGuild } from '../utils/database/Guild';
-import { createGuildMember, getUser, SaranUser } from '../utils/database/User';
+import { createGuildMember, SaranUser } from '../utils/database/User';
 import { getArgsFromMsg, mentionUser } from '../utils/helpers';
 const prisma = new PrismaClient();
 
@@ -16,9 +16,12 @@ export default class MessageEvent extends Event {
   async run(client: DiscordClient, message: Message) {
     if (message.author.bot) return;
     const member = await message.guild.members.fetch(message.author.id);
-    const guildd = await new SaranGuild(message.guildId).fetch();
-    const gUser = await guildd.fetchUser(message.author.id);
     const user = await new SaranUser(message.author.id).fetch();
+    const guild = await new SaranGuild(message.guildId).fetch(true);
+    const guildUser = await guild.fetchUser(message.member.id);
+    const config = guild.config;
+
+    guildUser.update({ xp: { increment: 5 } });
 
     await Promise.all(
       message.mentions.members.map(async (member) => {
@@ -52,12 +55,7 @@ export default class MessageEvent extends Event {
       await message.channel.send({ embeds: [afkembed] });
       await user.update({ afkMessage: null, afkTime: null });
     }
-    // guildd.updateMember(member, {}, { xp: { increment: 5 } });
-    const guildUser = await createGuildMember(
-      member,
-      {},
-      { xp: { increment: 5 } }
-    );
+
     if (message.content.includes('v/s')) {
       await message.react('◀️');
       await message.react('▶️');
@@ -66,35 +64,17 @@ export default class MessageEvent extends Event {
       await message.react('🔽');
     }
 
-    const userConfig = await getUser(message.author.id);
-    let config;
-    try {
-      config = await prisma.guildConfig.findUnique({
-        where: { id: message.guildId },
-      });
-
-      if (!config) {
-        console.log('Does not exist');
-        config = await prisma.guildConfig.create({
-          data: { id: message.guildId },
-        });
-      }
-    } catch (err) {
-      message.reply('Undiagnosable Error occured');
-      return;
-    }
-
     client.setConfig(config);
     try {
-      if (userConfig.lastFMTag) {
+      if (user.info.lastFMTag) {
         if (
           message.content
             .toLowerCase()
-            .startsWith(userConfig.lastFMTag.toLowerCase())
+            .startsWith(user.info.lastFMTag.toLowerCase())
         ) {
           const command = client.commands.get('np');
           const args = message.content
-            .slice(userConfig.lastFMName.length)
+            .slice(user.info.lastFMName.length)
             .split(/ +/);
 
           if (command) {

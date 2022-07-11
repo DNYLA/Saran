@@ -1,8 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = []
 }
 
@@ -15,10 +12,10 @@ model User {
   id         String      @id
   lastFMName String?
   lastFMTag  String?
-  donator Boolean @default(false)
-  guilds     GuildUser[]
-  afkTime DateTime?
+  donator    Boolean     @default(false)
   afkMessage String?
+  afkTime    DateTime?
+  guilds     GuildUser[]
 }
 
 model GuildUser {
@@ -26,12 +23,13 @@ model GuildUser {
   displayName        String?
   serverId           String
   lastFMTag          String?
-  reactionBoardScore Int     @default(0)
-  xp Int @default(0)
-  user               User    @relation(fields: [userId], references: [id])
-  isBooster Boolean @default(false)
-  customBoostRoleId String?
-  preJailedRoles String[]
+  reactionBoardScore Int      @default(0)
+  xp                 Int      @default(0)
+  customBoostRoleId  String?
+  isBooster          Boolean  @default(false)
+  preJailedRoles     String[]
+  user               User     @relation(fields: [userId], references: [id])
+  inactive Boolean @default(false) //Inactive is whenever a user leaves or gets kicked from a guild.
   @@id([userId, serverId])
 }
 
@@ -40,20 +38,20 @@ model GuildConfig {
   prefix               String                  @default(",")
   reactionBoardChannel String?
   reactionBoardLimit   Int                     @default(0)
+  jailChannel          String?
+  jailLogChannel       String?
+  jailRole             String?
   rbMessages           ReactionBoardMessages[]
-  jailChannel String?
-  jailLogChannel String?
-  jailRole String?
 }
 
 model ReactionBoardMessages {
-  messageId           String
-  serverId     String
+  serverId       String
+  reactionName   String
+  reactions      Int         @default(0)
+  userId         String
+  messageId      String
   embedMessageId String
-  reactionName String
-  reactions    Int @default(0)
-  userId       String
-  guild        GuildConfig @relation(fields: [serverId], references: [id])
+  guild          GuildConfig @relation(fields: [serverId], references: [id])
 
   @@id([messageId, serverId])
 }

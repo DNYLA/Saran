@@ -5,7 +5,7 @@ import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
 import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../../utils/base/command';
-import { getUser } from '../../../utils/database/User';
+import { SaranUser } from '../../../utils/database/User';
 import {
   getPeriodFromString,
   getTopTenStats,
@@ -49,7 +49,7 @@ export default class TopAlbums extends Command {
   }
 
   async run(message: Message, args: TopTenArguments) {
-    const user = await getUser(args.targetUserId);
+    const user = (await new SaranUser(args.targetUserId).fetch()).info;
     const period = getPeriodFromString(args.period);
 
     const topTen = await getTopTenStatsNoEmbed(
@@ -60,7 +60,6 @@ export default class TopAlbums extends Command {
     );
 
     const imageUrls = [];
-    const imgbuffers = [];
     for (let i = 0; i < topTen.length; i++) {
       if (i === 9) continue;
       const item = topTen[i];
@@ -75,8 +74,6 @@ export default class TopAlbums extends Command {
         console.log(err);
       }
     }
-
-    console.log(imageUrls);
 
     createCollage(imageUrls, 900).then((imageBuffer) => {
       const embedTitle = `${user.lastFMName} ${convertPeriodToText(

@@ -9,7 +9,7 @@ import {
   getCachedPlays,
   setCachedPlays,
 } from '../../../utils/database/redisManager';
-import { getGuildUsers, getUser } from '../../../utils/database/User';
+import { getGuildUsers } from '../../../utils/database/User';
 import {
   fetchRecentArtistInfo,
   fetchSearchArtistInfo,
@@ -63,7 +63,10 @@ export default class WhoKnows extends Command {
     let artist = recent as Artist;
 
     if (!artist) {
-      artist = await fetchSearchArtistInfo(user.lastFMName, args.artistName);
+      artist = await fetchSearchArtistInfo(
+        user.self.lastFMName,
+        args.artistName
+      );
     }
     if (!artist) return message.reply('Unable to find artist with name!');
 
@@ -90,8 +93,8 @@ export default class WhoKnows extends Command {
       const embed = new MessageEmbed()
         .setColor('#2F3136')
         .setAuthor({
-          name: `Requested by ${user.lastFMName}`,
-          url: `https://www.last.fm/user/${user.lastFMName}`,
+          name: `Requested by ${user.self.lastFMName}`,
+          url: `https://www.last.fm/user/${user.self.lastFMName}`,
           iconURL:
             'https://lastfm.freetls.fastly.net/i/u/avatar170s/a7ff67ef791aaba0c0c97e9c8a97bf04.png',
         })

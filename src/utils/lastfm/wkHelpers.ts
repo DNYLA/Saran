@@ -2,8 +2,8 @@ import { Message, MessageEmbed } from 'discord.js';
 import { getCachedPlays, setCachedPlays } from '../database/redisManager';
 import {
   getGuildUsers,
-  getUser,
   getUsersWithUsername,
+  SaranUser,
   UserWithGuilds,
 } from '../database/User';
 import {
@@ -31,7 +31,7 @@ export async function GetWhoKnowsInfo(
   recentType: SearchType,
   globalSearch?: boolean
 ) {
-  const user = await getUser(userId);
+  const user = await new SaranUser(userId).fetch();
   let users: WhoKnowsUser[];
 
   if (!globalSearch) {
@@ -51,17 +51,17 @@ export async function GetWhoKnowsInfo(
   if (fetchRecent) {
     if (recentType === SearchType.Track) {
       const { track: recentTrack } = await fetchRecentTrackInfo(
-        user.lastFMName
+        user.self.lastFMName
       );
       recent = recentTrack;
     } else if (recentType === SearchType.Album) {
       const { album: recentAlbum } = await fetchRecentAlbumInfo(
-        user.lastFMName
+        user.self.lastFMName
       );
       recent = recentAlbum;
     } else if (recentType === SearchType.Artist) {
       const { artist: recentArtist } = await fetchRecentArtistInfo(
-        user.lastFMName
+        user.self.lastFMName
       );
       recent = recentArtist;
     }

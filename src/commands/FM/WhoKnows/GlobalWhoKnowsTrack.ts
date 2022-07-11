@@ -13,7 +13,6 @@ import {
 } from '../../../utils/database/redisManager';
 import {
   getGuildUsers,
-  getUser,
   getUsersWithUsername,
 } from '../../../utils/database/User';
 import {
@@ -74,7 +73,7 @@ export default class GlobalWhoKnowstrack extends Command {
 
     if (!track) {
       track = await fetchSearchTrackInfo(
-        user.lastFMName,
+        user.self.lastFMName,
         args.trackName,
         args.artistName
       );
@@ -113,8 +112,8 @@ export default class GlobalWhoKnowstrack extends Command {
       const embed = new MessageEmbed()
         .setColor('#2F3136')
         .setAuthor({
-          name: `Requested by ${user.lastFMName}`,
-          url: `https://www.last.fm/user/${user.lastFMName}`,
+          name: `Requested by ${user.self.lastFMName}`,
+          url: `https://www.last.fm/user/${user.self.lastFMName}`,
           iconURL:
             'https://lastfm.freetls.fastly.net/i/u/avatar170s/a7ff67ef791aaba0c0c97e9c8a97bf04.png',
         })

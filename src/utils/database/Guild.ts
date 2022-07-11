@@ -1,9 +1,10 @@
 import { GuildConfig, GuildUser, Prisma, PrismaClient } from '@prisma/client';
 import { GuildMember, Message } from 'discord.js';
+import { cacheMiddleware } from '../../cache';
 import { GuildMemberWithUser } from './User';
 
 const prisma = new PrismaClient();
-
+prisma.$use(cacheMiddleware);
 export class SaranGuild {
   private _users = new Map<string, SaranGuildUser>();
   private _config: GuildConfig;
@@ -30,12 +31,13 @@ export class SaranGuild {
 
   async fetch(users?: boolean): Promise<SaranGuild> {
     try {
-      this._config = await prisma.guildConfig.upsert({
+      this._config = await prisma.guildConfig.findUniqueOrThrow({
         where: { id: this.serverId },
-        create: { id: this.serverId },
-        update: {},
       });
     } catch (err) {
+      this._config = await prisma.guildConfig.create({
+        data: { id: this.serverId },
+      });
       console.log(err);
     }
 
@@ -65,15 +67,12 @@ export class SaranGuild {
     return this;
   }
 
-  async fetchUser(id: string): Promise<GuildUser> {
+  async fetchUser(id: string): Promise<SaranGuildUser> {
     try {
-      return await prisma.guildUser.upsert({
-        where: {
-          userId_serverId: { userId: id, serverId: this.serverId },
-        },
-        create: { userId: id, serverId: this.serverId, displayName: '' },
-        update: {},
-      });
+      const guildUser = await new SaranGuildUser(id, this.serverId).fetch();
+      this._users.set(id, guildUser);
+
+      return guildUser;
     } catch (err) {
       console.log(err);
     }
@@ -192,6 +191,7 @@ export class SaranGuildUser {
         },
       });
     } catch (err) {
+      await this.create();
       console.log(err);
     }
 
@@ -199,16 +199,28 @@ export class SaranGuildUser {
   }
 
   async update(update: Prisma.GuildUserUpdateInput): Promise<SaranGuildUser> {
-    const user = await prisma.guildUser.update({
+    this.self = await prisma.guildUser.update({
       where: {
         userId_serverId: { userId: this.userId, serverId: this.serverId },
       },
       data: update,
     });
 
-    this.self = user;
-
     return this;
+  }
+
+  private async create(displayName?: string): Promise<void> {
+    try {
+      this.self = await prisma.guildUser.create({
+        data: {
+          userId: this.userId,
+          serverId: this.serverId,
+          displayName,
+        },
+      });
+    } catch (err) {
+      console.log(err);
+    }
   }
 }
 

@@ -6,8 +6,39 @@ import {
   User,
 } from '@prisma/client';
 import { GuildMember } from 'discord.js';
+import { cacheMiddleware, deleteCache, isCached, setCache } from '../../cache';
 
 const prisma = new PrismaClient();
+
+prisma.$use(cacheMiddleware);
+
+//Using an NPM module to handle caching via redis right now
+//Will create my own caching system when i have time as this is not a super needed
+//feature on the list.
+// prisma.$use(async (params: Prisma.MiddlewareParams, next) => {
+//   const id = params.args.where.id ?? null;
+//   console.log('Requesting data');
+
+//   if (
+//     params.model === 'User' &&
+//     (params.action === 'update' || params.action === 'upsert')
+//   ) {
+//     const result = await next(params);
+//     setCache(result);
+//   }
+
+//   //Not caching data that isnt from users table current || data that is created will not be added to the cache until it is fetched atleast once.
+//   if (params.model !== 'User' && params.action === 'findUnique')
+//     return await next(params);
+
+//   const user = isCached(id);
+//   if (user) return user;
+
+//   const result = await next(params);
+//   setCache(result);
+
+//   return result;
+// });
 
 export type UserWithGuilds = User & {
   guilds?: GuildUser[];
@@ -17,41 +48,11 @@ export type GuildMemberWithUser = GuildUser & {
   user: User;
 };
 
-export class SaranUserManager {
-  private users: SaranUser[] = [];
-  constructor() {}
-
-  async fetch(userId: string): Promise<SaranUser> {
-    const user = await new SaranUser(userId).fetch();
-    this.users.push(user);
-    return user;
-  }
-
-  async fetchMany(userIds: string[]): Promise<SaranUser[]> {
-    const users = await Promise.all(
-      userIds.map(async (id) => await new SaranUser(id).fetch())
-    );
-
-    this.users = this.users.concat(users);
-    return users;
-  }
-
-  // async fetchGuild(serverId: string): Promise<SaranUser[]> {
-  //   try {
-  //     return await prisma.user.findMany({
-  //       where: { lastFMName: { not: null }, guilds: { some: { serverId } } },
-  //       include: { guilds: true },
-  //     });
-  //   } catch (err) {
-  //     return null;
-  //   }
-  // }
-}
-
 export class SaranUser {
   private user: User;
   private guilds: GuildUser;
-  constructor(private userId: string) {
+  constructor(private userId: string, private userInfo?: User) {
+    if (userInfo) this.user = userInfo;
     //IsUser in Cache (Add This later)
     //Fetch User From Database
     //If Not In Database Create =>
@@ -61,12 +62,11 @@ export class SaranUser {
   async fetch(userId?: string): Promise<SaranUser> {
     const id = userId ?? this.userId;
     try {
-      this.user = await prisma.user.upsert({
+      this.user = await prisma.user.findUniqueOrThrow({
         where: { id },
-        create: { id },
-        update: {},
       });
     } catch (err) {
+      this.user = await prisma.user.create({ data: { id } });
       console.log(err);
     }
 
@@ -74,6 +74,10 @@ export class SaranUser {
   }
 
   public get info(): User {
+    return this.user;
+  }
+
+  public get self(): User {
     return this.user;
   }
 
@@ -89,25 +93,16 @@ export class SaranUser {
     return this;
   }
 
-  // async fetchGuildUser(serverId: string): Promise<SaranUser> {
-  //   const guildUser = await prisma.user.findUnique({
-  //     where: { id: lastFMName: { not: null }, guilds: { some: { serverId } } },
-  //     include: { guilds: true },
-  //   });
-  // }
-}
-
-export const getUser = async (id: string) => {
-  try {
-    let user = await prisma.user.findUnique({ where: { id } });
-    if (!user) user = await prisma.user.create({ data: { id } });
-
-    return user;
-  } catch (err) {
-    console.log(err);
-    return null;
+  async fetchMany(data: Prisma.UserWhereInput): Promise<User[]> {
+    try {
+      const users = await prisma.user.findMany({ where: data });
+      return users;
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
   }
-};
+}
 
 export const getGuildUsers = async (
   serverId: string

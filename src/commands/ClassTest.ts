@@ -29,14 +29,8 @@ export default class Ping extends Command {
 
   async run(message: Message) {
     const user = await new SaranUser('863092043249483796').fetch();
-    const guild = await new SaranGuild('987380648362774608').fetch();
-    await guild.fetch(true);
-    const topTen = await guild.fetchQueryUsers({
-      take: 10,
-      orderBy: { xp: 'desc' },
-    });
+    // const guild = await new SaranGuild('987380648362774608').fetch();
 
-    console.log(topTen);
     return message.reply('Pong');
   }
 }

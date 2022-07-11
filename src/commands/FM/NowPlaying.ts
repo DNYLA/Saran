@@ -6,7 +6,7 @@ import StartTyping from '../../hooks/StartTyping';
 import { MentionUserId, SelfUserId } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
 import { setCachedPlays } from '../../utils/database/redisManager';
-import { getUser, SaranUser } from '../../utils/database/User';
+import { SaranUser } from '../../utils/database/User';
 import {
   fetchRecentTrackInfo,
   getTargetUserId,

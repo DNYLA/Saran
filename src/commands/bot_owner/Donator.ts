@@ -5,7 +5,7 @@ import { MentionIdOrArg } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
 import {
   createGuildMember,
-  getUser,
+  SaranUser,
   updateUserById,
 } from '../../utils/database/User';
 import { getUserFromMention } from '../../utils/helpers';
@@ -37,7 +37,7 @@ export default class Donator extends Command {
   async run(message: Message, args: { type: string; userId: string }) {
     const { type, userId } = args;
 
-    const user = await getUser(userId);
+    const user = await new SaranUser(userId).fetch();
     // if (!user && type === 'guild') {
     //   try {
     //     const guild = await message.client.guilds
@@ -59,11 +59,11 @@ export default class Donator extends Command {
 
     if (!user) return message.reply('User doesnt exist!');
     if (type === 'add') {
-      await updateUserById(user.id, { donator: true });
-      return message.reply(`Successfully given <@${user.id}> donator`);
+      await user.update({ donator: true });
+      return message.reply(`Successfully given <@${user.info.id}> donator`);
     } else if (type === 'remove') {
-      await updateUserById(user.id, { donator: false });
-      return message.reply(`Removed donator from <@${user.id}>`);
+      await user.update({ donator: false });
+      return message.reply(`Removed donator from <@${user.info.id}>`);
     }
   }
 }

@@ -1,6 +1,6 @@
 import { Message, MessageMentions } from 'discord.js';
 import { Periods } from '../api/lastfm';
-import { getUser } from './database/User';
+import { SaranUser } from './database/User';
 
 export function getArgsFromMsg(
   msg: string,
@@ -46,7 +46,7 @@ export function joinArgs(args: string[]) {
 export async function getUserFromMention(mention: string) {
   const userId = getIdFromMention(mention);
   if (!userId) return null;
-  return await getUser(userId);
+  return await new SaranUser(userId).fetch();
 }
 
 export function getIdFromMention(mention: string) {

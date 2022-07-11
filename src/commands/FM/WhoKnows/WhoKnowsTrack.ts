@@ -1,23 +1,11 @@
 import { Message, MessageEmbed } from 'discord.js';
 import { fetchTrackInfo } from '../../../api/lastfm';
-import UsernameCheck, {
-  UsernameCheckNoMentions,
-} from '../../../checks/UsernameCheck';
+import { UsernameCheckNoMentions } from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
 import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../../utils/base/command';
-import {
-  getCachedPlays,
-  setCachedPlays,
-} from '../../../utils/database/redisManager';
-import { getGuildUsers, getUser } from '../../../utils/database/User';
-import {
-  fetchRecentTrackInfo,
-  fetchSearchTrackInfo,
-  getTargetUserId,
-  SearchType,
-} from '../../../utils/fmHelpers';
+import { fetchSearchTrackInfo, SearchType } from '../../../utils/fmHelpers';
 import {
   FormatWhoKnowsArray,
   GetWhoKnowsInfo,
@@ -69,7 +57,7 @@ export default class WhoKnowstrack extends Command {
 
     if (!track) {
       track = await fetchSearchTrackInfo(
-        user.lastFMName,
+        user.self.lastFMName,
         args.trackName,
         args.artistName
       );
@@ -108,8 +96,8 @@ export default class WhoKnowstrack extends Command {
       const embed = new MessageEmbed()
         .setColor('#2F3136')
         .setAuthor({
-          name: `Requested by ${user.lastFMName}`,
-          url: `https://www.last.fm/user/${user.lastFMName}`,
+          name: `Requested by ${user.self.lastFMName}`,
+          url: `https://www.last.fm/user/${user.self.lastFMName}`,
           iconURL:
             'https://lastfm.freetls.fastly.net/i/u/avatar170s/a7ff67ef791aaba0c0c97e9c8a97bf04.png',
         })

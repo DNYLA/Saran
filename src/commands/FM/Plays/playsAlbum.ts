@@ -5,7 +5,7 @@ import StartTyping from '../../../hooks/StartTyping';
 import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../../utils/base/command';
 import { setCachedPlays } from '../../../utils/database/redisManager';
-import { getUser } from '../../../utils/database/User';
+import { SaranUser } from '../../../utils/database/User';
 import {
   fetchRecentAlbumInfo,
   fetchSearchAlbumInfo,
@@ -47,7 +47,7 @@ export default class PlaysAlbum extends Command {
     message: Message,
     args: { targetUserId: string; albumName: string }
   ) {
-    const user = await getUser(args.targetUserId);
+    const user = (await new SaranUser(args.targetUserId).fetch()).info;
 
     let album: Album;
     let userInfo: PartialUser;
