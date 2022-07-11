@@ -1,9 +1,13 @@
 import DiscordClient from './utils/client';
 import { registerCommands, registerEvents } from './handler';
 import * as dotenv from 'dotenv';
-import { Intents } from 'discord.js';
+import { Client, Intents, Message, Base } from 'discord.js';
 dotenv.config();
 import { redis } from './utils/redis';
+
+declare global {
+  interface Client extends DiscordClient {}
+}
 
 const intents = new Intents(32767);
 const client = new DiscordClient({ intents });

@@ -1,30 +1,15 @@
 import { Message, MessageEmbed } from 'discord.js';
 import { fetchTrackInfo } from '../../../api/lastfm';
-import UsernameCheck, {
-  UsernameCheckNoMentions,
-} from '../../../checks/UsernameCheck';
+import { UsernameCheckNoMentions } from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
 import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../../utils/base/command';
+import { SearchType, fetchSearchTrackInfo } from '../../../utils/fmHelpers';
 import {
-  getCachedPlays,
-  setCachedPlays,
-} from '../../../utils/database/redisManager';
-import {
-  getGuildUsers,
-  getUsersWithUsername,
-} from '../../../utils/database/User';
-import {
-  fetchRecentTrackInfo,
-  fetchSearchTrackInfo,
-  getTargetUserId,
-  SearchType,
-} from '../../../utils/fmHelpers';
-import {
-  FormatWhoKnowsArray,
   GetWhoKnowsInfo,
   GetWhoKnowsListeners,
+  FormatWhoKnowsArray,
 } from '../../../utils/lastfm/wkHelpers';
 import { Track } from '../../../utils/types';
 import { SearchTrackArguments } from '../Plays/playsTrack';

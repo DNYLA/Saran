@@ -5,27 +5,14 @@ import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
 import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../../utils/base/command';
-import {
-  getCachedPlays,
-  setCachedPlays,
-} from '../../../utils/database/redisManager';
-import {
-  getGuildUsers,
-  getUsersWithUsername,
-} from '../../../utils/database/User';
-import {
-  fetchRecentAlbumInfo,
-  fetchRecentArtistInfo,
-  fetchSearchAlbumInfo,
-  getTargetUserId,
-  SearchType,
-} from '../../../utils/fmHelpers';
+
+import { fetchSearchAlbumInfo, SearchType } from '../../../utils/fmHelpers';
 import {
   FormatWhoKnowsArray,
   GetWhoKnowsInfo,
   GetWhoKnowsListeners,
 } from '../../../utils/lastfm/wkHelpers';
-import { Album, Artist } from '../../../utils/types';
+import { Album } from '../../../utils/types';
 
 export default class GlobalWhoKnowsAlbum extends Command {
   constructor() {

@@ -1,11 +1,7 @@
 import { Message, MessageEmbed } from 'discord.js';
+import DiscordClient from '../client';
 import { getCachedPlays, setCachedPlays } from '../database/redisManager';
-import {
-  getGuildUsers,
-  getUsersWithUsername,
-  SaranUser,
-  UserWithGuilds,
-} from '../database/User';
+import { getGuildUsers, SaranUser, UserWithGuilds } from '../database/User';
 import {
   fetchRecentAlbumInfo,
   fetchRecentArtistInfo,
@@ -33,11 +29,13 @@ export async function GetWhoKnowsInfo(
 ) {
   const user = await new SaranUser(userId).fetch();
   let users: WhoKnowsUser[];
-
+  const client = message.client as DiscordClient;
   if (!globalSearch) {
     users = await getGuildUsers(message.guildId);
   } else {
-    users = await getUsersWithUsername();
+    users = await client.database.users({
+      where: { lastFMName: { not: null } },
+    });
   }
 
   const guildUsers = await getGuildUsers(message.guildId);

@@ -24,7 +24,7 @@ export default class MessageReactionAdd extends Event {
 
   async run(client: DiscordClient, reaction: MessageReaction, user: User) {
     // const config = client.getConfig(reaction.message.guildId);
-    const storedGuild = await new SaranGuild(reaction.message.guildId).fetch();
+    const storedGuild = await client.database.guild(reaction.message.guildId);
     const config = storedGuild.config;
     if (!config) return; //Configs should auto be fetched whenever a message is sent
     if (!config.reactionBoardChannel) return;

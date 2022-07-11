@@ -3,6 +3,7 @@ import { Client, ClientOptions, Collection, Message } from 'discord.js';
 import Command from './base/command';
 import command from './base/command';
 import Event from './base/event';
+import { DatabaseManager } from './database/DatabaseManager';
 import { WebSearchImage, GoogleImagesSearch } from './types';
 
 export default class DiscordClient extends Client {
@@ -11,6 +12,7 @@ export default class DiscordClient extends Client {
   private _images = new Collection<string, GoogleImagesSearch>();
   // private _configs = new Array<GuildConfig>();
   private _deletedMessages = new Collection<string, Message>();
+  private _database = new DatabaseManager();
   constructor(options?: ClientOptions) {
     super(options);
   }
@@ -21,6 +23,10 @@ export default class DiscordClient extends Client {
 
   get events(): Collection<string, Event> {
     return this._events;
+  }
+
+  get database(): DatabaseManager {
+    return this._database;
   }
 
   getImage(name: string): GoogleImagesSearch {

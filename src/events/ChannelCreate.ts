@@ -1,14 +1,6 @@
-import {
-  GuildChannel,
-  GuildMember,
-  Interaction,
-  Message,
-  MessageEmbed,
-} from 'discord.js';
+import { GuildChannel } from 'discord.js';
 import Event from '../utils/base/event';
 import DiscordClient from '../utils/client';
-import { SaranGuild } from '../utils/database/Guild';
-import { WebSearchImage } from '../utils/types';
 
 export default class InteractionCreated extends Event {
   constructor() {
@@ -16,8 +8,7 @@ export default class InteractionCreated extends Event {
   }
 
   async run(client: DiscordClient, channel: GuildChannel) {
-    const storedGuild = await new SaranGuild(channel.guildId).fetch();
-
+    const storedGuild = await client.database.guild(channel.guildId);
     if (!storedGuild.config.jailRole) return;
 
     const role = await channel.guild.roles
@@ -37,8 +28,5 @@ export default class InteractionCreated extends Event {
       VIEW_CHANNEL: false,
       SEND_MESSAGES: false,
     });
-
-    // const channels = member.guild.channels.fetch('');
-    // membe
   }
 }
