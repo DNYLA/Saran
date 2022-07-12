@@ -41,9 +41,7 @@ export async function getUserFromMessage(
     userId = mention.id;
   }
 
-  return await (message.client as DiscordClient).database.users.findById(
-    userId
-  );
+  return await (message.client as DiscordClient).db.users.findById(userId);
 }
 
 export function getPeriodFromString(arg: string): Periods {
@@ -154,7 +152,7 @@ export async function getTopTenStats(
   args: TopTenArguments,
   type: SearchType
 ) {
-  const user = await (message.client as DiscordClient).database.users.findById(
+  const user = await (message.client as DiscordClient).db.users.findById(
     args.targetUserId
   );
 

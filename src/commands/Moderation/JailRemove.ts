@@ -28,7 +28,7 @@ export default class Jail extends Command {
   }
 
   async run(message: Message, args: { mentionedUserId: string }) {
-    const db = (message.client as DiscordClient).database;
+    const db = (message.client as DiscordClient).db;
     const config = await db.guilds.findById(message.guildId);
     if (!config.jailRole)
       return message.reply('Use ,jailsetup to setup the jail');

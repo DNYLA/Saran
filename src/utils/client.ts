@@ -23,7 +23,7 @@ export default class DiscordClient extends Client {
     return this._events;
   }
 
-  get database(): DatabaseManager {
+  get db(): DatabaseManager {
     return this._database;
   }
 

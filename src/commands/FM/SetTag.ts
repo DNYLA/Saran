@@ -27,7 +27,7 @@ export default class SetTag extends Command {
   }
 
   async run(message: Message, args: { tag: string }) {
-    const userService = (message.client as DiscordClient).database.users;
+    const userService = (message.client as DiscordClient).db.users;
     try {
       await userService.updateById(message.author.id, {
         lastFMTag: args.tag,

@@ -25,7 +25,7 @@ export default class IndexGuild extends Command {
 
   async run(message: Message) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const db = (message.client as DiscordClient).database;
+    const db = (message.client as DiscordClient).db;
     const members = await message.guild.members.fetch();
     const userIds = await fetchUserIdsWithUsername();
 

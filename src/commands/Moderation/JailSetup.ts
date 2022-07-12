@@ -20,7 +20,7 @@ export default class JailSetup extends Command {
   }
 
   async run(message: Message) {
-    const guildService = (message.client as DiscordClient).database.guilds;
+    const guildService = (message.client as DiscordClient).db.guilds;
     const config = await guildService.findById(message.guildId);
     const guild = await message.guild.fetch();
     const channels = await guild.channels.fetch();

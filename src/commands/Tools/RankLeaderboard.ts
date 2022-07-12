@@ -16,7 +16,7 @@ export default class RankLeaderboard extends Command {
 
   async run(message: Message) {
     const client = message.client as DiscordClient;
-    const users = await client.database.guildUsers.repo.findMany({
+    const users = await client.db.guildUsers.repo.findMany({
       where: { serverId: message.guildId },
       include: { user: true },
       take: 10,

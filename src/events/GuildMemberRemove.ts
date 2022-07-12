@@ -12,7 +12,7 @@ export default class InteractionCreated extends Event {
     // membe
 
     try {
-      await client.database.guildUsers.updateById(member.guild.id, member.id, {
+      await client.db.guildUsers.updateById(member.guild.id, member.id, {
         inactive: true,
       });
     } catch (err) {

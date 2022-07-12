@@ -26,8 +26,7 @@ export default class BoosterRoleName extends Command {
   }
 
   async run(message: Message, args: { roleName: string }) {
-    const guildUsersService = (message.client as DiscordClient).database
-      .guildUsers;
+    const guildUsersService = (message.client as DiscordClient).db.guildUsers;
     const user = await message.client.users.fetch(message.author.id);
     if (!user) return message.reply('User doesnt exist!');
 

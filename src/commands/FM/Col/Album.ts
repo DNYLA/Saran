@@ -46,9 +46,9 @@ export default class AlbumCollage extends Command {
   async run(message: Message, args: TopTenArguments) {
     console.log('Here');
 
-    const user = await (
-      message.client as DiscordClient
-    ).database.users.findById(args.targetUserId);
+    const user = await (message.client as DiscordClient).db.users.findById(
+      args.targetUserId
+    );
     const period = getPeriodFromString(args.period);
     const topTen = await getTopTenStatsNoEmbed(
       message,

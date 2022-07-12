@@ -9,13 +9,13 @@ export default class InteractionCreated extends Event {
 
   async run(client: DiscordClient, member: GuildMember) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const user = await client.database.guildUsers.findById(
+    const user = await client.db.guildUsers.findById(
       member.guild.id,
       member.id
     ); //Fetching now will use it later for checking muted or jailed
 
     try {
-      await client.database.guildUsers.updateById(member.guild.id, member.id, {
+      await client.db.guildUsers.updateById(member.guild.id, member.id, {
         inactive: false,
       });
     } catch (err) {

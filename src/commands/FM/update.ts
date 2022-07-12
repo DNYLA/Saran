@@ -20,9 +20,9 @@ export default class SetUsername extends Command {
   }
   //This will be reworked to fetch data however as of right now there is no point
   async run(message: Message) {
-    const user = await (
-      message.client as DiscordClient
-    ).database.users.findById(message.author.id);
+    const user = await (message.client as DiscordClient).db.users.findById(
+      message.author.id
+    );
     const username = user.lastFMName;
     if (!username) return message.reply('Finished updating.');
 

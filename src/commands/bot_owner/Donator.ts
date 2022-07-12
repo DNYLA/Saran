@@ -31,7 +31,7 @@ export default class Donator extends Command {
 
   async run(message: Message, args: { type: string; userId: string }) {
     const { type, userId } = args;
-    const usersService = (message.client as DiscordClient).database.users;
+    const usersService = (message.client as DiscordClient).db.users;
 
     // if (!user && type === 'guild') {
     //   try {

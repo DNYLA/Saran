@@ -27,13 +27,13 @@ export async function GetWhoKnowsInfo(
   globalSearch?: boolean
 ) {
   const client = message.client as DiscordClient;
-  const guildService = client.database.guildUsers;
-  const user = await client.database.users.findById(userId);
+  const guildService = client.db.guildUsers;
+  const user = await client.db.users.findById(userId);
   let users: WhoKnowsUser[];
   if (!globalSearch) {
     users = await guildService.findAllWithLastFm(message.guildId);
   } else {
-    users = await client.database.users.repo.findMany({
+    users = await client.db.users.repo.findMany({
       where: { lastFMName: { not: null } },
     });
   }

@@ -45,9 +45,9 @@ export default class Plays extends Command {
     message: Message,
     args: { targetUserId: string; artistName: string }
   ) {
-    const user = await (
-      message.client as DiscordClient
-    ).database.users.findById(args.targetUserId);
+    const user = await (message.client as DiscordClient).db.users.findById(
+      args.targetUserId
+    );
 
     let artist: Artist;
 

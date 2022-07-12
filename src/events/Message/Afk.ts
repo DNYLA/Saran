@@ -11,10 +11,10 @@ export default class MessageEvent extends Event {
   async run(client: DiscordClient, message: Message) {
     if (message.author.bot) return;
 
-    const user = await client.database.users.findById(message.author.id);
+    const user = await client.db.users.findById(message.author.id);
     await Promise.all(
       message.mentions.members.map(async (member) => {
-        const mentionedUser = await client.database.users.findById(member.id);
+        const mentionedUser = await client.db.users.findById(member.id);
         if (!mentionedUser.afkTime) return;
 
         const timeAfk = moment(mentionedUser.afkTime).fromNow();
@@ -41,7 +41,7 @@ export default class MessageEvent extends Event {
           }`
         );
       await message.channel.send({ embeds: [afkembed] });
-      await client.database.users.updateById(user.id, {
+      await client.db.users.updateById(user.id, {
         afkMessage: null,
         afkTime: null,
       });

@@ -36,7 +36,7 @@ export default class Jail extends Command {
     message: Message,
     args: { mentionedUserId: string; time: string; reason: string }
   ) {
-    const db = (message.client as DiscordClient).database;
+    const db = (message.client as DiscordClient).db;
     const config = await db.guilds.findById(message.guildId);
     if (!config.jailChannel)
       return message.reply('Use ,jailsetup to setup the jail');

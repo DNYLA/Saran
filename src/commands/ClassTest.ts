@@ -28,7 +28,7 @@ export default class Ping extends Command {
   async run(message: Message) {
     // const guild = await new SaranGuild('987380648362774608').fetch();
     // const client = message.client as DiscordClient;
-    // const newUser = await client.database.user('863092043249483796');
+    // const newUser = await client.db.user('863092043249483796');
 
     return message.reply('Pong');
   }

@@ -34,9 +34,9 @@ export default class NowPlaying extends Command {
 
   async run(message: Message, args: { targetUserId: string }) {
     // const user = await getUser(args.targetUserId);
-    const user = await (
-      message.client as DiscordClient
-    ).database.users.findById(args.targetUserId);
+    const user = await (message.client as DiscordClient).db.users.findById(
+      args.targetUserId
+    );
     const username = user.lastFMName;
     let donatorEmbed = false;
 

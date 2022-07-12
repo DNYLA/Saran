@@ -45,9 +45,9 @@ export default class PlaysAlbum extends Command {
     message: Message,
     args: { targetUserId: string; albumName: string }
   ) {
-    const user = await (
-      message.client as DiscordClient
-    ).database.users.findById(args.targetUserId);
+    const user = await (message.client as DiscordClient).db.users.findById(
+      args.targetUserId
+    );
     let album: Album;
 
     if (!args.albumName) {

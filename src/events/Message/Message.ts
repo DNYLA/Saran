@@ -10,7 +10,7 @@ export default class MessageEvent extends Event {
 
   async run(client: DiscordClient, message: Message) {
     if (message.author.bot) return;
-    const db = client.database;
+    const db = client.db;
     const user = await db.users.findById(message.author.id);
     const config = await db.guilds.findById(message.guildId);
 

@@ -18,7 +18,7 @@ export default class GetAvatar extends Command {
   async run(message: Message, args: { reason: string }) {
     const currentTime = new Date();
 
-    await (message.client as DiscordClient).database.users.updateById(
+    await (message.client as DiscordClient).db.users.updateById(
       message.author.id,
       { afkTime: currentTime, afkMessage: args.reason ?? '' }
     );

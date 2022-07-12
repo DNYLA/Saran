@@ -24,7 +24,7 @@ export default class SetUsername extends Command {
   }
 
   async run(message: Message, args: { username: string }) {
-    const userService = (message.client as DiscordClient).database.users;
+    const userService = (message.client as DiscordClient).db.users;
     try {
       await userService.updateById(message.author.id, {
         lastFMName: args.username,

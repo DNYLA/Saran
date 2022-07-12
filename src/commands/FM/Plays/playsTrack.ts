@@ -54,9 +54,9 @@ export default class PlaysTrack extends Command {
   }
 
   async run(message: Message, args: SearchTrackArguments) {
-    const user = await (
-      message.client as DiscordClient
-    ).database.users.findById(args.targetUserId);
+    const user = await (message.client as DiscordClient).db.users.findById(
+      args.targetUserId
+    );
     const { trackName, artistName } = args;
 
     let track: Track;

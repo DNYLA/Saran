@@ -8,7 +8,7 @@ export default class InteractionCreated extends Event {
   }
 
   async run(client: DiscordClient, channel: GuildChannel) {
-    const guild = await client.database.guilds.findById(channel.guildId);
+    const guild = await client.db.guilds.findById(channel.guildId);
     if (!guild.jailRole) return;
 
     const role = await channel.guild.roles
@@ -16,7 +16,7 @@ export default class InteractionCreated extends Event {
       .catch(console.error);
 
     if (!role) {
-      await client.database.guilds.updateById(channel.guildId, {
+      await client.db.guilds.updateById(channel.guildId, {
         jailRole: null,
         jailChannel: null,
         jailLogChannel: null,
