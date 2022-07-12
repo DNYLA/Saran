@@ -1,10 +1,10 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import axios from 'axios';
 import { Message, MessageAttachment, MessageEmbed } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import Command, { ArgumentTypes } from '../../utils/base/command';
 const instagramGetUrl = require('instagram-url-direct');
 // import { downloader as Downloader } from 'instagram-url-downloader';
-const Downloader = require('instagram-url-downloader').default;
 
 type InstagramLinkType = {
   results_number: number;
@@ -23,14 +23,13 @@ export default class Sanar extends Command {
   }
 
   async run(message: Message, args: { videoUrl: string }) {
-    let links: InstagramLinkType = await instagramGetUrl(args.videoUrl);
+    const links: InstagramLinkType = await instagramGetUrl(args.videoUrl);
     console.log(links);
 
     if (links.url_list.length === 0)
       return message.reply(
         'No Media found (If this is a valid link then this error can occur when instagram rate limits requests)'
       );
-    const url = links.url_list[0];
     const { data, headers } = await axios.get(links.url_list[0], {
       responseType: 'arraybuffer',
     });
@@ -50,7 +49,6 @@ export default class Sanar extends Command {
         .setImage(`attachment://${title}`);
       await message.channel.send({ embeds: [embed], files: [attachment] });
       message.channel.delete();
-    } else {
     }
     console.log(contentType);
     // if (args.length === 0) return message.reply('Provide a URL to scrape!');

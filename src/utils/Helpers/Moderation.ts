@@ -1,6 +1,5 @@
 import { GuildMember, Message, User, MessageMentions, Guild } from 'discord.js';
 import DiscordClient from '../client';
-import { getUser } from '../database/User';
 
 //This is added incase i decide to improve how permissions are handled.
 export function hasAdminPermissions(message: Message) {
@@ -13,7 +12,7 @@ export function hasAdminPermissions(message: Message) {
 }
 
 export function getUserIdFromMessage(message: Message, argument: string) {
-  let mention = message.mentions.users.first();
+  const mention = message.mentions.users.first();
 
   if (mention) return mention.id;
   else return argument;
@@ -21,8 +20,7 @@ export function getUserIdFromMessage(message: Message, argument: string) {
 
 export async function getUserFromMessage(
   client: DiscordClient,
-  message: Message,
-  args: string[]
+  message: Message
 ) {
   try {
     return await client.users.fetch(message.author.id);

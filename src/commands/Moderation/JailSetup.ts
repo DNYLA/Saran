@@ -2,7 +2,6 @@ import { Message } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import Command from '../../utils/base/command';
 import { SaranGuild } from '../../utils/database/Guild';
-import { getGuildMemberFromMention } from '../../utils/Helpers/Moderation';
 
 export default class JailSetup extends Command {
   constructor() {

@@ -1,13 +1,6 @@
-import axios from 'axios';
-import {
-  Message,
-  MessageActionRow,
-  MessageButton,
-  MessageEmbed,
-} from 'discord.js';
+import { Message } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import Command, { ArgumentTypes } from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
 import ytSearch from 'youtube-search';
 import { SearchQueryArgs } from './ImageSearch';
 const opts = {

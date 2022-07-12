@@ -7,5 +7,6 @@ export default abstract class Event {
     return this.name;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   abstract run(client: DiscordClient, ...args: any): Promise<void>;
 }

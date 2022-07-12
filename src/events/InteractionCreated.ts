@@ -1,7 +1,6 @@
-import { Interaction, Message, MessageEmbed } from 'discord.js';
+import { Interaction, MessageEmbed } from 'discord.js';
 import Event from '../utils/base/event';
 import DiscordClient from '../utils/client';
-import { WebSearchImage } from '../utils/types';
 
 export default class InteractionCreated extends Event {
   constructor() {

@@ -9,10 +9,9 @@ import { SaranUser } from '../../../utils/database/User';
 import {
   fetchRecentArtistInfo,
   fetchSearchArtistInfo,
-  getTargetUserId,
   SearchType,
 } from '../../../utils/fmHelpers';
-import { Artist, PartialUser } from '../../../utils/types';
+import { Artist } from '../../../utils/types';
 
 export default class Plays extends Command {
   constructor() {
@@ -49,12 +48,10 @@ export default class Plays extends Command {
     const user = (await new SaranUser(args.targetUserId).fetch()).info;
 
     let artist: Artist;
-    let userInfo: PartialUser;
 
     if (!args.artistName) {
       const artistInfo = await fetchRecentArtistInfo(user.lastFMName);
       artist = artistInfo.artist;
-      userInfo = artistInfo.user;
     } else {
       artist = await fetchSearchArtistInfo(user.lastFMName, args.artistName);
     }
@@ -68,7 +65,7 @@ export default class Plays extends Command {
     // });
 
     let imageUrl;
-    let plays = artist.stats.userplaycount;
+    const plays = artist.stats.userplaycount;
     try {
       imageUrl = artist.image[3]['#text'];
       await setCachedPlays(

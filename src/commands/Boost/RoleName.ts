@@ -1,15 +1,7 @@
-import { ColorResolvable, Message, Role } from 'discord.js';
+import { Message, Role } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
-import {
-  ImageUrlOrAttachment,
-  MentionIdOrArg,
-  MentionUserId,
-  StringToColour,
-} from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
 import { SaranGuildUser } from '../../utils/database/Guild';
-import { getDiscordUserFromMention } from '../../utils/Helpers/Moderation';
 
 export default class BoosterRoleName extends Command {
   constructor() {
@@ -51,7 +43,7 @@ export default class BoosterRoleName extends Command {
 
     const storedUser = await new SaranGuildUser(user.id, guild.id).fetch();
 
-    let roleId = storedUser.self.customBoostRoleId;
+    const roleId = storedUser.self.customBoostRoleId;
     let boosterRole: Role;
 
     if (!roleId) {

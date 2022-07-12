@@ -1,6 +1,5 @@
 import { Message, MessageEmbed } from 'discord.js';
 import { RequirmentsType } from '../utils/base/command';
-import { getTargetUserId } from '../utils/fmHelpers';
 import { mentionUser } from '../utils/helpers';
 
 export default (

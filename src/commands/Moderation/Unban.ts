@@ -1,9 +1,7 @@
-import { Client, Message } from 'discord.js';
+import { Message } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import { MentionIdOrArg } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
-import { getDiscordUserFromMention } from '../../utils/Helpers/Moderation';
 
 export default class UnBan extends Command {
   constructor() {

@@ -5,7 +5,6 @@ import {
   MessageEmbed,
 } from 'discord.js';
 import { GoogleCSESearch } from '../../api/WebSearch';
-import OwnerOnly from '../../checks/OwnerOnly';
 import StartTyping from '../../hooks/StartTyping';
 import Command, { ArgumentTypes } from '../../utils/base/command';
 import DiscordClient from '../../utils/client';

@@ -9,10 +9,9 @@ import { SaranUser } from '../../../utils/database/User';
 import {
   fetchRecentTrackInfo,
   fetchSearchTrackInfo,
-  getTargetUserId,
   SearchType,
 } from '../../../utils/fmHelpers';
-import { PartialUser, Track } from '../../../utils/types';
+import { Track } from '../../../utils/types';
 
 export type SearchTrackArguments = {
   targetUserId: string;
@@ -59,12 +58,10 @@ export default class PlaysTrack extends Command {
     const { trackName, artistName } = args;
 
     let track: Track;
-    let userInfo: PartialUser;
 
     if (!trackName) {
       const trackInfo = await fetchRecentTrackInfo(user.lastFMName);
       track = trackInfo.track;
-      userInfo = trackInfo.user;
     } else {
       track = await fetchSearchTrackInfo(
         user.lastFMName,

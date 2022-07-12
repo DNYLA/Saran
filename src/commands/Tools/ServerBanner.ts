@@ -1,8 +1,6 @@
 import { Message, MessageEmbed } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
-import { MentionUserId, SelfUserId } from '../../utils/argsparser';
-import Command, { ArgumentTypes } from '../../utils/base/command';
-import { AvatarType, getAvatarEmbed } from '../../utils/Helpers/Avatars';
+import Command from '../../utils/base/command';
 
 export default class GetAvatar extends Command {
   constructor() {
@@ -12,18 +10,10 @@ export default class GetAvatar extends Command {
       hooks: {
         preCommand: StartTyping,
       },
-      arguments: [
-        // {
-        //   parse: MentionUserId,
-        //   default: SelfUserId,
-        //   name: 'targetUserId',
-        //   type: ArgumentTypes.SINGLE,
-        // },
-      ],
     });
   }
 
-  async run(message: Message, args: { targetUserId: string }) {
+  async run(message: Message) {
     const guild = await message.guild.fetch();
 
     if (!guild.banner)

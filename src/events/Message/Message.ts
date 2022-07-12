@@ -1,12 +1,9 @@
-import { GuildConfig, PrismaClient } from '@prisma/client';
-import { Guild, Message, MessageEmbed } from 'discord.js';
-import moment from 'moment';
+import { Message } from 'discord.js';
 import Event from '../../utils/base/event';
 import DiscordClient from '../../utils/client';
 import { SaranGuild } from '../../utils/database/Guild';
 import { SaranUser } from '../../utils/database/User';
 import { getArgsFromMsg } from '../../utils/helpers';
-const prisma = new PrismaClient();
 
 export default class MessageEvent extends Event {
   constructor() {
@@ -20,7 +17,6 @@ export default class MessageEvent extends Event {
     const guildUser = await guild.fetchUser(message.member.id);
     const config = guild.config;
     let messageCommand = message.content.toLowerCase();
-
     guildUser.update({ xp: { increment: 5 } });
 
     //Replace custom lastfm tag with ,lf
@@ -44,6 +40,8 @@ export default class MessageEvent extends Event {
     );
 
     const command = client.commands.get(commandName.toLowerCase());
+    console.log(commandName);
+
     if (!command) return; //Invalid Command
 
     try {

@@ -52,6 +52,7 @@ model ReactionBoardMessages {
   messageId      String
   embedMessageId String
   guild          GuildConfig @relation(fields: [serverId], references: [id])
-
   @@id([messageId, serverId])
 }
+
+

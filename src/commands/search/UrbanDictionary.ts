@@ -1,13 +1,7 @@
 import axios from 'axios';
-import {
-  Message,
-  MessageActionRow,
-  MessageButton,
-  MessageEmbed,
-} from 'discord.js';
+import { Message, MessageEmbed } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import Command, { ArgumentTypes } from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
 import { SearchQueryArgs } from './ImageSearch';
 
 export type UrbanDictionaryLookup = {
@@ -40,8 +34,6 @@ export default class ImageSearch extends Command {
   }
 
   async run(message: Message, args: SearchQueryArgs) {
-    const client = message.client as DiscordClient;
-
     const author = message.member;
     const { query: term } = args;
     const { data } = await axios.get(

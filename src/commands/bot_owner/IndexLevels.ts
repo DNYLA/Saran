@@ -1,4 +1,4 @@
-import { Client, Collection, Message } from 'discord.js';
+import { Collection, Message } from 'discord.js';
 import OwnerOnly from '../../checks/OwnerOnly';
 import StartTyping from '../../hooks/StartTyping';
 import Command from '../../utils/base/command';
@@ -29,7 +29,7 @@ export default class IndexLevels extends Command {
     await Promise.all(
       channels.map(async (channel) => {
         if (!channel.isText()) return;
-        let messages = [];
+        const messages = [];
         let message = await channel.messages
           .fetch({ limit: 1 })
           .then((messagePage) =>
@@ -72,7 +72,9 @@ export default class IndexLevels extends Command {
           if (!member || !item) return;
           console.log(`${key}:${item}`);
           await createGuildMember(member, { xp: item });
-        } catch (err) {}
+        } catch (err) {
+          console.log(err);
+        }
       })
     );
 

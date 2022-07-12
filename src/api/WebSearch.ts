@@ -14,10 +14,7 @@ export class GoogleCSESearch {
     if (!apiKey || !cseKey) throw new Error('Provide a CSE or API Key');
   }
 
-  async search(
-    query: string,
-    options?: GoogleCSEOptions
-  ): Promise<WebSearchImage[]> {
+  async search(query: string): Promise<WebSearchImage[]> {
     query = query.replace(/\s/g, '+');
     // options.safeSearch = true;
     // options.searchType = 'image';

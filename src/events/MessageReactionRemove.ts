@@ -1,17 +1,7 @@
-import {
-  Emoji,
-  GuildChannel,
-  Interaction,
-  Message,
-  MessageEmbed,
-  MessageReaction,
-  ReactionEmoji,
-  User,
-} from 'discord.js';
+import { MessageEmbed, MessageReaction, User } from 'discord.js';
 import Event from '../utils/base/event';
 import DiscordClient from '../utils/client';
 import {
-  createReactionBoardInfo,
   getReactionBoardInfo,
   SaranGuild,
   updateReactionBoardInfo,
@@ -22,6 +12,7 @@ export default class MessageReactionAdd extends Event {
     super('messageReactionRemove');
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async run(client: DiscordClient, reaction: MessageReaction, user: User) {
     const storedGuild = await new SaranGuild(reaction.message.guildId).fetch();
     const config = storedGuild.config;

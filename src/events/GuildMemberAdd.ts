@@ -1,8 +1,7 @@
-import { GuildMember, Interaction, Message, MessageEmbed } from 'discord.js';
+import { GuildMember } from 'discord.js';
 import Event from '../utils/base/event';
 import DiscordClient from '../utils/client';
 import { SaranGuildUser } from '../utils/database/Guild';
-import { WebSearchImage } from '../utils/types';
 
 export default class InteractionCreated extends Event {
   constructor() {

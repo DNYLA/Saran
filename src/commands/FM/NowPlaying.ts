@@ -7,11 +7,7 @@ import { MentionUserId, SelfUserId } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
 import { setCachedPlays } from '../../utils/database/redisManager';
 import { SaranUser } from '../../utils/database/User';
-import {
-  fetchRecentTrackInfo,
-  getTargetUserId,
-  SearchType,
-} from '../../utils/fmHelpers';
+import { fetchRecentTrackInfo, SearchType } from '../../utils/fmHelpers';
 import { PartialUser, RecentTrack, Track } from '../../utils/types';
 
 export default class NowPlaying extends Command {

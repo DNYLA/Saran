@@ -3,7 +3,6 @@ import { Message } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import { ChannelMentionIdOrArg } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
 
 const prisma = new PrismaClient();
 
@@ -37,7 +36,6 @@ export default class SetReactionBoardChannel extends Command {
   }
 
   async run(message: Message, args: { channelId: string; limit: number }) {
-    const client = message.client as DiscordClient;
     const boardChannel = await message.guild.channels
       .fetch(args.channelId)
       .catch(console.error);
@@ -49,7 +47,7 @@ export default class SetReactionBoardChannel extends Command {
     }
 
     try {
-      const config = await prisma.guildConfig.update({
+      await prisma.guildConfig.update({
         where: { id: message.guildId },
         data: {
           reactionBoardChannel: boardChannel.id,

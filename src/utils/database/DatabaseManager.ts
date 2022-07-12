@@ -1,51 +1,63 @@
-import { Prisma, PrismaClient, User } from '@prisma/client';
-import { UserManager } from 'discord.js';
+import { GuildConfig, Prisma, PrismaClient, User } from '@prisma/client';
 import { cacheMiddleware } from '../../cache';
-import { SaranGuild } from './Guild';
-import { SaranUser } from './User';
 
 const prisma = new PrismaClient();
 
 prisma.$use(cacheMiddleware);
 
 export class DatabaseManager {
-  private _users = new Map<string, SaranUser>();
-  private _guilds = new Map<string, SaranGuild>();
+  private prisma = new PrismaClient();
+  users: UserRepository;
+  guilds: GuildRepository;
+  constructor() {
+    prisma.$use(cacheMiddleware);
+    this.users = new UserRepository(this.prisma.user);
+    this.guilds = new GuildRepository(this.prisma.guildConfig);
+  }
+}
 
-  constructor() {}
+export class UserRepository {
+  constructor(readonly repo: PrismaClient['user']) {}
 
-  async user(id: string) {
-    const user = this._users.get(id);
+  async findById(id: string): Promise<User> {
+    const user = this.repo.findUnique({ where: { id } });
+    if (!user) return await this.repo.create({ data: { id } });
 
-    if (user) return user;
-
-    const fetchedUser = await new SaranUser(id).fetch();
-    this._users.set(id, fetchedUser);
-
-    return fetchedUser;
+    return user;
   }
 
-  async guild(id: string) {
-    const guild = this._guilds.get(id);
-    if (guild) return guild;
-
-    const fetchedGuild = await new SaranGuild(id).fetch();
-    this._guilds.set(id, fetchedGuild);
-
-    return fetchedGuild;
-  }
-
-  /*
-    Custom fetch to grab users (not SaranUsers) from the DB.
-    Note: Should only be used when wanting to fetch partial users.
-    which is why we dont want to cache or store in the map.
-  */
-  async users(args: Prisma.UserFindManyArgs): Promise<User[]> {
+  async updateById(id: string, data: Prisma.UserUpdateInput): Promise<void> {
     try {
-      return await prisma.user.findMany(args);
+      await this.repo.update({
+        where: { id },
+        data,
+      });
     } catch (err) {
       console.log(err);
-      return [];
+    }
+  }
+}
+
+export class GuildRepository {
+  constructor(private readonly repo: PrismaClient['guildConfig']) {}
+
+  async findById(id: string): Promise<GuildConfig> {
+    const guild = this.repo.findUnique({ where: { id } });
+    if (!guild) return await this.repo.create({ data: { id } });
+    return guild;
+  }
+
+  async updateById(
+    id: string,
+    data: Prisma.GuildConfigUpdateInput
+  ): Promise<void> {
+    try {
+      await this.repo.update({
+        where: { id },
+        data,
+      });
+    } catch (err) {
+      console.log(err);
     }
   }
 }

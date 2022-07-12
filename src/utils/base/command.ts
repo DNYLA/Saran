@@ -118,7 +118,6 @@ export default abstract class Command {
     const _args = [...args];
     const parsedArgs = {};
     if (this.options?.arguments) {
-      let argIndex = 0; //It is possible that an arg is not required so using th index inside the loop may be invalid
       const parseDefault = (
         argDefault: string | ((message: Message) => string),
         msg: Message
@@ -130,7 +129,7 @@ export default abstract class Command {
       };
 
       // console.log(this.options.args);
-      this.options.arguments.map((arg, i) => {
+      this.options.arguments.map((arg) => {
         if (_args.length === 0) {
           // if (arg.parse && !arg.optional) {
           //   const parsed = arg.parse(message, _args, 0);
@@ -245,6 +244,7 @@ export default abstract class Command {
         this.options.errorMessage ??
           'An error occured whilst trying to execute!'
       );
+      success = false;
       console.log(err);
     }
 
@@ -257,6 +257,7 @@ export default abstract class Command {
     //Delete command request After Executed?
     try {
       if (this.options?.deleteCommand) await message.delete();
+      // eslint-disable-next-line no-empty
     } catch (err) {} //Message Probably already deleted
   }
 

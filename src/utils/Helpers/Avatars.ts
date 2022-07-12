@@ -1,4 +1,4 @@
-import { Client, GuildMember, Message, MessageEmbed, User } from 'discord.js';
+import { Message, MessageEmbed } from 'discord.js';
 
 export enum AvatarType {
   Profile,

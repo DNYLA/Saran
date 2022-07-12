@@ -1,13 +1,5 @@
 import { User } from '@prisma/client';
-import axios from 'axios';
-import {
-  Channel,
-  Message,
-  MessageAttachment,
-  MessageEmbed,
-  MessageMentions,
-  TextChannel,
-} from 'discord.js';
+import { Message, MessageEmbed, MessageMentions } from 'discord.js';
 import {
   fetchAlbumInfo,
   fetchArtistInfo,
@@ -28,7 +20,6 @@ import { convertPeriodToText, mentionUser } from './helpers';
 import {
   Album,
   Artist,
-  ArtistInfo,
   PartialUser,
   RecentTrack,
   TopAlbum,
@@ -36,7 +27,6 @@ import {
   TopTrack,
   Track,
 } from './types';
-const fs = require('fs');
 
 //Returns either the author id or if a mention exists the mentioned users id
 export async function getUserFromMessage(

@@ -2,7 +2,6 @@ import { Message } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import { MentionIdOrArg } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
-import { getGuildMemberFromMention } from '../../utils/Helpers/Moderation';
 
 export default class Kick extends Command {
   constructor() {

@@ -5,6 +5,10 @@ import { GuildMemberWithUser } from './User';
 
 const prisma = new PrismaClient();
 prisma.$use(cacheMiddleware);
+
+/**
+ * @deprecated The method should not be used
+ */
 export class SaranGuild {
   private _users = new Map<string, SaranGuildUser>();
   private _config: GuildConfig;
@@ -80,6 +84,7 @@ export class SaranGuild {
 
   async updateMember(
     member: GuildMember,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     guildData?: any,
     updateOnlyData?: Prisma.GuildUserUpdateArgs
   ) {
@@ -166,6 +171,9 @@ export class SaranGuild {
   }
 }
 
+/**
+ * @deprecated The method should not be used
+ */
 export class SaranGuildUser {
   /**
    *

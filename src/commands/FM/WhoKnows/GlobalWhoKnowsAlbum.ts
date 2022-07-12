@@ -78,8 +78,6 @@ export default class GlobalWhoKnowsAlbum extends Command {
       wkInfo
     );
 
-    let wkEmbed;
-
     try {
       const embed = new MessageEmbed()
         .setColor('#2F3136')

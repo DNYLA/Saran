@@ -1,8 +1,6 @@
 import { GuildChannel, Message } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
-import { MentionIdOrArg } from '../../utils/argsparser';
-import Command, { ArgumentTypes } from '../../utils/base/command';
-import { getGuildMemberFromMention } from '../../utils/Helpers/Moderation';
+import Command from '../../utils/base/command';
 
 export default class Mute extends Command {
   constructor() {

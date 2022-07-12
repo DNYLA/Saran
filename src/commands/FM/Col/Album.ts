@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { Message, MessageAttachment, MessageEmbed } from 'discord.js';
 import UsernameCheck from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
@@ -8,18 +7,14 @@ import Command, { ArgumentTypes } from '../../../utils/base/command';
 import { SaranUser } from '../../../utils/database/User';
 import {
   getPeriodFromString,
-  getTopTenStats,
   getTopTenStatsNoEmbed,
   SearchType,
 } from '../../../utils/fmHelpers';
 import { convertPeriodToText } from '../../../utils/helpers';
 import { TopTenArguments } from '../TopTen/topartists';
-const { createCollage } = require('@wylie39/image-collage');
-const fs = require('fs');
+import { createCollage } from '@wylie39/image-collage';
 
-var request = require('request');
-// import { request } from 'http';
-export default class TopAlbums extends Command {
+export default class AlbumCollage extends Command {
   constructor() {
     super('lf col', {
       aliases: ['lf collage'],
@@ -49,9 +44,10 @@ export default class TopAlbums extends Command {
   }
 
   async run(message: Message, args: TopTenArguments) {
+    console.log('Here');
+
     const user = (await new SaranUser(args.targetUserId).fetch()).info;
     const period = getPeriodFromString(args.period);
-
     const topTen = await getTopTenStatsNoEmbed(
       message,
       user,

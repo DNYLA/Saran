@@ -2,7 +2,6 @@ import { Message } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import { MentionIdOrArg } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
-import { getGuildMemberFromMention } from '../../utils/Helpers/Moderation';
 
 export default class UnMute extends Command {
   constructor() {
@@ -31,7 +30,7 @@ export default class UnMute extends Command {
     const user = await message.guild.members.fetch(args.mentionedUserId);
     if (!user) return message.reply('Unable to locate this user');
     try {
-      const timeout = await user.timeout(0);
+      await user.timeout(0);
       return message.reply('Unmute d this persona');
     } catch (err) {
       console.log(err);

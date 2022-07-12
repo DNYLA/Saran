@@ -1,11 +1,9 @@
-import { PrismaClient } from '@prisma/client';
 import { Message } from 'discord.js';
 import UsernameCheck from '../../checks/UsernameCheck';
-import NoUsernameSet from '../../hooks/NoUsernameSet';
 import StartTyping from '../../hooks/StartTyping';
-import Command, { ArgumentTypes } from '../../utils/base/command';
+import Command from '../../utils/base/command';
 import { deleteCache } from '../../utils/database/redisManager';
-import { SaranUser, updateUserById } from '../../utils/database/User';
+import { SaranUser } from '../../utils/database/User';
 
 export default class SetUsername extends Command {
   constructor() {
@@ -21,7 +19,7 @@ export default class SetUsername extends Command {
     });
   }
   //This will be reworked to fetch data however as of right now there is no point
-  async run(message: Message, args: { username: string }) {
+  async run(message: Message) {
     const user = await new SaranUser(message.author.id).fetch();
     const username = user.info.lastFMName;
     if (!username) return message.reply('Finished updating.');

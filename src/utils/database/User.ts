@@ -1,12 +1,7 @@
-import {
-  GuildConfig,
-  GuildUser,
-  Prisma,
-  PrismaClient,
-  User,
-} from '@prisma/client';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { GuildUser, Prisma, PrismaClient, User } from '@prisma/client';
 import { GuildMember } from 'discord.js';
-import { cacheMiddleware, deleteCache, isCached, setCache } from '../../cache';
+import { cacheMiddleware } from '../../cache';
 
 const prisma = new PrismaClient();
 
@@ -48,9 +43,17 @@ export type GuildMemberWithUser = GuildUser & {
   user: User;
 };
 
+// interface IUser extends User {}
+
+// const saran = new SaranTest(prisma.user);
+
+/**
+ * @deprecated The method should not be used
+ */
 export class SaranUser {
   private user: User;
   private guilds: GuildUser;
+
   constructor(private userId: string, private userInfo?: User) {
     if (userInfo) this.user = userInfo;
     //IsUser in Cache (Add This later)
@@ -59,7 +62,7 @@ export class SaranUser {
   }
 
   //Refetches User
-  async fetch(userId?: string): Promise<SaranUser> {
+  async fetch(userId?: string): Promise<this> {
     const id = userId ?? this.userId;
     try {
       this.user = await prisma.user.findUniqueOrThrow({
@@ -81,7 +84,7 @@ export class SaranUser {
     return this.user;
   }
 
-  async update(data: Prisma.UserUpdateInput): Promise<SaranUser> {
+  async update(data: Prisma.UserUpdateInput): Promise<this> {
     try {
       this.user = await prisma.user.update({
         where: { id: this.userId },
@@ -104,6 +107,9 @@ export class SaranUser {
   }
 }
 
+/**
+ * @deprecated The method should not be used
+ */
 export const getGuildUsers = async (
   serverId: string
 ): Promise<UserWithGuilds[]> => {
@@ -117,9 +123,11 @@ export const getGuildUsers = async (
   }
 };
 
+/**
+ * @deprecated The method should not be used
+ */
 export const getGuildUsersCustom = async (
-  serverId: string,
-  where?: any
+  serverId: string
 ): Promise<GuildMemberWithUser[]> => {
   try {
     return await prisma.guildUser.findMany({
@@ -133,6 +141,9 @@ export const getGuildUsersCustom = async (
   }
 };
 
+/**
+ * @deprecated The method should not be used
+ */
 export const getGuildUser = async (
   serverId: string,
   userId: string
@@ -146,7 +157,9 @@ export const getGuildUser = async (
     return null;
   }
 };
-
+/**
+ * @deprecated The method should not be used
+ */
 export const createGuildMember = async (
   member: GuildMember,
   guildData?: any,
@@ -186,7 +199,9 @@ export const createGuildMember = async (
     //Most likely user doesnt exist
   }
 };
-
+/**
+ * @deprecated The method should not be used
+ */
 export const fetchUserIdsWithUsername = async (): Promise<string[]> => {
   try {
     const users = await prisma.user.findMany({
@@ -199,7 +214,9 @@ export const fetchUserIdsWithUsername = async (): Promise<string[]> => {
     console.log(err);
   }
 };
-
+/**
+ * @deprecated The method should not be used
+ */
 export const updateUserById = async (id: string, update: any) => {
   try {
     await prisma.user.upsert({
@@ -213,5 +230,3 @@ export const updateUserById = async (id: string, update: any) => {
 
   return true;
 };
-
-const setUser = (id: string) => {};

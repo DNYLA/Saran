@@ -1,9 +1,6 @@
-import { GuildConfig, PrismaClient } from '@prisma/client';
-import { Guild, Message, MessageEmbed } from 'discord.js';
-import moment from 'moment';
+import { Message } from 'discord.js';
 import Event from '../../utils/base/event';
 import DiscordClient from '../../utils/client';
-const prisma = new PrismaClient();
 
 export default class MessageEvent extends Event {
   constructor() {

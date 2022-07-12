@@ -1,4 +1,4 @@
-import { Message, MessageMentions } from 'discord.js';
+import { MessageMentions } from 'discord.js';
 import { Periods } from '../api/lastfm';
 import { SaranUser } from './database/User';
 
@@ -8,11 +8,19 @@ export function getArgsFromMsg(
 ): { commandName: string; args?: string[] } {
   // Args including the command name
   const args = msg.slice(prefixLn).split(/ +/);
-
-  return {
-    commandName: args[0],
-    args: args.slice(1),
-  };
+  console.log(args);
+  if (args[0] === 'lf' && args.length >= 2) {
+    console.log('Here');
+    return {
+      commandName: `${args[0]} ${args[1]}`,
+      args: args.slice(2),
+    };
+  } else {
+    return {
+      commandName: args[0],
+      args: args.slice(1),
+    };
+  }
 }
 
 export enum MessageType {

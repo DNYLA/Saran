@@ -1,10 +1,8 @@
-import { GuildConfig } from '@prisma/client';
 import { Client, ClientOptions, Collection, Message } from 'discord.js';
 import Command from './base/command';
-import command from './base/command';
 import Event from './base/event';
 import { DatabaseManager } from './database/DatabaseManager';
-import { WebSearchImage, GoogleImagesSearch } from './types';
+import { GoogleImagesSearch } from './types';
 
 export default class DiscordClient extends Client {
   private _commands = new Collection<string, Command>();

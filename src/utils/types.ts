@@ -1,4 +1,4 @@
-import { GuildMember, Message, MessageEmbed, User } from 'discord.js';
+import { GuildMember, Message, User } from 'discord.js';
 import { ArgumentTypes, RequirmentsType } from './base/command';
 
 export type CommandOptions = {

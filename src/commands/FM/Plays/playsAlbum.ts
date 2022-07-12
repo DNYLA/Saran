@@ -9,11 +9,9 @@ import { SaranUser } from '../../../utils/database/User';
 import {
   fetchRecentAlbumInfo,
   fetchSearchAlbumInfo,
-  getTargetUserId,
   SearchType,
 } from '../../../utils/fmHelpers';
-import { joinArgs } from '../../../utils/helpers';
-import { Album, PartialUser } from '../../../utils/types';
+import { Album } from '../../../utils/types';
 
 export default class PlaysAlbum extends Command {
   constructor() {
@@ -50,12 +48,10 @@ export default class PlaysAlbum extends Command {
     const user = (await new SaranUser(args.targetUserId).fetch()).info;
 
     let album: Album;
-    let userInfo: PartialUser;
 
     if (!args.albumName) {
       const albumInfo = await fetchRecentAlbumInfo(user.lastFMName);
       album = albumInfo.album;
-      userInfo = albumInfo.user;
     } else {
       album = await fetchSearchAlbumInfo(user.lastFMName, args.albumName);
     }

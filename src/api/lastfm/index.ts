@@ -2,7 +2,6 @@ import axios, { AxiosRequestConfig } from 'axios';
 import {
   Album,
   Artist,
-  ArtistInfo,
   PartialUser,
   RecentTrack,
   SearchedItem,

@@ -1,14 +1,9 @@
-import { Client, Collection, Message } from 'discord.js';
+import { Message } from 'discord.js';
 import OwnerOnly from '../../checks/OwnerOnly';
 import StartTyping from '../../hooks/StartTyping';
 import { MentionIdOrArg } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
-import {
-  createGuildMember,
-  SaranUser,
-  updateUserById,
-} from '../../utils/database/User';
-import { getUserFromMention } from '../../utils/helpers';
+import { SaranUser } from '../../utils/database/User';
 
 export default class Donator extends Command {
   constructor() {

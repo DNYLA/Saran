@@ -1,4 +1,4 @@
-import { Message, MessageAttachment, MessageEmbed } from 'discord.js';
+import { Message, MessageEmbed } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import Command from '../../utils/base/command';
 import DiscordClient from '../../utils/client';

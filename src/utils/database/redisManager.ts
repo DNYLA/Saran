@@ -1,23 +1,6 @@
 import { SearchType } from '../fmHelpers';
 import { redis } from '../redis';
 
-const setJson = async (key, object, options) => {
-  if (!options) options = {};
-  const { ex, path } = options;
-  await redis.json.set(key, path ? path : '.', object);
-
-  if (ex) setExpire(key, ex);
-};
-const getJson = async (key, options) => {
-  if (!options) options = {};
-  const { ex, path } = options;
-
-  const data = redis.json.get(key, path ? path : '.');
-  if (ex) setExpire(key, ex);
-
-  return data;
-};
-
 const contructTableName = (name: string, type: SearchType) => {
   let typeText = '-artist';
   if (type === SearchType.Album) typeText = '-album';
@@ -50,6 +33,6 @@ export async function deleteCache(key: string) {
   return await redis.del(key);
 }
 
-const setExpire = async (key, time) => {
-  await redis.expire(key, time);
-};
+// const setExpire = async (key, time) => {
+//   await redis.expire(key, time);
+// };

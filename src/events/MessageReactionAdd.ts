@@ -1,19 +1,9 @@
-import {
-  Emoji,
-  GuildChannel,
-  Interaction,
-  Message,
-  MessageEmbed,
-  MessageReaction,
-  ReactionEmoji,
-  User,
-} from 'discord.js';
+import { MessageEmbed, MessageReaction, User } from 'discord.js';
 import Event from '../utils/base/event';
 import DiscordClient from '../utils/client';
 import {
   createReactionBoardInfo,
   getReactionBoardInfo,
-  SaranGuild,
   updateReactionBoardInfo,
 } from '../utils/database/Guild';
 
@@ -22,10 +12,12 @@ export default class MessageReactionAdd extends Event {
     super('messageReactionAdd');
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async run(client: DiscordClient, reaction: MessageReaction, user: User) {
     // const config = client.getConfig(reaction.message.guildId);
-    const storedGuild = await client.database.guild(reaction.message.guildId);
-    const config = storedGuild.config;
+    const config = await client.database.guilds.findById(
+      reaction.message.guildId
+    );
     if (!config) return; //Configs should auto be fetched whenever a message is sent
     if (!config.reactionBoardChannel) return;
     const guild = reaction.message.guild;
@@ -86,8 +78,6 @@ export default class MessageReactionAdd extends Event {
       if (!sobEmoji) return;
       if (sobEmoji.count < config.reactionBoardLimit) return;
       if (!reaction.message.channel.isText()) return;
-
-      let imageUrl;
 
       // const attachemnt = reaction.message.attachments.first();
       // console.log(reaction.message.url);

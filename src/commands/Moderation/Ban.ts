@@ -1,9 +1,7 @@
 import { Message } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
-import { MentionIdOrArg, MentionUserId } from '../../utils/argsparser';
+import { MentionIdOrArg } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
-import { getDiscordUserFromMention } from '../../utils/Helpers/Moderation';
 
 export default class Ban extends Command {
   constructor() {
@@ -45,9 +43,9 @@ export default class Ban extends Command {
     }
     if (user.id === '827212859447705610') {
       message.reply(
-        `I stayed awake and got rich
+        `I stayed awake and got rich
       I'm ready to die like this
-      You fell asleep you missed it
+      You fell asleep you missed it
       I hope your time ain't missed
       Life is a game this a glitch
       And I couldn't simulate this
@@ -70,7 +68,9 @@ export default class Ban extends Command {
         return message.reply(
           `${user.username}#${user.discriminator} already banned for ${prevBan.reason}`
         );
-    } catch (err) {}
+    } catch (err) {
+      console.log(err);
+    }
 
     try {
       await message.guild.bans.create(user.id, { reason: args.reason ?? '' });

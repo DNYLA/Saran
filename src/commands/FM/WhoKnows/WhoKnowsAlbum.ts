@@ -5,17 +5,7 @@ import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
 import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../../utils/base/command';
-import {
-  getCachedPlays,
-  setCachedPlays,
-} from '../../../utils/database/redisManager';
-import { getGuildUsers } from '../../../utils/database/User';
-import {
-  fetchRecentAlbumInfo,
-  fetchSearchAlbumInfo,
-  getTargetUserId,
-  SearchType,
-} from '../../../utils/fmHelpers';
+import { fetchSearchAlbumInfo, SearchType } from '../../../utils/fmHelpers';
 import {
   FormatWhoKnowsArray,
   GetWhoKnowsInfo,

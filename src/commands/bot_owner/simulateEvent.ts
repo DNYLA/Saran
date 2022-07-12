@@ -1,7 +1,5 @@
 import { Message } from 'discord.js';
 import OwnerOnly from '../../checks/OwnerOnly';
-import UsernameCheck from '../../checks/UsernameCheck';
-import NoUsernameSet from '../../hooks/NoUsernameSet';
 import StartTyping from '../../hooks/StartTyping';
 import { MentionUserId, SelfUserId } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
@@ -43,7 +41,6 @@ export default class UnmuteRemote extends Command {
       client.emit('guildMemberAdd', message.member);
     } else if (args.type === 'remove') {
       client.emit('guildMemberRemove', message.member);
-    } else if (args.type === 'ban') {
     }
   }
 }
