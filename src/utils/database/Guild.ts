@@ -185,13 +185,15 @@ export class SaranGuildUser {
 
   async fetch(): Promise<SaranGuildUser> {
     try {
-      this.self = await prisma.guildUser.findUnique({
+      const user = await prisma.guildUser.findUnique({
         where: {
           userId_serverId: { userId: this.userId, serverId: this.serverId },
         },
       });
+
+      if (!user) await this.create();
+      else this.self = user;
     } catch (err) {
-      await this.create();
       console.log(err);
     }
 
@@ -199,12 +201,17 @@ export class SaranGuildUser {
   }
 
   async update(update: Prisma.GuildUserUpdateInput): Promise<SaranGuildUser> {
-    this.self = await prisma.guildUser.update({
-      where: {
-        userId_serverId: { userId: this.userId, serverId: this.serverId },
-      },
-      data: update,
-    });
+    try {
+      this.self = await prisma.guildUser.update({
+        where: {
+          userId_serverId: { userId: this.userId, serverId: this.serverId },
+        },
+        data: update,
+      });
+    } catch (err) {
+      console.log(err);
+      await this.create(); //Create guild user as
+    }
 
     return this;
   }
