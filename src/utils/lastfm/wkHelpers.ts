@@ -1,7 +1,6 @@
 import { Message } from 'discord.js';
 import DiscordClient from '../client';
 import { getCachedPlays, setCachedPlays } from '../database/redisManager';
-import { getGuildUsers, SaranUser } from '../database/User';
 import {
   fetchRecentAlbumInfo,
   fetchRecentArtistInfo,
@@ -27,21 +26,21 @@ export async function GetWhoKnowsInfo(
   recentType: SearchType,
   globalSearch?: boolean
 ) {
-  const user = await new SaranUser(userId).fetch();
-  let users: WhoKnowsUser[];
   const client = message.client as DiscordClient;
+  const guildService = client.database.guildUsers;
+  const user = await client.database.users.findById(userId);
+  let users: WhoKnowsUser[];
   if (!globalSearch) {
-    users = await getGuildUsers(message.guildId);
+    users = await guildService.findAllWithLastFm(message.guildId);
   } else {
     users = await client.database.users.repo.findMany({
       where: { lastFMName: { not: null } },
     });
   }
 
-  const guildUsers = await getGuildUsers(message.guildId);
   let recent: Track | Album | Artist;
 
-  if (!guildUsers || guildUsers.length === 0) {
+  if (!users || users.length === 0) {
     message.reply('Server hasnt been indexed use ,lf index');
     return { indexed: false, recent: null, user, users };
   }
@@ -49,17 +48,17 @@ export async function GetWhoKnowsInfo(
   if (fetchRecent) {
     if (recentType === SearchType.Track) {
       const { track: recentTrack } = await fetchRecentTrackInfo(
-        user.self.lastFMName
+        user.lastFMName
       );
       recent = recentTrack;
     } else if (recentType === SearchType.Album) {
       const { album: recentAlbum } = await fetchRecentAlbumInfo(
-        user.self.lastFMName
+        user.lastFMName
       );
       recent = recentAlbum;
     } else if (recentType === SearchType.Artist) {
       const { artist: recentArtist } = await fetchRecentArtistInfo(
-        user.self.lastFMName
+        user.lastFMName
       );
       recent = recentArtist;
     }

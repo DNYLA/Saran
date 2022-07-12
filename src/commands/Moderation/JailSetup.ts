@@ -1,7 +1,7 @@
 import { Message } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import Command from '../../utils/base/command';
-import { SaranGuild } from '../../utils/database/Guild';
+import DiscordClient from '../../utils/client';
 
 export default class JailSetup extends Command {
   constructor() {
@@ -20,11 +20,12 @@ export default class JailSetup extends Command {
   }
 
   async run(message: Message) {
-    const storedGuild = await new SaranGuild(message.guildId).fetch();
+    const guildService = (message.client as DiscordClient).database.guilds;
+    const config = await guildService.findById(message.guildId);
     const guild = await message.guild.fetch();
     const channels = await guild.channels.fetch();
 
-    if (storedGuild.config.jailChannel) {
+    if (config.jailChannel) {
       return message.reply(
         'Jail channel already setup please contact the developer if you wish to overwrite this!'
       );
@@ -58,7 +59,7 @@ export default class JailSetup extends Command {
       SEND_MESSAGES: false,
     });
 
-    await storedGuild.update({
+    await guildService.updateById(message.guildId, {
       jailChannel: jailChannel.id,
       jailRole: jailRole.id,
       jailLogChannel: jailLog.id,

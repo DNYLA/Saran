@@ -3,7 +3,7 @@ import OwnerOnly from '../../checks/OwnerOnly';
 import StartTyping from '../../hooks/StartTyping';
 import { MentionIdOrArg } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
-import { SaranUser } from '../../utils/database/User';
+import DiscordClient from '../../utils/client';
 
 export default class Donator extends Command {
   constructor() {
@@ -31,8 +31,8 @@ export default class Donator extends Command {
 
   async run(message: Message, args: { type: string; userId: string }) {
     const { type, userId } = args;
+    const usersService = (message.client as DiscordClient).database.users;
 
-    const user = await new SaranUser(userId).fetch();
     // if (!user && type === 'guild') {
     //   try {
     //     const guild = await message.client.guilds
@@ -52,13 +52,12 @@ export default class Donator extends Command {
     //   } catch (err) {}
     // }
 
-    if (!user) return message.reply('User doesnt exist!');
     if (type === 'add') {
-      await user.update({ donator: true });
-      return message.reply(`Successfully given <@${user.info.id}> donator`);
+      await usersService.updateById(userId, { donator: true });
+      return message.reply(`Successfully given <@${userId}> donator`);
     } else if (type === 'remove') {
-      await user.update({ donator: false });
-      return message.reply(`Removed donator from <@${user.info.id}>`);
+      await usersService.updateById(userId, { donator: false });
+      return message.reply(`Removed donator from <@${userId}>`);
     }
   }
 }

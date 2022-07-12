@@ -3,6 +3,7 @@ import UsernameCheck from '../../checks/UsernameCheck';
 import NoUsernameSet from '../../hooks/NoUsernameSet';
 import StartTyping from '../../hooks/StartTyping';
 import Command from '../../utils/base/command';
+import DiscordClient from '../../utils/client';
 import {
   createGuildMember,
   fetchUserIdsWithUsername,
@@ -23,6 +24,8 @@ export default class IndexGuild extends Command {
   }
 
   async run(message: Message) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const db = (message.client as DiscordClient).database;
     const members = await message.guild.members.fetch();
     const userIds = await fetchUserIdsWithUsername();
 
@@ -35,6 +38,7 @@ export default class IndexGuild extends Command {
       const member = clientMembers.at(i);
       if (member.user.bot) return;
       await createGuildMember(member);
+
       console.log(member.displayName);
     }
 

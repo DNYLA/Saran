@@ -1,7 +1,7 @@
 import { Message, MessageEmbed } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import Command from '../../utils/base/command';
-import { getGuildUsersCustom } from '../../utils/database/User';
+import DiscordClient from '../../utils/client';
 
 export default class RankLeaderboard extends Command {
   constructor() {
@@ -15,7 +15,13 @@ export default class RankLeaderboard extends Command {
   }
 
   async run(message: Message) {
-    const users = await getGuildUsersCustom(message.guildId);
+    const client = message.client as DiscordClient;
+    const users = await client.database.guildUsers.repo.findMany({
+      where: { serverId: message.guildId },
+      include: { user: true },
+      take: 10,
+      orderBy: { xp: 'desc' },
+    });
 
     // const user = users.find((u) => u.userId === message.member.id);
     const user = await message.guild.members.fetch(message.author.id);

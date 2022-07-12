@@ -2,7 +2,7 @@ import { Message, MessageEmbed } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import { MentionIdOrArg } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
-import { SaranGuild, SaranGuildUser } from '../../utils/database/Guild';
+import DiscordClient from '../../utils/client';
 
 export default class Jail extends Command {
   constructor() {
@@ -28,26 +28,27 @@ export default class Jail extends Command {
   }
 
   async run(message: Message, args: { mentionedUserId: string }) {
-    const storedGuild = await new SaranGuild(message.guildId).fetch();
-    if (!storedGuild.config.jailRole)
+    const db = (message.client as DiscordClient).database;
+    const config = await db.guilds.findById(message.guildId);
+    if (!config.jailRole)
       return message.reply('Use ,jailsetup to setup the jail');
 
     const guild = await message.guild.fetch();
     const user = await message.guild.members.fetch(args.mentionedUserId);
     if (!user) return message.reply('Cant find guild member');
 
-    const guildMember = await new SaranGuildUser(
+    const guildMember = await db.guildUsers.findById(
       args.mentionedUserId,
       message.guildId
-    ).fetch();
+    );
 
-    if (!user.roles.cache.has(storedGuild.config.jailRole)) {
+    if (!user.roles.cache.has(config.jailRole)) {
       return message.reply('user is not jailed');
     }
 
-    const roleIds = guildMember.self.preJailedRoles;
+    const roleIds = guildMember.preJailedRoles;
 
-    await user.roles.remove(storedGuild.config.jailRole).catch(console.error);
+    await user.roles.remove(config.jailRole).catch(console.error);
 
     for (let i = 0; i < roleIds.length; i++) {
       const id = roleIds[i];
@@ -58,7 +59,7 @@ export default class Jail extends Command {
       } //Role might not exist anymores
     }
 
-    await guildMember.update({
+    await db.guildUsers.updateById(message.guildId, guildMember.userId, {
       displayName: user.displayName,
       preJailedRoles: [],
     });
@@ -83,7 +84,7 @@ export default class Jail extends Command {
 
     try {
       const logChannel = await guild.channels
-        .fetch(storedGuild.config.jailLogChannel)
+        .fetch(config.jailLogChannel)
         .catch(() => console.log('No Jail Log channel'));
 
       if (logChannel && logChannel.isText())

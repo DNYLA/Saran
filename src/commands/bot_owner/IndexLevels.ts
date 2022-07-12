@@ -2,7 +2,6 @@ import { Collection, Message } from 'discord.js';
 import OwnerOnly from '../../checks/OwnerOnly';
 import StartTyping from '../../hooks/StartTyping';
 import Command from '../../utils/base/command';
-import { createGuildMember } from '../../utils/database/User';
 
 export default class IndexLevels extends Command {
   constructor() {
@@ -64,19 +63,19 @@ export default class IndexLevels extends Command {
       })
     );
 
-    await Promise.all(
-      collectionKeys.map(async (key) => {
-        const item = usersCollection[key];
-        try {
-          const member = await guild.members.fetch(key);
-          if (!member || !item) return;
-          console.log(`${key}:${item}`);
-          await createGuildMember(member, { xp: item });
-        } catch (err) {
-          console.log(err);
-        }
-      })
-    );
+    // await Promise.all(
+    //   collectionKeys.map(async (key) => {
+    //     const item = usersCollection[key];
+    //     try {
+    //       const member = await guild.members.fetch(key);
+    //       if (!member || !item) return;
+    //       console.log(`${key}:${item}`);
+    //       await createGuildMember(member, { xp: item });
+    //     } catch (err) {
+    //       console.log(err);
+    //     }
+    //   })
+    // );
 
     message.reply('Indexed Levels');
   }

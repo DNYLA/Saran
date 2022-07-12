@@ -1,7 +1,7 @@
 import { Message } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import Command, { ArgumentTypes } from '../../utils/base/command';
-import { updateUserById } from '../../utils/database/User';
+import DiscordClient from '../../utils/client';
 
 export default class SetUsername extends Command {
   constructor() {
@@ -24,10 +24,13 @@ export default class SetUsername extends Command {
   }
 
   async run(message: Message, args: { username: string }) {
-    console.log(args);
-    if (updateUserById(message.author.id, { lastFMName: args.username })) {
+    const userService = (message.client as DiscordClient).database.users;
+    try {
+      await userService.updateById(message.author.id, {
+        lastFMName: args.username,
+      });
       return message.reply(`Successfully set name to ${args.username}`);
-    } else {
+    } catch (err) {
       message.reply('Error Occured whilst trying to set your username.');
     }
   }

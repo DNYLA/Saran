@@ -14,8 +14,8 @@ import {
   Periods,
 } from '../api/lastfm';
 import { TopTenArguments } from '../commands/FM/TopTen/topartists';
+import DiscordClient from './client';
 import { setCachedPlays } from './database/redisManager';
-import { SaranUser } from './database/User';
 import { convertPeriodToText, mentionUser } from './helpers';
 import {
   Album,
@@ -30,18 +30,20 @@ import {
 
 //Returns either the author id or if a mention exists the mentioned users id
 export async function getUserFromMessage(
-  msg: Message,
+  message: Message,
   ignoreMention?: boolean
 ) {
-  let userId = msg.author.id;
+  let userId = message.author.id;
 
-  const mention = msg.mentions.users.first();
+  const mention = message.mentions.users.first();
 
   if (mention && !ignoreMention) {
     userId = mention.id;
   }
 
-  return await new SaranUser(userId).fetch();
+  return await (message.client as DiscordClient).database.users.findById(
+    userId
+  );
 }
 
 export function getPeriodFromString(arg: string): Periods {
@@ -152,7 +154,9 @@ export async function getTopTenStats(
   args: TopTenArguments,
   type: SearchType
 ) {
-  const user = (await new SaranUser(args.targetUserId).fetch()).info;
+  const user = await (message.client as DiscordClient).database.users.findById(
+    args.targetUserId
+  );
 
   console.log(args.period);
   const period: Periods = getPeriodFromString(args.period);

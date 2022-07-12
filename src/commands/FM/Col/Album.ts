@@ -4,7 +4,6 @@ import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
 import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../../utils/base/command';
-import { SaranUser } from '../../../utils/database/User';
 import {
   getPeriodFromString,
   getTopTenStatsNoEmbed,
@@ -13,6 +12,7 @@ import {
 import { convertPeriodToText } from '../../../utils/helpers';
 import { TopTenArguments } from '../TopTen/topartists';
 import { createCollage } from '@wylie39/image-collage';
+import DiscordClient from '../../../utils/client';
 
 export default class AlbumCollage extends Command {
   constructor() {
@@ -46,7 +46,9 @@ export default class AlbumCollage extends Command {
   async run(message: Message, args: TopTenArguments) {
     console.log('Here');
 
-    const user = (await new SaranUser(args.targetUserId).fetch()).info;
+    const user = await (
+      message.client as DiscordClient
+    ).database.users.findById(args.targetUserId);
     const period = getPeriodFromString(args.period);
     const topTen = await getTopTenStatsNoEmbed(
       message,

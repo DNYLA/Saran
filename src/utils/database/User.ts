@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { GuildUser, Prisma, PrismaClient, User } from '@prisma/client';
+import { GuildUser, PrismaClient, User } from '@prisma/client';
 import { GuildMember } from 'discord.js';
 import { cacheMiddleware } from '../../cache';
 
@@ -41,104 +41,6 @@ export type UserWithGuilds = User & {
 
 export type GuildMemberWithUser = GuildUser & {
   user: User;
-};
-
-// interface IUser extends User {}
-
-// const saran = new SaranTest(prisma.user);
-
-/**
- * @deprecated The method should not be used
- */
-export class SaranUser {
-  private user: User;
-  private guilds: GuildUser;
-
-  constructor(private userId: string, private userInfo?: User) {
-    if (userInfo) this.user = userInfo;
-    //IsUser in Cache (Add This later)
-    //Fetch User From Database
-    //If Not In Database Create =>
-  }
-
-  //Refetches User
-  async fetch(userId?: string): Promise<this> {
-    const id = userId ?? this.userId;
-    try {
-      this.user = await prisma.user.findUniqueOrThrow({
-        where: { id },
-      });
-    } catch (err) {
-      this.user = await prisma.user.create({ data: { id } });
-      console.log(err);
-    }
-
-    return this;
-  }
-
-  public get info(): User {
-    return this.user;
-  }
-
-  public get self(): User {
-    return this.user;
-  }
-
-  async update(data: Prisma.UserUpdateInput): Promise<this> {
-    try {
-      this.user = await prisma.user.update({
-        where: { id: this.userId },
-        data,
-      });
-    } catch (err) {
-      console.log(err);
-    }
-    return this;
-  }
-
-  async fetchMany(data: Prisma.UserWhereInput): Promise<User[]> {
-    try {
-      const users = await prisma.user.findMany({ where: data });
-      return users;
-    } catch (err) {
-      console.log(err);
-      return [];
-    }
-  }
-}
-
-/**
- * @deprecated The method should not be used
- */
-export const getGuildUsers = async (
-  serverId: string
-): Promise<UserWithGuilds[]> => {
-  try {
-    return await prisma.user.findMany({
-      where: { lastFMName: { not: null }, guilds: { some: { serverId } } },
-      include: { guilds: true },
-    });
-  } catch (err) {
-    return null;
-  }
-};
-
-/**
- * @deprecated The method should not be used
- */
-export const getGuildUsersCustom = async (
-  serverId: string
-): Promise<GuildMemberWithUser[]> => {
-  try {
-    return await prisma.guildUser.findMany({
-      where: { serverId },
-      include: { user: true },
-      take: 10,
-      orderBy: { xp: 'desc' },
-    });
-  } catch (err) {
-    return null;
-  }
 };
 
 /**
@@ -213,20 +115,4 @@ export const fetchUserIdsWithUsername = async (): Promise<string[]> => {
   } catch (err) {
     console.log(err);
   }
-};
-/**
- * @deprecated The method should not be used
- */
-export const updateUserById = async (id: string, update: any) => {
-  try {
-    await prisma.user.upsert({
-      where: { id },
-      update,
-      create: { id, ...update },
-    });
-  } catch (err) {
-    return false;
-  }
-
-  return true;
 };

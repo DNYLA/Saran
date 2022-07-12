@@ -2,7 +2,7 @@ import { ColorResolvable, Message, Role } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import { StringToColour } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
-import { SaranGuildUser } from '../../utils/database/Guild';
+import DiscordClient from '../../utils/client';
 
 export default class BoosterRoleColour extends Command {
   constructor() {
@@ -28,7 +28,8 @@ export default class BoosterRoleColour extends Command {
   }
 
   async run(message: Message, args: { colour: string }) {
-    console.log('running');
+    const guildUsersService = (message.client as DiscordClient).database
+      .guildUsers;
     const user = await message.client.users.fetch(message.author.id);
     if (!user) return message.reply('User doesnt exist!');
 
@@ -43,9 +44,8 @@ export default class BoosterRoleColour extends Command {
     }
     if (!guildUser.premiumSince) return message.reply('You gotta be booster!');
 
-    const storedUser = await new SaranGuildUser(user.id, guild.id).fetch();
-
-    const roleId = storedUser.self.customBoostRoleId;
+    const storedUser = await guildUsersService.findById(guild.id, user.id);
+    const roleId = storedUser.customBoostRoleId;
     let boosterRole: Role;
 
     if (!roleId) {
@@ -78,8 +78,10 @@ export default class BoosterRoleColour extends Command {
       // await boosterRole.setIcon(args.iconLink);
 
       await boosterRole.setColor(args.colour as ColorResolvable);
-      if (storedUser.self.customBoostRoleId !== boosterRole.id)
-        await storedUser.update({ customBoostRoleId: boosterRole.id });
+      if (storedUser.customBoostRoleId !== boosterRole.id)
+        await guildUsersService.updateById(guild.id, user.id, {
+          customBoostRoleId: boosterRole.id,
+        });
       await guildUser.roles.add(boosterRole);
 
       // guild.roles.premiumSubscriberRole.setIcon(args.iconLink);

@@ -2,7 +2,7 @@ import { Message, MessageEmbed } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import { MentionIdOrArg } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
-import { SaranGuild, SaranGuildUser } from '../../utils/database/Guild';
+import DiscordClient from '../../utils/client';
 
 export default class Jail extends Command {
   constructor() {
@@ -36,18 +36,14 @@ export default class Jail extends Command {
     message: Message,
     args: { mentionedUserId: string; time: string; reason: string }
   ) {
-    const storedGuild = await new SaranGuild(message.guildId).fetch();
-    if (!storedGuild.config.jailChannel)
+    const db = (message.client as DiscordClient).database;
+    const config = await db.guilds.findById(message.guildId);
+    if (!config.jailChannel)
       return message.reply('Use ,jailsetup to setup the jail');
 
     const guild = await message.guild.fetch();
     const user = await message.guild.members.fetch(args.mentionedUserId);
     if (!user) return message.reply('Cant find guild member');
-
-    const guildMember = await new SaranGuildUser(
-      args.mentionedUserId,
-      message.guildId
-    ).fetch();
 
     const roleIds = [];
 
@@ -69,8 +65,7 @@ export default class Jail extends Command {
     //   await user.roles.remove(role.id);
     // }
 
-    await guildMember.update({
-      displayName: user.displayName,
+    await db.guildUsers.updateById(message.guildId, args.mentionedUserId, {
       preJailedRoles: roleIds,
     });
 
@@ -103,7 +98,7 @@ export default class Jail extends Command {
 
     try {
       const logChannel = await guild.channels
-        .fetch(storedGuild.config.jailLogChannel)
+        .fetch(config.jailLogChannel)
         .catch(() => console.log('No Jail Log channel'));
 
       if (logChannel && logChannel.isText())
@@ -114,7 +109,7 @@ export default class Jail extends Command {
     }
 
     try {
-      await user.roles.add(storedGuild.config.jailRole);
+      await user.roles.add(config.jailRole);
     } catch (err) {
       return message.reply('Jail Role Doesnt exist');
     }

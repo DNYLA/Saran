@@ -1,8 +1,6 @@
 import { Message } from 'discord.js';
 import Event from '../../utils/base/event';
 import DiscordClient from '../../utils/client';
-import { SaranGuild } from '../../utils/database/Guild';
-import { SaranUser } from '../../utils/database/User';
 import { getArgsFromMsg } from '../../utils/helpers';
 
 export default class MessageEvent extends Event {
@@ -12,18 +10,20 @@ export default class MessageEvent extends Event {
 
   async run(client: DiscordClient, message: Message) {
     if (message.author.bot) return;
-    const user = await new SaranUser(message.author.id).fetch();
-    const guild = await new SaranGuild(message.guildId).fetch();
-    const guildUser = await guild.fetchUser(message.member.id);
-    const config = guild.config;
+    const db = client.database;
+    const user = await db.users.findById(message.author.id);
+    const config = await db.guilds.findById(message.guildId);
+
     let messageCommand = message.content.toLowerCase();
-    guildUser.update({ xp: { increment: 5 } });
+    db.guildUsers.updateById(message.guildId, user.id, {
+      xp: { increment: 5 },
+    }); //No point of awaiting this data not needed
 
     //Replace custom lastfm tag with ,lf
-    if (messageCommand.startsWith(user.self.lastFMTag.toLowerCase())) {
-      console.log('Hit');
+    //Update to allow it to replace lf instead
+    if (messageCommand.startsWith(user.lastFMTag.toLowerCase())) {
       messageCommand = messageCommand.replace(
-        user.self.lastFMTag.toLowerCase(),
+        user.lastFMTag.toLowerCase(),
         `${config.prefix}np`
       );
     }

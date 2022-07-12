@@ -1,7 +1,7 @@
 import { Message, MessageEmbed } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import Command, { ArgumentTypes } from '../../utils/base/command';
-import { SaranUser } from '../../utils/database/User';
+import DiscordClient from '../../utils/client';
 
 export default class GetAvatar extends Command {
   constructor() {
@@ -16,9 +16,12 @@ export default class GetAvatar extends Command {
   }
 
   async run(message: Message, args: { reason: string }) {
-    const user = await new SaranUser(message.author.id).fetch();
     const currentTime = new Date();
-    await user.update({ afkTime: currentTime, afkMessage: args.reason ?? '' });
+
+    await (message.client as DiscordClient).database.users.updateById(
+      message.author.id,
+      { afkTime: currentTime, afkMessage: args.reason ?? '' }
+    );
 
     const afkembed = new MessageEmbed()
       .setColor('#49b166')

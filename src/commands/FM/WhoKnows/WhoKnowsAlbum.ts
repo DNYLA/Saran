@@ -54,7 +54,7 @@ export default class WhoKnowsAlbum extends Command {
     let album = recent as Album;
 
     if (!album) {
-      album = await fetchSearchAlbumInfo(user.self.lastFMName, args.albumName);
+      album = await fetchSearchAlbumInfo(user.lastFMName, args.albumName);
     }
     if (!album) return message.reply('Unable to find album with name!');
 
@@ -82,8 +82,8 @@ export default class WhoKnowsAlbum extends Command {
       const embed = new MessageEmbed()
         .setColor('#2F3136')
         .setAuthor({
-          name: `Requested by ${user.self.lastFMName}`,
-          url: `https://www.last.fm/user/${user.self.lastFMName}`,
+          name: `Requested by ${user.lastFMName}`,
+          url: `https://www.last.fm/user/${user.lastFMName}`,
           iconURL:
             'https://lastfm.freetls.fastly.net/i/u/avatar170s/a7ff67ef791aaba0c0c97e9c8a97bf04.png',
         })

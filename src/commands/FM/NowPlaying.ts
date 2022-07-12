@@ -5,8 +5,8 @@ import NoUsernameSet from '../../hooks/NoUsernameSet';
 import StartTyping from '../../hooks/StartTyping';
 import { MentionUserId, SelfUserId } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
+import DiscordClient from '../../utils/client';
 import { setCachedPlays } from '../../utils/database/redisManager';
-import { SaranUser } from '../../utils/database/User';
 import { fetchRecentTrackInfo, SearchType } from '../../utils/fmHelpers';
 import { PartialUser, RecentTrack, Track } from '../../utils/types';
 
@@ -34,14 +34,16 @@ export default class NowPlaying extends Command {
 
   async run(message: Message, args: { targetUserId: string }) {
     // const user = await getUser(args.targetUserId);
-    const user = await new SaranUser(args.targetUserId).fetch();
-    const username = user.info.lastFMName;
+    const user = await (
+      message.client as DiscordClient
+    ).database.users.findById(args.targetUserId);
+    const username = user.lastFMName;
     let donatorEmbed = false;
 
     // if (!user.lastFMName) return
 
     // if !args.includes('alt') &&
-    if (user.info.donator) {
+    if (user.donator) {
       donatorEmbed = true;
     }
 
@@ -54,7 +56,7 @@ export default class NowPlaying extends Command {
         track: tr,
         recentTrack: rt,
         user: UserInfo,
-      } = await fetchRecentTrackInfo(user.info.lastFMName);
+      } = await fetchRecentTrackInfo(user.lastFMName);
       track = tr;
       recentTrack = rt;
       userInfo = UserInfo;
@@ -77,7 +79,7 @@ export default class NowPlaying extends Command {
     const artistUrl = track?.artist ? track.artist.url : baseUrl;
     const albumName = track?.album?.title ?? recentTrack.album['#text'];
     await setCachedPlays(
-      user.info.lastFMName,
+      user.lastFMName,
       `${trackName}-${artistName}`,
       track?.userplaycount ?? 0,
       SearchType.Track
@@ -105,8 +107,8 @@ export default class NowPlaying extends Command {
           // .setColor('#4a5656')
           .setColor('#0a090b')
           .setAuthor({
-            name: user.info.lastFMName,
-            url: `https://www.last.fm/user/${user.info.lastFMName}`,
+            name: user.lastFMName,
+            url: `https://www.last.fm/user/${user.lastFMName}`,
             iconURL:
               'https://lastfm.freetls.fastly.net/i/u/avatar170s/a7ff67ef791aaba0c0c97e9c8a97bf04.png',
           })
@@ -137,8 +139,8 @@ export default class NowPlaying extends Command {
           // .setTitle(recentTrack.name)
           // .setURL(recentTrack.url)
           .setAuthor({
-            name: user.info.lastFMName,
-            url: `https://www.last.fm/user/${user.info.lastFMName}`,
+            name: user.lastFMName,
+            url: `https://www.last.fm/user/${user.lastFMName}`,
             iconURL:
               'https://lastfm.freetls.fastly.net/i/u/avatar170s/a7ff67ef791aaba0c0c97e9c8a97bf04.png',
           })

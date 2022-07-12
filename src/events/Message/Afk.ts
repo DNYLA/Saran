@@ -2,7 +2,6 @@ import { Message, MessageEmbed } from 'discord.js';
 import moment from 'moment';
 import Event from '../../utils/base/event';
 import DiscordClient from '../../utils/client';
-import { SaranUser } from '../../utils/database/User';
 
 export default class MessageEvent extends Event {
   constructor() {
@@ -12,39 +11,40 @@ export default class MessageEvent extends Event {
   async run(client: DiscordClient, message: Message) {
     if (message.author.bot) return;
 
-    const user = await new SaranUser(message.author.id).fetch();
-
+    const user = await client.database.users.findById(message.author.id);
     await Promise.all(
       message.mentions.members.map(async (member) => {
-        const mentionedUser = await new SaranUser(member.id).fetch();
+        const mentionedUser = await client.database.users.findById(member.id);
+        if (!mentionedUser.afkTime) return;
 
-        if (!mentionedUser.info.afkTime) return;
-
-        const timeAfk = moment(mentionedUser.info.afkTime).fromNow();
-        const reason = mentionedUser.info.afkMessage ?? '😴';
+        const timeAfk = moment(mentionedUser.afkTime).fromNow();
+        const reason = mentionedUser.afkMessage ?? '😴';
 
         const afkembed = new MessageEmbed()
           .setColor('#49b166')
           .setDescription(
-            `😴 <@${mentionedUser.info.id}> has been AFK since ${timeAfk}: ${reason}`
+            `😴 <@${mentionedUser.id}> has been AFK since ${timeAfk}: ${reason}`
           );
 
         await message.channel.send({ embeds: [afkembed] });
       })
     );
 
-    if (user.info.afkTime) {
-      const timeAfk = moment(user.info.afkTime).fromNow();
+    if (user.afkTime) {
+      const timeAfk = moment(user.afkTime).fromNow();
 
       const afkembed = new MessageEmbed()
         .setColor('#49b166')
         .setDescription(
           `Welcome <@${message.author.id}> you were away for ${timeAfk}: ${
-            user.info.afkMessage ?? ''
+            user.afkMessage ?? ''
           }`
         );
       await message.channel.send({ embeds: [afkembed] });
-      await user.update({ afkMessage: null, afkTime: null });
+      await client.database.users.updateById(user.id, {
+        afkMessage: null,
+        afkTime: null,
+      });
     }
   }
 }

@@ -80,13 +80,6 @@ export async function GetGuildUserFromMessage(
   return user;
 }
 
-export async function getUserFromMention(mention: string) {
-  const matches = mention.matchAll(MessageMentions.USERS_PATTERN).next().value;
-
-  if (!matches) return null;
-  return await getUser(matches[1]);
-}
-
 export async function getDiscordUserFromMention(
   client: DiscordClient,
   mention: string,

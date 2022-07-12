@@ -1,7 +1,6 @@
 import { GuildMember } from 'discord.js';
 import Event from '../utils/base/event';
 import DiscordClient from '../utils/client';
-import { SaranGuildUser } from '../utils/database/Guild';
 
 export default class InteractionCreated extends Event {
   constructor() {
@@ -13,11 +12,14 @@ export default class InteractionCreated extends Event {
     // membe
 
     try {
-      const user = await new SaranGuildUser(member.id, member.guild.id).fetch();
-      await user.update({ inactive: true });
+      await client.database.guildUsers.updateById(member.guild.id, member.id, {
+        inactive: true,
+      });
     } catch (err) {
       console.log(err);
       //Log this somewhere
+
+      //User Probably Doesnt exist in database
     }
   }
 }

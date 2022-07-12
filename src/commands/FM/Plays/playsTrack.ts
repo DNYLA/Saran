@@ -4,8 +4,8 @@ import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
 import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../../utils/base/command';
+import DiscordClient from '../../../utils/client';
 import { setCachedPlays } from '../../../utils/database/redisManager';
-import { SaranUser } from '../../../utils/database/User';
 import {
   fetchRecentTrackInfo,
   fetchSearchTrackInfo,
@@ -54,7 +54,9 @@ export default class PlaysTrack extends Command {
   }
 
   async run(message: Message, args: SearchTrackArguments) {
-    const user = (await new SaranUser(args.targetUserId).fetch()).info;
+    const user = await (
+      message.client as DiscordClient
+    ).database.users.findById(args.targetUserId);
     const { trackName, artistName } = args;
 
     let track: Track;

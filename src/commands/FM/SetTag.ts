@@ -3,7 +3,7 @@ import UsernameCheck from '../../checks/UsernameCheck';
 import NoUsernameSet from '../../hooks/NoUsernameSet';
 import StartTyping from '../../hooks/StartTyping';
 import Command, { ArgumentTypes } from '../../utils/base/command';
-import { updateUserById } from '../../utils/database/User';
+import DiscordClient from '../../utils/client';
 
 export default class SetTag extends Command {
   constructor() {
@@ -19,17 +19,21 @@ export default class SetTag extends Command {
       invalidUsage: 'Usage: ,lf tag <custom_tag>',
       arguments: [
         {
-          name: 'newTag',
+          name: 'tag',
           type: ArgumentTypes.SINGLE,
         },
       ],
     });
   }
 
-  async run(message: Message, args: { newTag: string }) {
-    if (updateUserById(message.author.id, { lastFMTag: args.newTag })) {
-      message.reply(`Successfully set custom tag to ${args.newTag}`);
-    } else {
+  async run(message: Message, args: { tag: string }) {
+    const userService = (message.client as DiscordClient).database.users;
+    try {
+      await userService.updateById(message.author.id, {
+        lastFMTag: args.tag,
+      });
+      message.reply(`Successfully set custom tag to ${args.tag}`);
+    } catch (err) {
       message.reply('Error Occured whilst trying to set your custom tag.');
     }
   }
