@@ -30,6 +30,8 @@ export default class MessageEvent extends Event {
       })
     );
 
+    if (!user) return;
+
     if (user.afkTime) {
       const timeAfk = moment(user.afkTime).fromNow();
 

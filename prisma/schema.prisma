@@ -9,13 +9,16 @@ datasource db {
 }
 
 model User {
-  id         String      @id
+  id         String        @id
   lastFMName String?
   lastFMTag  String?
-  donator    Boolean     @default(false)
+  donator    Boolean       @default(false)
   afkMessage String?
   afkTime    DateTime?
   guilds     GuildUser[]
+  Artists    UserArtists[]
+  Albums     UserAlbums[]
+  Tracks     UserTracks[]
 }
 
 model GuildUser {
@@ -28,8 +31,8 @@ model GuildUser {
   customBoostRoleId  String?
   isBooster          Boolean  @default(false)
   preJailedRoles     String[]
+  inactive           Boolean  @default(false) //Inactive is whenever a user leaves or gets kicked from a guild.
   user               User     @relation(fields: [userId], references: [id])
-  inactive Boolean @default(false) //Inactive is whenever a user leaves or gets kicked from a guild.
   @@id([userId, serverId])
 }
 
@@ -52,7 +55,32 @@ model ReactionBoardMessages {
   messageId      String
   embedMessageId String
   guild          GuildConfig @relation(fields: [serverId], references: [id])
+
   @@id([messageId, serverId])
 }
 
+model UserTracks {
+  trackId    Int    @id @default(autoincrement())
+  userId     String
+  name       String
+  artistName String
+  plays      Int
+  user       User   @relation(fields: [userId], references: [id])
+}
 
+model UserAlbums {
+  albumId    Int    @id @default(autoincrement())
+  userId     String
+  name       String
+  artistName String
+  plays      Int
+  user       User   @relation(fields: [userId], references: [id])
+}
+
+model UserArtists {
+  artistId Int    @id @default(autoincrement())
+  userId   String
+  name     String
+  plays    Int
+  user     User   @relation(fields: [userId], references: [id])
+}
