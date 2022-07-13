@@ -67,6 +67,8 @@ export default class WhoKnows extends Command {
       },
     });
 
+    console.log(guildPlays);
+
     const { sum, description } = await FormatWhoKnows(message, guildPlays);
 
     try {

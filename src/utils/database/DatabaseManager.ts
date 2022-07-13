@@ -36,7 +36,7 @@ export class UserRepository {
   constructor(readonly repo: PrismaClient['user']) {}
 
   async findById(id: string): Promise<User> {
-    const user = this.repo.findUnique({ where: { id } });
+    const user = await this.repo.findUnique({ where: { id } });
     if (!user) return await this.repo.create({ data: { id } });
 
     return user;
@@ -58,7 +58,7 @@ export class GuildRepository {
   constructor(readonly repo: PrismaClient['guildConfig']) {}
 
   async findById(id: string): Promise<GuildConfig> {
-    const guild = this.repo.findUnique({ where: { id } });
+    const guild = await this.repo.findUnique({ where: { id } });
     if (!guild) return await this.repo.create({ data: { id } });
     return guild;
   }
