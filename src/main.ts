@@ -11,7 +11,7 @@ declare global {
 }
 
 const intents = new Intents(32767);
-const client = new DiscordClient({ intents });
+export const client = new DiscordClient({ intents });
 
 (async () => {
   await redis.connect();

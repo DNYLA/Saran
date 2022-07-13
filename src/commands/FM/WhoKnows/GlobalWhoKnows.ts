@@ -5,8 +5,14 @@ import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
 import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../../utils/base/command';
-import { fetchSearchArtistInfo, SearchType } from '../../../utils/fmHelpers';
+import DiscordClient from '../../../utils/client';
 import {
+  fetchRecentArtistInfo,
+  fetchSearchArtistInfo,
+  SearchType,
+} from '../../../utils/fmHelpers';
+import {
+  FormatWhoKnows,
   FormatWhoKnowsArray,
   GetWhoKnowsInfo,
   GetWhoKnowsListeners,
@@ -44,39 +50,23 @@ export default class GlobalWhoKnows extends Command {
     message: Message,
     args: { targetUserId: string; artistName: string }
   ) {
-    const { user, users, recent, indexed } = await GetWhoKnowsInfo(
-      message,
-      args.targetUserId,
-      !args.artistName,
-      SearchType.Artist
-    );
+    const client = message.client as DiscordClient;
+    const user = await client.db.users.findById(args.targetUserId);
+    const { artist } = await fetchRecentArtistInfo(user.lastFMName);
 
-    if (!indexed) return;
-    let artist = recent as Artist;
+    const guildPlays = await client.db.artists.repo.findMany({
+      where: {
+        name: artist.name,
+      },
+      orderBy: {
+        plays: 'asc',
+      },
+      include: {
+        user: true,
+      },
+    });
 
-    if (!artist) {
-      artist = await fetchSearchArtistInfo(user.lastFMName, args.artistName);
-    }
-    if (!artist) return message.reply('Unable to find artist with name!');
-
-    const fetchArtist = async (username: string) => {
-      const data = await fetchArtistInfo(username, artist.name);
-      //Return 0 as returning null will be handled the same way
-      if (!data) return 0;
-      else return Number(data.stats.userplaycount);
-    };
-
-    const wkInfo = await GetWhoKnowsListeners(
-      users,
-      artist.name,
-      SearchType.Artist,
-      fetchArtist
-    );
-
-    const { description, sum, totalListeners } = await FormatWhoKnowsArray(
-      message,
-      wkInfo
-    );
+    const { sum, description } = await FormatWhoKnows(message, guildPlays);
 
     try {
       const embed = new MessageEmbed()
@@ -90,7 +80,7 @@ export default class GlobalWhoKnows extends Command {
         .setTitle(`Top Listeners for ${artist.name}`)
         .setDescription(description)
         .setFooter({
-          text: `Total Listeners: ${totalListeners} ∙ Total Plays: ${sum}`,
+          text: `Total Listeners: ${guildPlays.length} ∙ Total Plays: ${sum}`,
         });
 
       return message.channel.send({ embeds: [embed] });

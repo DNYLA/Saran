@@ -1,7 +1,11 @@
+import { Prisma, prisma, UserTracks } from '@prisma/client';
 import axios, { AxiosRequestConfig } from 'axios';
+import TopArtists from '../../commands/FM/TopTen/topartists';
+import { client } from '../../main';
 import {
   Album,
   Artist,
+  GlobalAttributes,
   PartialUser,
   RecentTrack,
   SearchedItem,
@@ -29,6 +33,13 @@ const CONFIG: AxiosRequestConfig = {
 };
 const AXIOS = axios.create(CONFIG); //Axios Uses .defaults.baseURL to set/call the API this way we can change the API URL outside the library.
 
+AXIOS.interceptors.request.use((request) => {
+  // console.log('Starting Request', JSON.stringify(request, null, 2));
+  console.log('Starting Request', request.url ?? 'Not Available');
+
+  return request;
+});
+
 export async function fetchRecentTracks(
   username: string,
   limit: number
@@ -47,6 +58,184 @@ export async function fetchRecentTracks(
     console.log(err);
     return { tracks: [], user: null };
   }
+}
+
+export async function fetchUserTracks(
+  username: string,
+  userId: string
+): Promise<TopTrack[]> {
+  const tracks: TopTrack[] = [];
+  const MAX_PAGES = 5;
+  try {
+    let currentPage = 1;
+    let totalPages = 5;
+
+    for (let i = 0; i < MAX_PAGES; i++) {
+      if (currentPage > totalPages) break;
+
+      const { data } = await AXIOS.get(
+        new EscapedURI('user.getTopTracks')
+          .addUsername(username)
+          .addLimit(1000)
+          .addPage(currentPage).URI
+      );
+
+      const page: TopTrack[] = data.toptracks.track;
+      const attributes: GlobalAttributes = data.toptracks['@attr'];
+
+      currentPage = Number(attributes.page) + 1;
+      totalPages = Number(attributes.totalPages);
+      tracks.push(...page);
+    }
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+
+  const strippedTracks: Prisma.UserTracksCreateManyInput[] = [];
+
+  tracks.forEach((track) => {
+    strippedTracks.push({
+      userId,
+      name: track.name,
+      artistName: track.artist.name,
+      plays: Number(track.playcount),
+    });
+  });
+
+  try {
+    await client.db.tracks.repo.createMany({ data: strippedTracks });
+  } catch (err) {
+    console.log(err);
+  }
+
+  // return {
+  //   tracks: data.recenttracks.track,
+  //   user: data.recenttracks['@attr'],
+  // };
+
+  return tracks;
+}
+
+export async function fetchUserArtists(
+  username: string,
+  userId: string
+): Promise<TopArtist[]> {
+  const artists: TopArtist[] = [];
+  const MAX_PAGES = 5;
+  try {
+    let currentPage = 1;
+    let totalPages = 5;
+
+    for (let i = 0; i < MAX_PAGES; i++) {
+      if (currentPage > totalPages) break;
+
+      const { data } = await AXIOS.get(
+        new EscapedURI('user.getTopArtists')
+          .addUsername(username)
+          .addLimit(1000)
+          .addPage(currentPage).URI
+      );
+
+      const page: TopArtist[] = data.topartists.artist;
+      const attributes: GlobalAttributes = data.topartists['@attr'];
+
+      currentPage = Number(attributes.page) + 1;
+      totalPages = Number(attributes.totalPages);
+      artists.push(...page);
+    }
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+
+  const strippedArtists: Prisma.UserArtistsCreateManyInput[] = [];
+
+  artists.forEach((artist) => {
+    strippedArtists.push({
+      userId,
+      name: artist.name,
+      plays: Number(artist.playcount),
+    });
+  });
+
+  console.log(strippedArtists.length);
+
+  try {
+    await client.db.artists.repo.createMany({ data: strippedArtists });
+  } catch (err) {
+    console.log(err);
+  }
+
+  console.log(artists.length);
+
+  // return {
+  //   tracks: data.recenttracks.track,
+  //   user: data.recenttracks['@attr'],
+  // };
+
+  return artists;
+}
+
+export async function fetchUserAlbums(
+  username: string,
+  userId: string
+): Promise<TopAlbum[]> {
+  const albums: TopAlbum[] = [];
+  const MAX_PAGES = 5;
+  try {
+    let currentPage = 1;
+    let totalPages = 5;
+
+    for (let i = 0; i < MAX_PAGES; i++) {
+      if (currentPage > totalPages) break;
+
+      const { data } = await AXIOS.get(
+        new EscapedURI('user.getTopAlbums')
+          .addUsername(username)
+          .addLimit(1000)
+          .addPage(currentPage).URI
+      );
+
+      const page: TopAlbum[] = data.topalbums.album;
+      const attributes: GlobalAttributes = data.topalbums['@attr'];
+
+      currentPage = Number(attributes.page) + 1;
+      totalPages = Number(attributes.totalPages);
+      albums.push(...page);
+    }
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+
+  const strippedAlbums: Prisma.UserAlbumsCreateManyInput[] = [];
+
+  albums.forEach((album) => {
+    strippedAlbums.push({
+      userId,
+      name: album.name,
+      artistName: album.artist.name,
+      plays: Number(album.playcount),
+    });
+  });
+
+  console.log(strippedAlbums.length);
+
+  try {
+    await client.db.albums.repo.createMany({ data: strippedAlbums });
+  } catch (err) {
+    console.log(err);
+  }
+
+  console.log(strippedAlbums.length);
+
+  // return {
+  //   tracks: data.recenttracks.track,
+  //   user: data.recenttracks['@attr'],
+  // };
+
+  return albums;
 }
 
 export async function fetchTrackInfo(
@@ -213,13 +402,6 @@ export async function fetchTopTenAlbums(
   }
 }
 
-AXIOS.interceptors.request.use((request) => {
-  // console.log('Starting Request', JSON.stringify(request, null, 2));
-  console.log('Starting Request', request.url ?? 'Not Available');
-
-  return request;
-});
-
 class EscapedURI {
   private uri = '';
   constructor(method: string) {
@@ -252,6 +434,11 @@ class EscapedURI {
 
   addLimit(limit: number): EscapedURI {
     this.uri += this.addField('limit', limit.toString());
+    return this;
+  }
+
+  addPage(page: number): EscapedURI {
+    this.uri += this.addField('page', page.toString());
     return this;
   }
 

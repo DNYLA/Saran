@@ -5,8 +5,14 @@ import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
 import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../../utils/base/command';
-import { fetchSearchAlbumInfo, SearchType } from '../../../utils/fmHelpers';
+import DiscordClient from '../../../utils/client';
 import {
+  fetchRecentAlbumInfo,
+  fetchSearchAlbumInfo,
+  SearchType,
+} from '../../../utils/fmHelpers';
+import {
+  FormatWhoKnows,
   FormatWhoKnowsArray,
   GetWhoKnowsInfo,
   GetWhoKnowsListeners,
@@ -43,40 +49,28 @@ export default class WhoKnowsAlbum extends Command {
     message: Message,
     args: { targetUserId: string; albumName: string }
   ) {
-    const { user, users, recent, indexed } = await GetWhoKnowsInfo(
-      message,
-      args.targetUserId,
-      !args.albumName,
-      SearchType.Album
-    );
-    if (!indexed) return;
+    const client = message.client as DiscordClient;
+    const user = await client.db.users.findById(args.targetUserId);
+    const { album } = await fetchRecentAlbumInfo(user.lastFMName);
+    const guildName = message.guild.name;
 
-    let album = recent as Album;
-
-    if (!album) {
-      album = await fetchSearchAlbumInfo(user.lastFMName, args.albumName);
-    }
     if (!album) return message.reply('Unable to find album with name!');
 
-    const fetchTrack = async (username: string) => {
-      const data = await fetchAlbumInfo(username, album.name, album.artist);
+    const guildPlays = await client.db.albums.repo.findMany({
+      where: {
+        name: album.name,
+        artistName: album.artist,
+        user: { guilds: { some: { serverId: message.guildId } } },
+      },
+      orderBy: {
+        plays: 'asc',
+      },
+      include: {
+        user: true,
+      },
+    });
 
-      //Return 0 as returning null will be handled the same way
-      if (!data) return 0;
-      else return Number(data.userplaycount);
-    };
-
-    const wkInfo = await GetWhoKnowsListeners(
-      users,
-      `${album.name}-${album.artist}`,
-      SearchType.Album,
-      fetchTrack
-    );
-
-    const { description, sum, totalListeners } = await FormatWhoKnowsArray(
-      message,
-      wkInfo
-    );
+    const { sum, description } = await FormatWhoKnows(message, guildPlays);
 
     try {
       const embed = new MessageEmbed()
@@ -87,10 +81,12 @@ export default class WhoKnowsAlbum extends Command {
           iconURL:
             'https://lastfm.freetls.fastly.net/i/u/avatar170s/a7ff67ef791aaba0c0c97e9c8a97bf04.png',
         })
-        .setTitle(`Top Listeners for ${album.name} by ${album.artist}`)
+        .setTitle(
+          `Top Listeners for ${album.name} by ${album.artist} in ${guildName}`
+        )
         .setDescription(description)
         .setFooter({
-          text: `Total Listeners: ${totalListeners} ∙ Total Plays: ${sum}`,
+          text: `Total Listeners: ${guildPlays.length} ∙ Total Plays: ${sum}`,
         });
 
       return message.channel.send({ embeds: [embed] });

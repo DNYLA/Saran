@@ -13,7 +13,6 @@ export default class MessageEvent extends Event {
     const db = client.db;
     const user = await db.users.findById(message.author.id);
     const config = await db.guilds.findById(message.guildId);
-
     let messageCommand = message.content.toLowerCase();
     db.guildUsers.updateById(message.guildId, user.id, {
       xp: { increment: 5 },

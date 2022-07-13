@@ -5,11 +5,17 @@ import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
 import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../../utils/base/command';
-import { fetchSearchArtistInfo, SearchType } from '../../../utils/fmHelpers';
+import DiscordClient from '../../../utils/client';
+import {
+  fetchRecentArtistInfo,
+  fetchSearchArtistInfo,
+  SearchType,
+} from '../../../utils/fmHelpers';
 import {
   GetWhoKnowsInfo,
   GetWhoKnowsListeners,
   FormatWhoKnowsArray,
+  FormatWhoKnows,
 } from '../../../utils/lastfm/wkHelpers';
 import { Artist } from '../../../utils/types';
 
@@ -43,38 +49,25 @@ export default class WhoKnows extends Command {
     message: Message,
     args: { targetUserId: string; artistName: string }
   ) {
-    const { user, users, recent, indexed } = await GetWhoKnowsInfo(
-      message,
-      args.targetUserId,
-      !args.artistName,
-      SearchType.Artist
-    );
-    if (!indexed) return;
-    let artist = recent as Artist;
+    const client = message.client as DiscordClient;
+    const user = await client.db.users.findById(args.targetUserId);
+    const { artist } = await fetchRecentArtistInfo(user.lastFMName);
+    const guildName = message.guild.name;
 
-    if (!artist) {
-      artist = await fetchSearchArtistInfo(user.lastFMName, args.artistName);
-    }
-    if (!artist) return message.reply('Unable to find artist with name!');
+    const guildPlays = await client.db.artists.repo.findMany({
+      where: {
+        name: artist.name,
+        user: { guilds: { some: { serverId: message.guildId } } },
+      },
+      orderBy: {
+        plays: 'asc',
+      },
+      include: {
+        user: true,
+      },
+    });
 
-    const fetchArtist = async (username: string) => {
-      const data = await fetchArtistInfo(username, artist.name);
-      //Return 0 as returning null will be handled the same way
-      if (!data) return 0;
-      else return Number(data.stats.userplaycount);
-    };
-
-    const wkInfo = await GetWhoKnowsListeners(
-      users,
-      artist.name,
-      SearchType.Artist,
-      fetchArtist
-    );
-
-    const { description, sum, totalListeners } = await FormatWhoKnowsArray(
-      message,
-      wkInfo
-    );
+    const { sum, description } = await FormatWhoKnows(message, guildPlays);
 
     try {
       const embed = new MessageEmbed()
@@ -85,10 +78,10 @@ export default class WhoKnows extends Command {
           iconURL:
             'https://lastfm.freetls.fastly.net/i/u/avatar170s/a7ff67ef791aaba0c0c97e9c8a97bf04.png',
         })
-        .setTitle(`Top Listeners for ${artist.name}`)
+        .setTitle(`Top Listeners for ${artist.name} in ${guildName}`)
         .setDescription(description)
         .setFooter({
-          text: `Total Listeners: ${totalListeners} ∙ Total Plays: ${sum}`,
+          text: `Total Listeners: ${guildPlays.length} ∙ Total Plays: ${sum}`,
         });
 
       return message.channel.send({ embeds: [embed] });

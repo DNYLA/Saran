@@ -87,6 +87,14 @@ export type RecentTrack = {
   '@atrr': { nowplaying: boolean };
 };
 
+export type GlobalAttributes = {
+  user: string;
+  totalPages: number;
+  page: number;
+  total: number;
+  perPage: number;
+};
+
 export type RecentInfo = {
   '#text': string;
   mbid?: string;

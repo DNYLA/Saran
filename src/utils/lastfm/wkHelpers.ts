@@ -1,3 +1,4 @@
+import { User } from '@prisma/client';
 import { Message } from 'discord.js';
 import DiscordClient from '../client';
 import { getCachedPlays, setCachedPlays } from '../database/redisManager';
@@ -30,6 +31,7 @@ export async function GetWhoKnowsInfo(
   const guildService = client.db.guildUsers;
   const user = await client.db.users.findById(userId);
   let users: WhoKnowsUser[];
+  console.log('here');
   if (!globalSearch) {
     users = await guildService.findAllWithLastFm(message.guildId);
   } else {
@@ -39,6 +41,7 @@ export async function GetWhoKnowsInfo(
   }
 
   let recent: Track | Album | Artist;
+  console.log('here');
 
   if (!users || users.length === 0) {
     message.reply('Server hasnt been indexed use ,lf index');
@@ -112,6 +115,38 @@ export async function GetWhoKnowsListeners(
   }
 
   return wkInfo;
+}
+
+export type WkInfo = {
+  userId: string;
+  plays: number;
+  user: User;
+};
+
+export async function FormatWhoKnows(message: Message, info: WkInfo[]) {
+  let sum = 0;
+  let description = '';
+
+  //Sometimes slicing top 10 doesnt work so to double check we only loop over 10
+  for (let i = 0; i < 10; i++) {
+    if (i > info.length - 1) break;
+    const { userId, plays, user } = info[i];
+    try {
+      const discordUser = await message.client.users.fetch(userId);
+      if (!discordUser) continue; //Unable to fetch the user
+      const formatted = `${discordUser.username}#${discordUser.discriminator}`;
+      sum += Number(plays);
+      description += `**${i + 1}. [${
+        i === 0 ? '👑' : ''
+      } ${formatted}](https://www.last.fm/user/${
+        user.lastFMName
+      })** has **${plays}** plays\n`;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  return { sum, description };
 }
 
 export async function FormatWhoKnowsArray(

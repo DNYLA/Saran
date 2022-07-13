@@ -14,6 +14,10 @@ export default class InteractionCreated extends Event {
       member.id
     ); //Fetching now will use it later for checking muted or jailed
 
+    if (!user) {
+      return await client.db.guildUsers.create(member);
+    }
+
     try {
       await client.db.guildUsers.updateById(member.guild.id, member.id, {
         inactive: false,
