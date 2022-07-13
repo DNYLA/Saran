@@ -7,7 +7,7 @@ const client = createClient({
 
 client.on('connect', async () => {
   console.log('Connected Redis');
-  // await client.FLUSHDB();
+  await client.FLUSHDB();
 });
 
 client.on('error', (err) => {

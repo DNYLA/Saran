@@ -32,6 +32,6 @@ export const cacheMiddleware: Prisma.Middleware = createPrismaRedisCache({
     },
   },
   cacheTime: 300,
-  // excludeModels: ['Product', 'Cart'],
+  excludeModels: ['ReactionBoardMessages'],
   // excludeMethods: ['count', 'groupBy'],
 });
