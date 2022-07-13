@@ -59,7 +59,7 @@ export default class GlobalWhoKnows extends Command {
         name: artist.name,
       },
       orderBy: {
-        plays: 'asc',
+        plays: 'desc',
       },
       include: {
         user: true,

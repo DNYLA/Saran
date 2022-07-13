@@ -62,7 +62,7 @@ export default class GlobalWhoKnowstrack extends Command {
         artistName: track.artist.name,
       },
       orderBy: {
-        plays: 'asc',
+        plays: 'desc',
       },
       include: {
         user: true,

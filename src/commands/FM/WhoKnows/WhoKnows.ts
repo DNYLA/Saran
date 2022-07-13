@@ -60,7 +60,7 @@ export default class WhoKnows extends Command {
         user: { guilds: { some: { serverId: message.guildId } } },
       },
       orderBy: {
-        plays: 'asc',
+        plays: 'desc',
       },
       include: {
         user: true,

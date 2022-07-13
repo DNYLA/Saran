@@ -61,7 +61,7 @@ export default class GlobalWhoKnowsAlbum extends Command {
         artistName: album.artist,
       },
       orderBy: {
-        plays: 'asc',
+        plays: 'desc',
       },
       include: {
         user: true,
