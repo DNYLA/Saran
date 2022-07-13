@@ -20,12 +20,13 @@ export default class MessageEvent extends Event {
 
     //Replace custom lastfm tag with ,lf
     //Update to allow it to replace lf instead
-    if (messageCommand.startsWith(user.lastFMTag.toLowerCase())) {
-      messageCommand = messageCommand.replace(
-        user.lastFMTag.toLowerCase(),
-        `${config.prefix}np`
-      );
-    }
+    if (user.lastFMTag)
+      if (messageCommand.startsWith(user.lastFMTag.toLowerCase())) {
+        messageCommand = messageCommand.replace(
+          user.lastFMTag.toLowerCase(),
+          `${config.prefix}np`
+        );
+      }
 
     //Not a valid command
     if (!messageCommand.startsWith(config.prefix)) return;
