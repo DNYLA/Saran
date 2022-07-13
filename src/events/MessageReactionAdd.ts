@@ -23,6 +23,8 @@ export default class MessageReactionAdd extends Event {
 
     const alreadySet = await getReactionBoardInfo(message.id, guild.id);
 
+    console.log(alreadySet);
+
     try {
       await message.guild.channels.fetch();
       const channel = await message.guild.channels.fetch(
