@@ -11,6 +11,9 @@ export default class MessageEvent extends Event {
   async run(client: DiscordClient, message: Message) {
     if (message.author.bot) return;
     const db = client.db;
+    console.log(
+      `Author: ${message.author.id} Id: ${message.id}; Guild: ${message.guildId}`
+    );
     const user = await db.users.findById(message.author.id);
     const config = await db.guilds.findById(message.guildId);
     await db.guildUsers.updateById(message.guildId, message.author.id, {
