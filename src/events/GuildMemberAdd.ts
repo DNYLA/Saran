@@ -15,7 +15,8 @@ export default class InteractionCreated extends Event {
     ); //Fetching now will use it later for checking muted or jailed
 
     if (!user) {
-      return await client.db.guildUsers.create(member);
+      await client.db.guildUsers.create(member);
+      return;
     }
 
     try {
