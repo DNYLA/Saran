@@ -39,6 +39,7 @@ model GuildUser {
 model GuildConfig {
   id                   String                  @id
   prefix               String                  @default(",")
+  name String @default("")
   reactionBoardChannel String?
   reactionBoardLimit   Int                     @default(0)
   jailChannel          String?

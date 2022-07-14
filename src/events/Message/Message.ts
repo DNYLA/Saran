@@ -20,6 +20,10 @@ export default class MessageEvent extends Event {
       xp: { increment: 5 },
     }); //No point of awaiting this data not needed
 
+    if (config) {
+      await db.guilds.updateById(message.guildId, { name: message.guild.name });
+    }
+
     let messageCommand = message.content.toLowerCase();
 
     //Replace custom lastfm tag with ,lf
