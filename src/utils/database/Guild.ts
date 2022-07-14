@@ -1,10 +1,8 @@
 /* eslint-disable deprecation/deprecation */
 import { PrismaClient } from '@prisma/client';
 import { Message } from 'discord.js';
-import { cacheMiddleware } from '../../cache';
 
 const prisma = new PrismaClient();
-prisma.$use(cacheMiddleware);
 
 export async function getReactionBoardInfo(
   messageId: string,

@@ -1,7 +1,7 @@
 {
-  "name": "betterfm",
+  "name": "saran",
   "version": "1.0.0",
-  "description": "BetterFM discord bot",
+  "description": "saran multi-purpose discord bot",
   "main": "main.ts",
   "engines": {
     "node": "16.15.1"

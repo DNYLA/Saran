@@ -1,11 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { GuildUser, PrismaClient, User } from '@prisma/client';
 import { GuildMember } from 'discord.js';
-import { cacheMiddleware } from '../../cache';
 
 const prisma = new PrismaClient();
-
-prisma.$use(cacheMiddleware);
 
 //Using an NPM module to handle caching via redis right now
 //Will create my own caching system when i have time as this is not a super needed

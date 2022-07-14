@@ -22,17 +22,18 @@ const redis = new Redis({
   password: process.env.REDIS_PASSWORD,
 });
 
-export const cacheMiddleware: Prisma.Middleware = createPrismaRedisCache({
-  models: [{ model: 'User' }, { model: 'GuildConfig' }],
-  storage: {
-    type: 'redis',
-    options: {
-      client: redis,
-      invalidation: { referencesTTL: 15 * 60 },
-    },
-  },
-  cacheTime: 15 * 60,
-  excludeModels: ['ReactionBoardMessages'],
-  // excludeMethods: ['count', 'groupBy'],
-  // onHit: (key) => console.log(key),
-});
+// Disabled as its causing way too many issues right now.
+// export const cacheMiddleware: Prisma.Middleware = createPrismaRedisCache({
+//   models: [{ model: 'User' }, { model: 'GuildConfig' }],
+//   storage: {
+//     type: 'redis',
+//     options: {
+//       client: redis,
+//       invalidation: { referencesTTL: 15 * 60 },
+//     },
+//   },
+//   cacheTime: 15 * 60,
+//   excludeModels: ['ReactionBoardMessages'],
+//   // excludeMethods: ['count', 'groupBy'],
+//   // onHit: (key) => console.log(key),
+// });

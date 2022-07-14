@@ -7,8 +7,6 @@ import {
   UserTracks,
 } from '@prisma/client';
 import { GuildMember } from 'discord.js';
-import { weightSrvRecords } from 'ioredis/built/cluster/util';
-import { cacheMiddleware } from '../../cache';
 
 const prisma = new PrismaClient();
 
@@ -21,7 +19,7 @@ export class DatabaseManager {
   artists: ArtistRepository;
   albums: AlbumRepository;
   constructor() {
-    this.prisma.$use(cacheMiddleware);
+    // this.prisma.$use(cacheMiddleware);
     this.users = new UserRepository(this.prisma.user);
     this.guilds = new GuildRepository(this.prisma.guildConfig);
     this.guildUsers = new GuildUserRepository(this.prisma.guildUser);
@@ -96,11 +94,11 @@ export class GuildUserRepository {
     userId: string,
     data: Prisma.GuildUserUpdateInput
   ): Promise<void> {
-    const user = await this.repo.findUnique({
-      where: { userId_serverId: { serverId, userId } },
-    });
-
     try {
+      const user = await this.repo.findUnique({
+        where: { userId_serverId: { serverId, userId } },
+      });
+
       //Not sure how to create with update data.
       if (!user) await this.repo.create({ data: { serverId, userId } });
 
