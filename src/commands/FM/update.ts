@@ -8,7 +8,6 @@ import UsernameCheck from '../../checks/UsernameCheck';
 import StartTyping from '../../hooks/StartTyping';
 import Command from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
-import { deleteCache } from '../../utils/database/redisManager';
 
 export default class SetUsername extends Command {
   constructor() {

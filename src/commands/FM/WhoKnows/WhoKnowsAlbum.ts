@@ -1,5 +1,4 @@
-import { Message, MessageEmbed } from 'discord.js';
-import { fetchAlbumInfo } from '../../../api/lastfm';
+import { Message } from 'discord.js';
 import UsernameCheck from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
@@ -9,15 +8,9 @@ import DiscordClient from '../../../utils/client';
 import {
   fetchRecentAlbumInfo,
   fetchSearchAlbumInfo,
-  SearchType,
   WhoKnowsEmbed,
 } from '../../../utils/fmHelpers';
-import {
-  FormatWhoKnows,
-  FormatWhoKnowsArray,
-  GetWhoKnowsInfo,
-  GetWhoKnowsListeners,
-} from '../../../utils/lastfm/wkHelpers';
+import { FormatWhoKnows } from '../../../utils/lastfm/wkHelpers';
 import { Album } from '../../../utils/types';
 
 export default class WhoKnowsAlbum extends Command {

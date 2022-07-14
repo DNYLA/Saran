@@ -1,5 +1,4 @@
-import { Message, MessageEmbed } from 'discord.js';
-import { fetchAlbumInfo } from '../../../api/lastfm';
+import { Message } from 'discord.js';
 import UsernameCheck from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
@@ -7,19 +6,8 @@ import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../../utils/base/command';
 import DiscordClient from '../../../utils/client';
 
-import {
-  fetchRecentAlbumInfo,
-  fetchSearchAlbumInfo,
-  SearchType,
-  WhoKnowsEmbed,
-} from '../../../utils/fmHelpers';
-import {
-  FormatWhoKnows,
-  FormatWhoKnowsArray,
-  GetWhoKnowsInfo,
-  GetWhoKnowsListeners,
-} from '../../../utils/lastfm/wkHelpers';
-import { Album } from '../../../utils/types';
+import { fetchRecentAlbumInfo, WhoKnowsEmbed } from '../../../utils/fmHelpers';
+import { FormatWhoKnows } from '../../../utils/lastfm/wkHelpers';
 
 export default class GlobalWhoKnowsAlbum extends Command {
   constructor() {

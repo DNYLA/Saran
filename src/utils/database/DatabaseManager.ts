@@ -4,7 +4,6 @@ import {
   Prisma,
   PrismaClient,
   User,
-  UserTracks,
 } from '@prisma/client';
 import { GuildMember } from 'discord.js';
 
@@ -124,16 +123,17 @@ export class GuildUserRepository {
     }
   }
 
-  async create(member: GuildMember): Promise<void> {
-    const user = await this.repo.findUnique({
-      where: {
-        userId_serverId: { userId: member.id, serverId: member.guild.id },
-      },
-    });
-    if (user) return;
+  async create(member: GuildMember): Promise<GuildUser> {
     // member.premiumSinceTimestamp //Update to check if user is booster
     try {
-      await this.repo.create({
+      const user = await this.repo.findUnique({
+        where: {
+          userId_serverId: { userId: member.id, serverId: member.guild.id },
+        },
+      });
+      if (user) return user;
+
+      return await this.repo.create({
         data: {
           userId: member.id,
           serverId: member.guild.id,

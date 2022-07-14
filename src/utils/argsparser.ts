@@ -6,15 +6,9 @@ export const StringToColour = (message: Message, args: string[]) => {
 };
 
 export const ImageUrlOrAttachment = (message: Message, args: string[]) => {
-  console.log('does this get ran?');
-  console.log(message.attachments);
   if (message.attachments.size > 0) {
-    console.log('Test');
-
     return message.attachments.first().url;
   }
-
-  console.log('Test');
 
   if (args.length > 0) return args[0];
 

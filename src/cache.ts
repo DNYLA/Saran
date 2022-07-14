@@ -1,7 +1,5 @@
 import { User } from '@prisma/client';
 import Redis from 'ioredis';
-import Prisma from 'prisma';
-import { createPrismaRedisCache } from 'prisma-redis-middleware';
 
 const users = new Map<string, User>();
 
@@ -16,11 +14,11 @@ export function setCache(user: User) {
   users.set(user.id, user);
 }
 
-const redis = new Redis({
-  host: process.env.REDIS_HOST,
-  port: Number(process.env.REDIS_PORT),
-  password: process.env.REDIS_PASSWORD,
-});
+// const redis = new Redis({
+//   host: process.env.REDIS_HOST,
+//   port: Number(process.env.REDIS_PORT),
+//   password: process.env.REDIS_PASSWORD,
+// });
 
 // Disabled as its causing way too many issues right now.
 // export const cacheMiddleware: Prisma.Middleware = createPrismaRedisCache({

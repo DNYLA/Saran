@@ -1,5 +1,4 @@
-import { Message, MessageEmbed } from 'discord.js';
-import { fetchArtistInfo } from '../../../api/lastfm';
+import { Message } from 'discord.js';
 import UsernameCheck from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
@@ -9,15 +8,9 @@ import DiscordClient from '../../../utils/client';
 import {
   fetchRecentArtistInfo,
   fetchSearchArtistInfo,
-  SearchType,
   WhoKnowsEmbed,
 } from '../../../utils/fmHelpers';
-import {
-  GetWhoKnowsInfo,
-  GetWhoKnowsListeners,
-  FormatWhoKnowsArray,
-  FormatWhoKnows,
-} from '../../../utils/lastfm/wkHelpers';
+import { FormatWhoKnows } from '../../../utils/lastfm/wkHelpers';
 import { Artist } from '../../../utils/types';
 
 export default class WhoKnows extends Command {

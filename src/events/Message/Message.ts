@@ -13,10 +13,11 @@ export default class MessageEvent extends Event {
     const db = client.db;
     const user = await db.users.findById(message.author.id);
     const config = await db.guilds.findById(message.guildId);
-    let messageCommand = message.content.toLowerCase();
-    db.guildUsers.updateById(message.guildId, user.id, {
+    await db.guildUsers.updateById(message.guildId, message.author.id, {
       xp: { increment: 5 },
     }); //No point of awaiting this data not needed
+
+    let messageCommand = message.content.toLowerCase();
 
     //Replace custom lastfm tag with ,lf
     //Update to allow it to replace lf instead

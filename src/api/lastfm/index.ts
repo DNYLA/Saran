@@ -1,6 +1,5 @@
-import { Prisma, prisma, UserTracks } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import axios, { AxiosRequestConfig } from 'axios';
-import TopArtists from '../../commands/FM/TopTen/topartists';
 import { client } from '../../main';
 import {
   Album,
