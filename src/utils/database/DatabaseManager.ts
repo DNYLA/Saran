@@ -125,7 +125,7 @@ export class GuildUserRepository {
       if (!user) await this.create(userId, serverId);
 
       await this.repo.update({
-        where: { userId_serverId: { serverId, userId } },
+        where: { userId_serverId: { userId, serverId } },
         data,
       });
     } catch (err) {
