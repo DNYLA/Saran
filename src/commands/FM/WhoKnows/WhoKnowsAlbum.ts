@@ -10,6 +10,7 @@ import {
   fetchRecentAlbumInfo,
   fetchSearchAlbumInfo,
   SearchType,
+  WhoKnowsEmbed,
 } from '../../../utils/fmHelpers';
 import {
   FormatWhoKnows,
@@ -51,43 +52,42 @@ export default class WhoKnowsAlbum extends Command {
   ) {
     const client = message.client as DiscordClient;
     const user = await client.db.users.findById(args.targetUserId);
-    const { album } = await fetchRecentAlbumInfo(user.lastFMName);
+
+    let album: Album;
+    if (args.albumName) {
+      album = await fetchSearchAlbumInfo(user.lastFMName, args.albumName);
+    } else {
+      album = (await fetchRecentAlbumInfo(user.lastFMName)).album;
+    }
+
     const guildName = message.guild.name;
 
     if (!album) return message.reply('Unable to find album with name!');
 
-    const guildPlays = await client.db.albums.repo.findMany({
-      where: {
-        name: album.name,
-        artistName: album.artist,
-        user: { guilds: { some: { serverId: message.guildId } } },
-      },
-      orderBy: {
-        plays: 'desc',
-      },
-      include: {
-        user: true,
-      },
-    });
+    const albumService = client.db.albums;
 
-    const { sum, description } = await FormatWhoKnows(message, guildPlays);
+    const filter = albumService.WhoKnowsFilter(
+      album.name,
+      album.artist,
+      message.guildId
+    );
+    const guildPlays = await albumService.repo.findMany(filter);
+
+    const { sum, description, requester } = await FormatWhoKnows(
+      message,
+      guildPlays,
+      message.author.id
+    );
 
     try {
-      const embed = new MessageEmbed()
-        .setColor('#2F3136')
-        .setAuthor({
-          name: `Requested by ${user.lastFMName}`,
-          url: `https://www.last.fm/user/${user.lastFMName}`,
-          iconURL:
-            'https://lastfm.freetls.fastly.net/i/u/avatar170s/a7ff67ef791aaba0c0c97e9c8a97bf04.png',
-        })
-        .setTitle(
-          `Top Listeners for ${album.name} by ${album.artist} in ${guildName}`
-        )
-        .setDescription(description)
-        .setFooter({
-          text: `Total Listeners: ${guildPlays.length} ∙ Total Plays: ${sum}`,
-        });
+      const embed = WhoKnowsEmbed(
+        { username: message.author.username, ...requester },
+        user.lastFMName,
+        `Top Listeners for ${album.name} by ${album.artist} in ${guildName}`,
+        description,
+        guildPlays.length,
+        sum
+      );
 
       return message.channel.send({ embeds: [embed] });
     } catch (err) {

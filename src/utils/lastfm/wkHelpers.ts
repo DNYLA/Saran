@@ -123,10 +123,20 @@ export type WkInfo = {
   user: User;
 };
 
-export async function FormatWhoKnows(message: Message, info: WkInfo[]) {
+export async function FormatWhoKnows(
+  message: Message,
+  info: WkInfo[],
+  requesterId: string
+) {
   let sum = 0;
   let description = '';
+  let requester = { rank: -1, plays: null };
+  info.forEach((item, i) => {
+    if (item.userId === requesterId)
+      requester = { rank: i + 1, plays: item.plays };
+  });
 
+  //Will change to allow fetching and interaction between pages.
   //Sometimes slicing top 10 doesnt work so to double check we only loop over 10
   for (let i = 0; i < 10; i++) {
     if (i > info.length - 1) break;
@@ -146,7 +156,7 @@ export async function FormatWhoKnows(message: Message, info: WkInfo[]) {
     }
   }
 
-  return { sum, description };
+  return { sum, description, requester };
 }
 
 export async function FormatWhoKnowsArray(

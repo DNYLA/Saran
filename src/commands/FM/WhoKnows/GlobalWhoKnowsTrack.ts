@@ -1,23 +1,12 @@
-import { Message, MessageEmbed } from 'discord.js';
-import { fetchTrackInfo } from '../../../api/lastfm';
+import { Message } from 'discord.js';
 import { UsernameCheckNoMentions } from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
 import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../../utils/base/command';
 import DiscordClient from '../../../utils/client';
-import {
-  SearchType,
-  fetchSearchTrackInfo,
-  fetchRecentTrackInfo,
-} from '../../../utils/fmHelpers';
-import {
-  GetWhoKnowsInfo,
-  GetWhoKnowsListeners,
-  FormatWhoKnowsArray,
-  FormatWhoKnows,
-} from '../../../utils/lastfm/wkHelpers';
-import { Track } from '../../../utils/types';
+import { fetchRecentTrackInfo, WhoKnowsEmbed } from '../../../utils/fmHelpers';
+import { FormatWhoKnows } from '../../../utils/lastfm/wkHelpers';
 import { SearchTrackArguments } from '../Plays/playsTrack';
 
 export default class GlobalWhoKnowstrack extends Command {
@@ -56,36 +45,25 @@ export default class GlobalWhoKnowstrack extends Command {
     const user = await client.db.users.findById(args.targetUserId);
     const { track } = await fetchRecentTrackInfo(user.lastFMName);
 
-    const guildPlays = await client.db.tracks.repo.findMany({
-      where: {
-        name: track.name,
-        artistName: track.artist.name,
-      },
-      orderBy: {
-        plays: 'desc',
-      },
-      include: {
-        user: true,
-      },
-    });
+    const trackService = client.db.tracks;
+    const filter = trackService.WhoKnowsFilter(track.name, track.artist.name);
+    const guildPlays = await trackService.repo.findMany(filter);
 
-    const { sum, description } = await FormatWhoKnows(message, guildPlays);
+    const { sum, description, requester } = await FormatWhoKnows(
+      message,
+      guildPlays,
+      message.author.id
+    );
 
     try {
-      const embed = new MessageEmbed()
-        .setColor('#2F3136')
-        .setAuthor({
-          name: `Requested by ${user.lastFMName}`,
-          url: `https://www.last.fm/user/${user.lastFMName}`,
-          iconURL:
-            'https://lastfm.freetls.fastly.net/i/u/avatar170s/a7ff67ef791aaba0c0c97e9c8a97bf04.png',
-        })
-        .setTitle(`Top Listeners for ${track.name} by ${track.artist.name}`)
-        .setDescription(description)
-        .setFooter({
-          text: `Total Listeners: ${guildPlays.length} ∙ Total Plays: ${sum}`,
-        });
-
+      const embed = WhoKnowsEmbed(
+        { username: message.author.username, ...requester },
+        user.lastFMName,
+        `Top Listeners for ${track.name} by ${track.artist.name}`,
+        description,
+        guildPlays.length,
+        sum
+      );
       return message.channel.send({ embeds: [embed] });
     } catch (err) {
       console.log(err);

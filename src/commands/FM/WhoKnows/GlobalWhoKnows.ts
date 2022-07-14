@@ -10,6 +10,7 @@ import {
   fetchRecentArtistInfo,
   fetchSearchArtistInfo,
   SearchType,
+  WhoKnowsEmbed,
 } from '../../../utils/fmHelpers';
 import {
   FormatWhoKnows,
@@ -54,34 +55,25 @@ export default class GlobalWhoKnows extends Command {
     const user = await client.db.users.findById(args.targetUserId);
     const { artist } = await fetchRecentArtistInfo(user.lastFMName);
 
-    const guildPlays = await client.db.artists.repo.findMany({
-      where: {
-        name: artist.name,
-      },
-      orderBy: {
-        plays: 'desc',
-      },
-      include: {
-        user: true,
-      },
-    });
+    const artistService = client.db.artists;
+    const filter = artistService.WhoKnowsFilter(artist.name);
+    const guildPlays = await artistService.repo.findMany(filter);
 
-    const { sum, description } = await FormatWhoKnows(message, guildPlays);
+    const { sum, description, requester } = await FormatWhoKnows(
+      message,
+      guildPlays,
+      message.author.id
+    );
 
     try {
-      const embed = new MessageEmbed()
-        .setColor('#2F3136')
-        .setAuthor({
-          name: `Requested by ${user.lastFMName}`,
-          url: `https://www.last.fm/user/${user.lastFMName}`,
-          iconURL:
-            'https://lastfm.freetls.fastly.net/i/u/avatar170s/a7ff67ef791aaba0c0c97e9c8a97bf04.png',
-        })
-        .setTitle(`Top Listeners for ${artist.name}`)
-        .setDescription(description)
-        .setFooter({
-          text: `Total Listeners: ${guildPlays.length} ∙ Total Plays: ${sum}`,
-        });
+      const embed = WhoKnowsEmbed(
+        { username: message.author.username, ...requester },
+        user.lastFMName,
+        `Top Listeners for ${artist.name}`,
+        description,
+        guildPlays.length,
+        sum
+      );
 
       return message.channel.send({ embeds: [embed] });
     } catch (err) {

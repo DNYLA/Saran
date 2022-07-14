@@ -7,11 +7,10 @@ import {
   UserTracks,
 } from '@prisma/client';
 import { GuildMember } from 'discord.js';
+import { weightSrvRecords } from 'ioredis/built/cluster/util';
 import { cacheMiddleware } from '../../cache';
 
 const prisma = new PrismaClient();
-
-prisma.$use(cacheMiddleware);
 
 export class DatabaseManager {
   private prisma = new PrismaClient();
@@ -22,7 +21,7 @@ export class DatabaseManager {
   artists: ArtistRepository;
   albums: AlbumRepository;
   constructor() {
-    prisma.$use(cacheMiddleware);
+    this.prisma.$use(cacheMiddleware);
     this.users = new UserRepository(this.prisma.user);
     this.guilds = new GuildRepository(this.prisma.guildConfig);
     this.guildUsers = new GuildUserRepository(this.prisma.guildUser);
@@ -36,10 +35,14 @@ export class UserRepository {
   constructor(readonly repo: PrismaClient['user']) {}
 
   async findById(id: string): Promise<User> {
-    const user = await this.repo.findUnique({ where: { id } });
-    if (!user) return await this.repo.create({ data: { id } });
+    try {
+      const user = await this.repo.findUnique({ where: { id } });
+      if (!user) return await this.repo.create({ data: { id } });
 
-    return user;
+      return user;
+    } catch (err) {
+      return null;
+    }
   }
 
   async updateById(id: string, data: Prisma.UserUpdateInput): Promise<void> {
@@ -145,14 +148,61 @@ export class GuildUserRepository {
   }
 }
 
-export class TracksRepository {
-  constructor(readonly repo: PrismaClient['userTracks']) {}
+type WhoKnowsFilter = {
+  where: {
+    name: Prisma.StringFilter;
+    artistName?: Prisma.StringFilter;
+    user?: { guilds: { some: { serverId: string } } };
+  };
+  orderBy: { plays: Prisma.SortOrder };
+  include: { user: boolean };
+};
+
+class LastFMRepository {
+  /**
+   *
+   */
+  // constructor() {}
+
+  WhoKnowsFilter(name: string, artistName?: string, serverId?: string) {
+    const filter: WhoKnowsFilter = {
+      where: {
+        name: { equals: name, mode: 'insensitive' },
+      },
+      orderBy: {
+        plays: 'desc',
+      },
+      include: {
+        user: true,
+      },
+    };
+
+    if (serverId) {
+      filter.where['user'] = { guilds: { some: { serverId } } };
+    }
+
+    if (artistName) {
+      filter.where['artistName'] = { equals: artistName, mode: 'insensitive' };
+    }
+
+    return filter;
+  }
 }
 
-export class ArtistRepository {
-  constructor(readonly repo: PrismaClient['userArtists']) {}
+export class TracksRepository extends LastFMRepository {
+  constructor(readonly repo: PrismaClient['userTracks']) {
+    super();
+  }
 }
 
-export class AlbumRepository {
-  constructor(readonly repo: PrismaClient['userAlbums']) {}
+export class ArtistRepository extends LastFMRepository {
+  constructor(readonly repo: PrismaClient['userArtists']) {
+    super();
+  }
+}
+
+export class AlbumRepository extends LastFMRepository {
+  constructor(readonly repo: PrismaClient['userAlbums']) {
+    super();
+  }
 }

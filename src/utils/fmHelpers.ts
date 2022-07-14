@@ -348,3 +348,30 @@ export function getTargetUserId(
 
   return userId;
 }
+
+//This will do for now until i create my own embed builder
+export function WhoKnowsEmbed(
+  requester: { username: string; rank: number; plays: number },
+  lastfmName: string,
+  title: string,
+  description: string,
+  listeners: number,
+  totalPlays: number
+) {
+  if (requester.rank > 0) {
+    description += `\n**Rank:** \`#${requester.rank}\` | **Plays:** \`${requester.plays}\``;
+  }
+  return new MessageEmbed()
+    .setColor('#2F3136')
+    .setAuthor({
+      name: `Requested by ${requester.username}`,
+      url: `https://www.last.fm/user/${lastfmName}`,
+      iconURL:
+        'https://lastfm.freetls.fastly.net/i/u/avatar170s/a7ff67ef791aaba0c0c97e9c8a97bf04.png',
+    })
+    .setTitle(title)
+    .setDescription(description)
+    .setFooter({
+      text: `Total Listeners: ${listeners} ∙ Total Plays: ${totalPlays}`,
+    });
+}

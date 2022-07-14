@@ -10,6 +10,7 @@ import {
   fetchRecentArtistInfo,
   fetchSearchArtistInfo,
   SearchType,
+  WhoKnowsEmbed,
 } from '../../../utils/fmHelpers';
 import {
   GetWhoKnowsInfo,
@@ -51,40 +52,37 @@ export default class WhoKnows extends Command {
   ) {
     const client = message.client as DiscordClient;
     const user = await client.db.users.findById(args.targetUserId);
-    const { artist } = await fetchRecentArtistInfo(user.lastFMName);
+    let artist: Artist;
+    if (args.artistName) {
+      artist = await fetchSearchArtistInfo(user.lastFMName, args.artistName);
+    } else {
+      artist = (await fetchRecentArtistInfo(user.lastFMName)).artist;
+    }
+
     const guildName = message.guild.name;
 
-    const guildPlays = await client.db.artists.repo.findMany({
-      where: {
-        name: artist.name,
-        user: { guilds: { some: { serverId: message.guildId } } },
-      },
-      orderBy: {
-        plays: 'desc',
-      },
-      include: {
-        user: true,
-      },
-    });
-
-    console.log(guildPlays);
-
-    const { sum, description } = await FormatWhoKnows(message, guildPlays);
+    const artistService = client.db.artists;
+    const filter = artistService.WhoKnowsFilter(
+      artist.name,
+      null,
+      message.guildId
+    );
+    const guildPlays = await artistService.repo.findMany(filter);
+    const { sum, description, requester } = await FormatWhoKnows(
+      message,
+      guildPlays,
+      message.author.id
+    );
 
     try {
-      const embed = new MessageEmbed()
-        .setColor('#2F3136')
-        .setAuthor({
-          name: `Requested by ${user.lastFMName}`,
-          url: `https://www.last.fm/user/${user.lastFMName}`,
-          iconURL:
-            'https://lastfm.freetls.fastly.net/i/u/avatar170s/a7ff67ef791aaba0c0c97e9c8a97bf04.png',
-        })
-        .setTitle(`Top Listeners for ${artist.name} in ${guildName}`)
-        .setDescription(description)
-        .setFooter({
-          text: `Total Listeners: ${guildPlays.length} ∙ Total Plays: ${sum}`,
-        });
+      const embed = WhoKnowsEmbed(
+        { username: message.author.username, ...requester },
+        user.lastFMName,
+        `Top Listeners for ${artist.name} in ${guildName}`,
+        description,
+        guildPlays.length,
+        sum
+      );
 
       return message.channel.send({ embeds: [embed] });
     } catch (err) {

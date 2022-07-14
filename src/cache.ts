@@ -23,15 +23,16 @@ const redis = new Redis({
 });
 
 export const cacheMiddleware: Prisma.Middleware = createPrismaRedisCache({
-  models: [{ model: 'User' }, { model: 'GuildConfig', cacheTime: 10 * 60 }],
+  models: [{ model: 'User' }, { model: 'GuildConfig' }],
   storage: {
     type: 'redis',
     options: {
       client: redis,
-      invalidation: { referencesTTL: 300 },
+      invalidation: { referencesTTL: 15 * 60 },
     },
   },
-  cacheTime: 300,
+  cacheTime: 15 * 60,
   excludeModels: ['ReactionBoardMessages'],
   // excludeMethods: ['count', 'groupBy'],
+  // onHit: (key) => console.log(key),
 });
