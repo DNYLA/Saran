@@ -12,7 +12,7 @@ export default class MessageEvent extends Event {
     if (message.author.bot) return;
     const db = client.db;
     console.log(
-      `Author: ${message.author.id} Id: ${message.id}; Guild: ${message.guildId}`
+      `Author: ${message.author.id} Id: ${message.id}; Guild: ${message.guild.name}-${message.guildId}`
     );
     const user = await db.users.findById(message.author.id);
     const config = await db.guilds.findById(message.guildId);
