@@ -8,9 +8,12 @@ export default class InteractionCreated extends Event {
   }
 
   async run(client: DiscordClient, member: GuildMember) {
-    // const channels = member.guild.channels.fetch('');
-    // membe
+    const user = await client.db.users.findGuildUser(
+      member.id,
+      member.guild.id
+    );
 
+    if (!user || !user.guilds) return; //No point of adding user to guild
     try {
       await client.db.guildUsers.updateById(member.guild.id, member.id, {
         inactive: true,

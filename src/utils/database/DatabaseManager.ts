@@ -6,6 +6,7 @@ import {
   User,
 } from '@prisma/client';
 import { GuildMember } from 'discord.js';
+import { client } from '../../main';
 
 const prisma = new PrismaClient();
 
@@ -21,7 +22,10 @@ export class DatabaseManager {
     // this.prisma.$use(cacheMiddleware);
     this.users = new UserRepository(this.prisma.user);
     this.guilds = new GuildRepository(this.prisma.guildConfig);
-    this.guildUsers = new GuildUserRepository(this.prisma.guildUser);
+    this.guildUsers = new GuildUserRepository(
+      this.prisma.guildUser,
+      this.prisma.user
+    );
     this.tracks = new TracksRepository(this.prisma.userTracks);
     this.artists = new ArtistRepository(this.prisma.userArtists);
     this.albums = new AlbumRepository(this.prisma.userAlbums);
@@ -40,6 +44,21 @@ export class UserRepository {
     } catch (err) {
       return null;
     }
+  }
+
+  async findGuildUser(id: string, serverId: string) {
+    const user = await this.repo.findUnique({
+      where: { id },
+      include: { guilds: { where: { serverId: serverId } } },
+    });
+
+    if (!user)
+      return await this.repo.create({
+        data: { id },
+        include: { guilds: true },
+      });
+
+    return user;
   }
 
   async updateById(id: string, data: Prisma.UserUpdateInput): Promise<void> {
@@ -78,13 +97,17 @@ export class GuildRepository {
   }
 }
 export class GuildUserRepository {
-  constructor(readonly repo: PrismaClient['guildUser']) {}
+  constructor(
+    readonly repo: PrismaClient['guildUser'],
+    private readonly userRepo: PrismaClient['user']
+  ) {}
 
   async findById(serverId: string, userId: string): Promise<GuildUser> {
     const guild = this.repo.findUnique({
       where: { userId_serverId: { serverId, userId } },
     });
-    if (!guild) return await this.repo.create({ data: { serverId, userId } });
+    if (!guild) return await this.create(userId, serverId);
+
     return guild;
   }
 
@@ -99,7 +122,7 @@ export class GuildUserRepository {
       });
 
       //Not sure how to create with update data.
-      if (!user) await this.repo.create({ data: { serverId, userId } });
+      if (!user) await this.create(userId, serverId);
 
       await this.repo.update({
         where: { userId_serverId: { serverId, userId } },
@@ -112,7 +135,6 @@ export class GuildUserRepository {
 
   async findAllWithLastFm(serverId: string) {
     try {
-      console.log('here');
       return await prisma.user.findMany({
         where: { lastFMName: { not: null }, guilds: { some: { serverId } } },
         include: { guilds: true },
@@ -123,23 +145,27 @@ export class GuildUserRepository {
     }
   }
 
-  async create(member: GuildMember): Promise<GuildUser> {
+  async create(userId: string, serverId: string): Promise<GuildUser> {
     // member.premiumSinceTimestamp //Update to check if user is booster
-    try {
-      const user = await this.repo.findUnique({
-        where: {
-          userId_serverId: { userId: member.id, serverId: member.guild.id },
-        },
-      });
-      if (user) return user;
+    const guild = await client.guilds.fetch(serverId);
+    const member = await guild.members.fetch(userId);
 
-      return await this.repo.create({
-        data: {
-          userId: member.id,
-          serverId: member.guild.id,
-          displayName: member.displayName,
-        },
+    try {
+      const user = await this.userRepo.findUnique({
+        where: { id: userId },
+        include: { guilds: { where: { serverId: serverId } } },
       });
+      if (user && user.guilds.length > 0) return user.guilds[0]; //returns guilduser
+
+      const newUser = await this.userRepo.create({
+        data: {
+          id: serverId,
+          guilds: { create: { serverId, displayName: member.displayName } },
+        },
+        include: { guilds: true },
+      });
+
+      return newUser.guilds[0];
     } catch (err) {
       console.log(err);
     }
