@@ -44,7 +44,8 @@ export async function registerEvents(client: DiscordClient, dir = '') {
       const { default: Event } = await import(`./${newPathFileName}`);
       const event = new Event();
       client.events.set(event.name, event);
-      client.on(event.getName(), event.run.bind(event, client));
+      // client.on(event.getName(), event.run.bind(event, client));
+      client.on(event.getName(), event.execute.bind(event, client));
     }
   }
 }
