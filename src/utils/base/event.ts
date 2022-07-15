@@ -11,7 +11,6 @@ export default abstract class Event {
   abstract run(client: DiscordClient, ...args: any): Promise<void>;
 
   async execute(client: DiscordClient, ...args: any) {
-    console.log('Executing');
     try {
       await this.run(client, ...args);
     } catch (err) {
