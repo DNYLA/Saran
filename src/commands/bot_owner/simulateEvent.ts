@@ -1,4 +1,5 @@
 import { Message } from 'discord.js';
+import { userInfo } from 'os';
 import OwnerOnly from '../../checks/OwnerOnly';
 import StartTyping from '../../hooks/StartTyping';
 import { MentionUserId, SelfUserId } from '../../utils/argsparser';
@@ -31,14 +32,16 @@ export default class UnmuteRemote extends Command {
     });
   }
 
-  async run(
-    message: Message,
-    args: { type: string; mentionOrSelfId?: string }
-  ) {
+  async run(message: Message, args: { type: string; mentionOrSelfId: string }) {
     const client = message.client as DiscordClient;
+    const guild = await client.guilds.fetch(message.guildId);
+    const member = await guild.members.fetch(args.mentionOrSelfId);
+
+    if (!member) return;
 
     if (args.type === 'add') {
-      client.emit('guildMemberAdd', message.member);
+      await client.db.users.repo.delete({ where: { id: member.id } });
+      client.emit('guildMemberAdd', member);
     } else if (args.type === 'remove') {
       client.emit('guildMemberRemove', message.member);
     }

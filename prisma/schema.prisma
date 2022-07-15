@@ -32,7 +32,7 @@ model GuildUser {
   isBooster          Boolean  @default(false)
   preJailedRoles     String[]
   inactive           Boolean  @default(false) //Inactive is whenever a user leaves or gets kicked from a guild.
-  user               User     @relation(fields: [userId], references: [id])
+  user               User     @relation(fields: [userId], references: [id],  onDelete: Cascade)
   @@id([userId, serverId])
 }
 
@@ -66,7 +66,7 @@ model UserTracks {
   name       String
   artistName String
   plays      Int
-  user       User   @relation(fields: [userId], references: [id])
+  user       User   @relation(fields: [userId], references: [id],  onDelete: Cascade)
 }
 
 model UserAlbums {
@@ -75,7 +75,7 @@ model UserAlbums {
   name       String
   artistName String
   plays      Int
-  user       User   @relation(fields: [userId], references: [id])
+  user       User   @relation(fields: [userId], references: [id],  onDelete: Cascade)
 }
 
 model UserArtists {
@@ -83,5 +83,5 @@ model UserArtists {
   userId   String
   name     String
   plays    Int
-  user     User   @relation(fields: [userId], references: [id])
+  user     User   @relation(fields: [userId], references: [id],  onDelete: Cascade)
 }

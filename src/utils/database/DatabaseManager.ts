@@ -52,9 +52,12 @@ export class UserRepository {
       include: { guilds: { where: { serverId: serverId } } },
     });
 
+    console.log('FindGuildUser');
+    console.log(user);
+
     if (!user)
       return await this.repo.create({
-        data: { id },
+        data: { id, guilds: { create: { serverId } } },
         include: { guilds: true },
       });
 
@@ -153,19 +156,25 @@ export class GuildUserRepository {
     try {
       const user = await this.userRepo.findUnique({
         where: { id: userId },
-        include: { guilds: { where: { serverId: serverId } } },
+        include: { guilds: { where: { serverId } } },
       });
+      console.log(user);
       if (user && user.guilds.length > 0) return user.guilds[0]; //returns guilduser
+      if (!user) {
+        const newUser = await this.userRepo.create({
+          data: {
+            id: userId,
+            guilds: { create: { serverId, displayName: member.displayName } },
+          },
+          include: { guilds: true },
+        });
 
-      const newUser = await this.userRepo.create({
-        data: {
-          id: serverId,
-          guilds: { create: { serverId, displayName: member.displayName } },
-        },
-        include: { guilds: true },
+        return newUser.guilds[0];
+      }
+
+      return await this.repo.create({
+        data: { userId, serverId, displayName: member.displayName },
       });
-
-      return newUser.guilds[0];
     } catch (err) {
       console.log(err);
     }

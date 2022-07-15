@@ -9,11 +9,6 @@ export default class MessageEvent extends Event {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async run(client: DiscordClient, message: Message) {
-    client.user.setPresence({
-      activities: [{ name: 'Listening to death grips', type: 'PLAYING' }],
-      status: 'online',
-    });
-
     client.user.setActivity('Spotify', {
       type: 'LISTENING',
       name: 'Youtube',

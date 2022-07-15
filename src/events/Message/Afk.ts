@@ -12,6 +12,7 @@ export default class MessageEvent extends Event {
     if (message.author.bot) return;
 
     const user = await client.db.users.findById(message.author.id);
+
     await Promise.all(
       message.mentions.members.map(async (member) => {
         const mentionedUser = await client.db.users.findById(member.id);
