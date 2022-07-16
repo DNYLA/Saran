@@ -67,6 +67,29 @@ export const ChannelMentionIdOrArg = (
   return args[index];
 };
 
+export const RoleMentionIdOrArg = (
+  message: Message,
+  args: string[],
+  index: number
+) => {
+  if (args.length > 0) {
+    const isMention = args[index]
+      .matchAll(MessageMentions.ROLES_PATTERN)
+      .next().value;
+    if (isMention) {
+      return isMention[1];
+    }
+  }
+
+  return args[index];
+};
+
+// export const NumberParser = (
+//   message: Message,
+//   args: string[],
+//   index: number
+// ) => {};
+
 export const SelfUserId = (message: Message) => {
   return message.author.id;
 };

@@ -8,7 +8,7 @@ export function getArgsFromMsg(
   // Args including the command name
   const args = msg.slice(prefixLn).split(/ +/);
   console.log(args);
-  if (args[0] === 'lf' && args.length >= 2) {
+  if ((args[0] === 'lf' || args[0] === 'levels') && args.length >= 2) {
     console.log('Here');
     return {
       commandName: `${args[0]} ${args[1]}`,

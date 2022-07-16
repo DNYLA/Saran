@@ -18,6 +18,7 @@ export class DatabaseManager {
   tracks: TracksRepository;
   artists: ArtistRepository;
   albums: AlbumRepository;
+  levels: LevelsRepository;
   constructor() {
     // this.prisma.$use(cacheMiddleware);
     this.users = new UserRepository(this.prisma.user);
@@ -29,6 +30,7 @@ export class DatabaseManager {
     this.tracks = new TracksRepository(this.prisma.userTracks);
     this.artists = new ArtistRepository(this.prisma.userArtists);
     this.albums = new AlbumRepository(this.prisma.userAlbums);
+    this.levels = new LevelsRepository(this.prisma.levels);
   }
 }
 
@@ -118,7 +120,7 @@ export class GuildUserRepository {
     serverId: string,
     userId: string,
     data: Prisma.GuildUserUpdateInput
-  ): Promise<void> {
+  ): Promise<GuildUser> {
     try {
       const user = await this.repo.findUnique({
         where: { userId_serverId: { serverId, userId } },
@@ -127,7 +129,7 @@ export class GuildUserRepository {
       //Not sure how to create with update data.
       if (!user) await this.create(userId, serverId);
 
-      await this.repo.update({
+      return await this.repo.update({
         where: { userId_serverId: { userId, serverId } },
         data,
       });
@@ -238,4 +240,8 @@ export class AlbumRepository extends LastFMRepository {
   constructor(readonly repo: PrismaClient['userAlbums']) {
     super();
   }
+}
+
+export class LevelsRepository {
+  constructor(readonly repo: PrismaClient['levels']) {}
 }

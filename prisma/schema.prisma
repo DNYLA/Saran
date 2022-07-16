@@ -46,6 +46,7 @@ model GuildConfig {
   jailLogChannel       String?
   jailRole             String?
   rbMessages           ReactionBoardMessages[]
+  levels Levels[]
 }
 
 model ReactionBoardMessages {
@@ -58,6 +59,15 @@ model ReactionBoardMessages {
   guild          GuildConfig @relation(fields: [serverId], references: [id])
 
   @@id([messageId, serverId])
+}
+
+model Levels {
+  serverId       String
+  roleId String
+  level Int
+  guild          GuildConfig @relation(fields: [serverId], references: [id])
+  @@id([roleId, serverId])
+
 }
 
 model UserTracks {
@@ -85,3 +95,5 @@ model UserArtists {
   plays    Int
   user     User   @relation(fields: [userId], references: [id],  onDelete: Cascade)
 }
+
+

@@ -26,12 +26,16 @@ export default class Rank extends Command {
     const guildUser = await message.guild.members.fetch(args.targetUserId);
     const user = await getGuildUser(message.guildId, args.targetUserId);
     const isSelf = args.targetUserId === message.author.id;
-    const targetText = isSelf ? 'You have' : guildUser.displayName + ' has';
+    const targetText = isSelf ? 'You are' : guildUser.displayName + ' is';
 
     if (!user || user.guilds.length === 0)
       return message.reply(`${targetText} 0 XP`);
-    else return message.reply(`${targetText} ${user.guilds[0].xp} xp`);
-    // if (args.length === 0) return message.reply('Provide a URL to scrape!');
+    else {
+      const xp = user.guilds[0].xp;
+      return message.reply(
+        `${targetText} Level: ${Math.round(xp / 2000)} - XP: ${xp}`
+      );
+    } // if (args.length === 0) return message.reply('Provide a URL to scrape!');
     // const url = 'https://www.instagram.com/p/Cdc02LTD0Fo/';
 
     // const html = await axios.get(url);

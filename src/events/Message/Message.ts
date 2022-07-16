@@ -15,15 +15,45 @@ export default class MessageEvent extends Event {
       `Author: ${message.author.id} Id: ${message.id}; Guild: ${message.guild.name}-${message.guildId}`
     );
     const user = await db.users.findById(message.author.id);
-    const config = await db.guilds.findById(message.guildId);
-    await db.guildUsers.updateById(message.guildId, message.author.id, {
-      xp: { increment: 5 },
-    }); //No point of awaiting this data not needed
+    // const config = await db.guilds.findById(message.guildId);
+    const config = await db.guilds.repo.findUnique({
+      where: { id: message.guildId },
+      include: { levels: true },
+    });
+    const guildUser = await db.guildUsers.updateById(
+      message.guildId,
+      message.author.id,
+      {
+        xp: { increment: 5 },
+      }
+    );
 
     if (config) {
       await db.guilds.updateById(message.guildId, {
         name: message.guild.name,
       });
+    }
+
+    const levels = config.levels.filter(
+      (l) =>
+        guildUser.xp >= l.level * 2000 && guildUser.xp - 5 <= l.level * 2000
+    );
+
+    const guild = await message.guild.fetch();
+    guild.roles.fetch();
+    const local = await guild.members.fetch(guildUser.userId);
+
+    for (let i = 0; i < levels.length; i++) {
+      const level = levels[i];
+
+      try {
+        const role = guild.roles.cache.get(level.roleId);
+        if (role) {
+          await local.roles.add(role);
+        }
+      } catch (err) {
+        console.log(err);
+      }
     }
 
     if (!user) return;
