@@ -1,6 +1,7 @@
 import {
   GuildConfig,
   GuildUser,
+  Levels,
   Prisma,
   PrismaClient,
   User,
@@ -84,6 +85,21 @@ export class GuildRepository {
   async findById(id: string): Promise<GuildConfig> {
     const guild = await this.repo.findUnique({ where: { id } });
     if (!guild) return await this.repo.create({ data: { id } });
+    return guild;
+  }
+
+  async findByIdWithLevels(
+    id: string
+  ): Promise<GuildConfig & { levels: Levels[] }> {
+    const guild = await this.repo.findUnique({
+      where: { id },
+      include: { levels: true },
+    });
+    if (!guild)
+      return await this.repo.create({
+        data: { id },
+        include: { levels: true },
+      });
     return guild;
   }
 

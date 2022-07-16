@@ -2,6 +2,7 @@ import { Message } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import { MentionUserId, SelfUserId } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
+import DiscordClient from '../../utils/client';
 import { getGuildUser } from '../../utils/database/User';
 
 export default class Rank extends Command {
@@ -23,19 +24,22 @@ export default class Rank extends Command {
   }
 
   async run(message: Message, args: { targetUserId: string }) {
+    const db = (message.client as DiscordClient).db;
     const guildUser = await message.guild.members.fetch(args.targetUserId);
-    const user = await getGuildUser(message.guildId, args.targetUserId);
+    const user = await db.guildUsers.findById(
+      message.guildId,
+      message.author.id
+    );
     const isSelf = args.targetUserId === message.author.id;
     const targetText = isSelf ? 'You are' : guildUser.displayName + ' is';
+    const xpThreshhold = Math.floor(
+      500 * user.level * Math.floor((user.level + 1) * 0.5)
+    );
 
-    if (!user || user.guilds.length === 0)
-      return message.reply(`${targetText} 0 XP`);
-    else {
-      const xp = user.guilds[0].xp;
-      return message.reply(
-        `${targetText} Level: ${Math.round(xp / 2000)} - XP: ${xp}`
-      );
-    } // if (args.length === 0) return message.reply('Provide a URL to scrape!');
+    return message.reply(
+      `${targetText} Level: ${user.level} - XP: ${user.xp}/${xpThreshhold}`
+    );
+    // if (args.length === 0) return message.reply('Provide a URL to scrape!');
     // const url = 'https://www.instagram.com/p/Cdc02LTD0Fo/';
 
     // const html = await axios.get(url);

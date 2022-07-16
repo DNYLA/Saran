@@ -32,7 +32,7 @@ export default class Levels extends Command {
     let description = '';
     for (let i = 0; i < levels.length; i++) {
       const level = levels[i];
-      description += `<@&${level.roleId}>: ${level.level}`;
+      description += `<@&${level.roleId}>: ${level.level}\n`;
     }
 
     const embed = new MessageEmbed()

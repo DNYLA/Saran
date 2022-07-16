@@ -27,6 +27,7 @@ model GuildUser {
   serverId           String
   lastFMTag          String?
   reactionBoardScore Int      @default(0)
+  level Int @default(0)
   xp                 Int      @default(0)
   customBoostRoleId  String?
   isBooster          Boolean  @default(false)

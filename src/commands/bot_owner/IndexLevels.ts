@@ -2,6 +2,7 @@ import { Collection, Message } from 'discord.js';
 import OwnerOnly from '../../checks/OwnerOnly';
 import StartTyping from '../../hooks/StartTyping';
 import Command from '../../utils/base/command';
+import DiscordClient from '../../utils/client';
 
 export default class IndexLevels extends Command {
   constructor() {
@@ -15,7 +16,6 @@ export default class IndexLevels extends Command {
         preCommand: StartTyping,
         postCommand: () => console.log('Finished Executing'),
       },
-      deleteCommand: true,
     });
   }
 
@@ -34,7 +34,6 @@ export default class IndexLevels extends Command {
           .then((messagePage) =>
             messagePage.size === 1 ? messagePage.at(0) : null
           );
-
         while (message) {
           console.log(messages.length);
           await channel.messages
@@ -55,27 +54,34 @@ export default class IndexLevels extends Command {
 
           if (!collectionKeys.includes(msg.author.id))
             collectionKeys.push(msg.author.id);
-          const xp = Math.floor(
-            (usersCollection[msg.author.id] ?? 0) + 10 * 1.2
-          );
-          usersCollection[msg.author.id] = xp;
+
+          usersCollection[msg.author.id] =
+            (usersCollection[msg.author.id] ?? 0) + 1;
         });
       })
     );
 
-    // await Promise.all(
-    //   collectionKeys.map(async (key) => {
-    //     const item = usersCollection[key];
-    //     try {
-    //       const member = await guild.members.fetch(key);
-    //       if (!member || !item) return;
-    //       console.log(`${key}:${item}`);
-    //       await createGuildMember(member, { xp: item });
-    //     } catch (err) {
-    //       console.log(err);
-    //     }
-    //   })
-    // );
+    const db = (message.client as DiscordClient).db;
+
+    await Promise.all(
+      collectionKeys.map(async (key) => {
+        const level = Math.floor(usersCollection[key] / 250);
+        try {
+          const member = await guild.members.fetch(key);
+          if (!member || !level) return;
+          console.log(`${key}:${usersCollection[key]}`);
+          await db.guildUsers.repo.upsert({
+            where: {
+              userId_serverId: { serverId: member.guild.id, userId: member.id },
+            },
+            create: { level, serverId: member.guild.id, userId: member.id },
+            update: { level, xp: 0 },
+          });
+        } catch (err) {
+          console.log(err);
+        }
+      })
+    );
 
     message.reply('Indexed Levels');
   }
