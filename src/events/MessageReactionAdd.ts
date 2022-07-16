@@ -16,9 +16,8 @@ export default class MessageReactionAdd extends Event {
   async run(client: DiscordClient, reaction: MessageReaction, user: User) {
     // const config = client.getConfig(reaction.message.guildId);
     const config = await client.db.guilds.findById(reaction.message.guildId);
-    if (!config) return; //Configs should auto be fetched whenever a message is sent
-    if (!config.reactionBoardChannel) return;
-    const guild = reaction.message.guild;
+    if (!config || !config.reactionBoardChannel) return;
+    const guild = await reaction.message.guild.fetch();
     const message = await reaction.message.fetch();
 
     const alreadySet = await getReactionBoardInfo(message.id, guild.id);
@@ -26,22 +25,22 @@ export default class MessageReactionAdd extends Event {
     console.log(alreadySet);
 
     try {
-      await message.guild.channels.fetch();
-      const channel = await message.guild.channels.fetch(
+      const rbChannel = await message.guild.channels.fetch(
         config.reactionBoardChannel
       );
+
       const reactions = message.reactions.cache;
       const sobEmoji = reactions.get('😭');
-      if (!channel) return;
-      if (!channel.isText()) return;
+      if (!rbChannel) return;
+      if (!rbChannel.isText()) return;
       if (reaction.emoji.name != '😭') return;
-      const reactionChannel = await guild.channels.fetch(
+      const messageChannel = await guild.channels.fetch(
         reaction.message.channelId
       );
 
       if (alreadySet) {
         try {
-          const preSet = await channel.messages.fetch(
+          const preSet = await rbChannel.messages.fetch(
             alreadySet.embedMessageId
           );
           if (preSet) {
@@ -55,7 +54,7 @@ export default class MessageReactionAdd extends Event {
               .setDescription(message.content)
               .addFields(
                 {
-                  name: `#${reactionChannel.name}`,
+                  name: `#${messageChannel.name}`,
                   value: `[Go To Message](${message.url})`,
                   inline: true,
                 },
@@ -77,7 +76,7 @@ export default class MessageReactionAdd extends Event {
 
       if (alreadySet) return;
       if (!sobEmoji) return;
-      if (sobEmoji.count < config.reactionBoardLimit) return;
+      if (config.reactionBoardLimit > sobEmoji.count) return;
       if (!reaction.message.channel.isText()) return;
 
       // const attachemnt = reaction.message.attachments.first();
@@ -96,7 +95,7 @@ export default class MessageReactionAdd extends Event {
         .setDescription(message.content)
         .addFields(
           {
-            name: `#${reactionChannel.name}`,
+            name: `#${messageChannel.name}`,
             value: `[Go To Message](${message.url})`,
             inline: true,
           },
@@ -108,7 +107,7 @@ export default class MessageReactionAdd extends Event {
         .setFooter({ text: 'Emoji Score: 15' })
         .setTimestamp();
 
-      const sentMessage = await channel.send({ embeds: [messageEmbed] });
+      const sentMessage = await rbChannel.send({ embeds: [messageEmbed] });
       await createReactionBoardInfo(
         sobEmoji.count,
         sobEmoji.emoji.name,

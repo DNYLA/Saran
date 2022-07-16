@@ -8,8 +8,6 @@ export async function getReactionBoardInfo(
   messageId: string,
   serverId: string
 ) {
-  console.log(messageId);
-  console.log(serverId);
   return await prisma.reactionBoardMessages.findUnique({
     where: { messageId_serverId: { messageId, serverId } },
   });
