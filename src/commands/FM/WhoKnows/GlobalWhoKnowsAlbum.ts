@@ -6,8 +6,13 @@ import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../../utils/base/command';
 import DiscordClient from '../../../utils/client';
 
-import { fetchRecentAlbumInfo, WhoKnowsEmbed } from '../../../utils/fmHelpers';
+import {
+  fetchRecentAlbumInfo,
+  fetchSearchAlbumInfo,
+  WhoKnowsEmbed,
+} from '../../../utils/fmHelpers';
 import { FormatWhoKnows } from '../../../utils/lastfm/wkHelpers';
+import { Album } from '../../../utils/types';
 
 export default class GlobalWhoKnowsAlbum extends Command {
   constructor() {
@@ -41,8 +46,12 @@ export default class GlobalWhoKnowsAlbum extends Command {
   ) {
     const client = message.client as DiscordClient;
     const user = await client.db.users.findById(args.targetUserId);
-    const { album } = await fetchRecentAlbumInfo(user.lastFMName);
-    if (!album) return message.reply('Unable to find album with name!');
+    let album: Album;
+    if (args.albumName) {
+      album = await fetchSearchAlbumInfo(user.lastFMName, args.albumName);
+    } else {
+      album = (await fetchRecentAlbumInfo(user.lastFMName)).album;
+    }
     const albumService = client.db.albums;
 
     const filter = albumService.WhoKnowsFilter(album.name, album.artist);

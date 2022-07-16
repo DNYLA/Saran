@@ -5,8 +5,13 @@ import StartTyping from '../../../hooks/StartTyping';
 import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../../utils/base/command';
 import DiscordClient from '../../../utils/client';
-import { fetchRecentTrackInfo, WhoKnowsEmbed } from '../../../utils/fmHelpers';
+import {
+  fetchRecentTrackInfo,
+  fetchSearchTrackInfo,
+  WhoKnowsEmbed,
+} from '../../../utils/fmHelpers';
 import { FormatWhoKnows } from '../../../utils/lastfm/wkHelpers';
+import { Track } from '../../../utils/types';
 import { SearchTrackArguments } from '../Plays/playsTrack';
 
 export default class GlobalWhoKnowstrack extends Command {
@@ -43,8 +48,16 @@ export default class GlobalWhoKnowstrack extends Command {
   async run(message: Message, args: SearchTrackArguments) {
     const client = message.client as DiscordClient;
     const user = await client.db.users.findById(args.targetUserId);
-    const { track } = await fetchRecentTrackInfo(user.lastFMName);
-
+    let track: Track;
+    if (args.trackName) {
+      track = await fetchSearchTrackInfo(
+        user.lastFMName,
+        args.trackName,
+        args.artistName
+      );
+    } else {
+      track = (await fetchRecentTrackInfo(user.lastFMName)).track;
+    }
     const trackService = client.db.tracks;
     const filter = trackService.WhoKnowsFilter(track.name, track.artist.name);
     const guildPlays = await trackService.repo.findMany(filter);

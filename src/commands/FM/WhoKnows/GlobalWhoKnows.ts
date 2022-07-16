@@ -5,8 +5,13 @@ import StartTyping from '../../../hooks/StartTyping';
 import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../../utils/base/command';
 import DiscordClient from '../../../utils/client';
-import { fetchRecentArtistInfo, WhoKnowsEmbed } from '../../../utils/fmHelpers';
+import {
+  fetchRecentArtistInfo,
+  fetchSearchArtistInfo,
+  WhoKnowsEmbed,
+} from '../../../utils/fmHelpers';
 import { FormatWhoKnows } from '../../../utils/lastfm/wkHelpers';
+import { Artist } from '../../../utils/types';
 
 export default class GlobalWhoKnows extends Command {
   constructor() {
@@ -41,7 +46,12 @@ export default class GlobalWhoKnows extends Command {
   ) {
     const client = message.client as DiscordClient;
     const user = await client.db.users.findById(args.targetUserId);
-    const { artist } = await fetchRecentArtistInfo(user.lastFMName);
+    let artist: Artist;
+    if (args.artistName) {
+      artist = await fetchSearchArtistInfo(user.lastFMName, args.artistName);
+    } else {
+      artist = (await fetchRecentArtistInfo(user.lastFMName)).artist;
+    }
 
     const artistService = client.db.artists;
     const filter = artistService.WhoKnowsFilter(artist.name);
