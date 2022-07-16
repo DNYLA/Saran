@@ -83,6 +83,7 @@ export default class IndexLevels extends Command {
       })
     );
 
+    console.log(usersCollection);
     message.reply('Indexed Levels');
   }
 }

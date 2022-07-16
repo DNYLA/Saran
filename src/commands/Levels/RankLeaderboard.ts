@@ -18,9 +18,8 @@ export default class RankLeaderboard extends Command {
     const client = message.client as DiscordClient;
     const users = await client.db.guildUsers.repo.findMany({
       where: { serverId: message.guildId },
-      include: { user: true },
       take: 10,
-      orderBy: { xp: 'desc' },
+      orderBy: { level: 'desc' },
     });
 
     // const user = users.find((u) => u.userId === message.member.id);
@@ -28,15 +27,15 @@ export default class RankLeaderboard extends Command {
     let description = '';
 
     for (let i = 0; i < users.length; i++) {
-      const { userId, xp } = users[i];
-      if (xp === 0) continue;
+      const { userId, level } = users[i];
+      if (level === 0) continue;
       try {
         const discordUser = await message.client.users.fetch(userId);
         const formatted = `${discordUser.username}#${discordUser.discriminator}`;
 
         description += `**${i + 1}. ${
           i === 0 ? '👑' : ''
-        } ${formatted}** has **${xp}** xp\n`;
+        } ${formatted}** level **${level}**\n`;
       } catch (err) {
         console.log(err);
       }

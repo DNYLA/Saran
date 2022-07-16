@@ -28,7 +28,7 @@ export default class Rank extends Command {
     const guildUser = await message.guild.members.fetch(args.targetUserId);
     const user = await db.guildUsers.findById(
       message.guildId,
-      message.author.id
+      args.targetUserId
     );
     const isSelf = args.targetUserId === message.author.id;
     const targetText = isSelf ? 'You are' : guildUser.displayName + ' is';
