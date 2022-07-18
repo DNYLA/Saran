@@ -1,3 +1,4 @@
+import { GuildConfig } from '@prisma/client';
 import { Message } from 'discord.js';
 import Event from '../../utils/base/event';
 import DiscordClient from '../../utils/client';
@@ -15,21 +16,20 @@ export default class MessageEvent extends Event {
       `Author: ${message.author.id} Id: ${message.id}; Guild: ${message.guild.name}-${message.guildId}`
     );
     const user = await db.users.findById(message.author.id);
-    const config = await db.guilds.repo.findUnique({
-      where: { id: message.guildId },
-      include: { levels: true },
-    });
+    const config = await db.guilds.findById(message.guildId);
+
     if (config) {
       await db.guilds.updateById(message.guildId, {
         name: message.guild.name,
       });
     }
 
-    await handleLevelUp(client, message);
+    await handleLevelUp(client, message, config);
 
     if (!user) return;
 
     let messageCommand = message.content.toLowerCase();
+    console.log(config);
 
     //Replace custom lastfm tag with ,lf
     //Update to allow it to replace lf instead
@@ -71,10 +71,13 @@ export default class MessageEvent extends Event {
   }
 }
 
-async function handleLevelUp(client: DiscordClient, message: Message) {
+async function handleLevelUp(
+  client: DiscordClient,
+  message: Message,
+  config: GuildConfig
+) {
   const db = client.db;
 
-  const config = await db.guilds.findById(message.guildId);
   const user = await db.guildUsers.findById(message.guildId, message.author.id);
   const addedLevel = user.level + 1;
   const xpMultiplier = Math.floor(15 * addedLevel);
@@ -86,8 +89,6 @@ async function handleLevelUp(client: DiscordClient, message: Message) {
   await guild.roles.fetch();
   const local = await guild.members.fetch(user.userId);
 
-  console.log(xpThreshhold);
-  console.log(xpMultiplier);
   if (newXp >= xpThreshhold) {
     //User Leveled Up
     await db.guildUsers.updateById(message.guildId, message.author.id, {

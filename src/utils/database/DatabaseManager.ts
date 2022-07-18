@@ -124,7 +124,7 @@ export class GuildUserRepository {
   ) {}
 
   async findById(serverId: string, userId: string): Promise<GuildUser> {
-    const guild = this.repo.findUnique({
+    const guild = await this.repo.findUnique({
       where: { userId_serverId: { serverId, userId } },
     });
     if (!guild) return await this.create(userId, serverId);
