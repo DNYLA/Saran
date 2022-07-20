@@ -2,18 +2,25 @@ import { Message, MessageEmbed } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import Command from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
+import { CommandOptions } from '../../utils/types';
 
-export default class Levels extends Command {
-  constructor() {
-    super('levels', {
-      invalidUsage: `Do ,levels`,
-      hooks: {
-        preCommand: StartTyping,
+export default class LevelsCommand extends Command {
+  constructor(subcommand: string, options?: CommandOptions) {
+    super(
+      'levels',
+      options ?? {
+        invalidUsage: `Do ,levels`,
+        isSubcommand: true,
+        hooks: {
+          preCommand: StartTyping,
+        },
       },
-    });
+      subcommand
+    );
   }
 
-  async run(message: Message) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async run(message: Message, args: unknown): Promise<Message | void> {
     const client = message.client as DiscordClient;
     const guild = await message.guild.fetch();
     await guild.roles.fetch();
@@ -22,7 +29,6 @@ export default class Levels extends Command {
     const levels = await db.levels.repo.findMany({
       where: { serverId: guild.id },
     });
-    console.log(levels);
 
     if (!levels) return message.reply('No levels for this guild');
 

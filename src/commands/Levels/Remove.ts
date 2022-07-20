@@ -3,10 +3,11 @@ import StartTyping from '../../hooks/StartTyping';
 import { RoleMentionIdOrArg } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
+import LevelsCommand from './Levels';
 
-export default class LevelsRemove extends Command {
+export default class LevelsRemove extends LevelsCommand {
   constructor() {
-    super('levels remove', {
+    super('remove', {
       requirments: {
         permissions: {
           administrator: true,

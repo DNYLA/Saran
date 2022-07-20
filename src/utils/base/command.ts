@@ -20,7 +20,20 @@ export enum ArgumentTypes {
 }
 
 export default abstract class Command {
-  constructor(private name: string, private options?: CommandOptions) {}
+  constructor(
+    private name: string,
+    private options?: CommandOptions,
+    subcommand?: string
+  ) {
+    if (options && options.aliases && subcommand) {
+      const newAliases = [];
+      options.aliases.forEach((alias) => {
+        newAliases.push(`${name} ${alias}`);
+      });
+      this.options.aliases = newAliases;
+    }
+    if (subcommand) this.name = `${name} ${subcommand}`;
+  }
 
   getName(): string {
     return this.name.toLowerCase(); //Return lowercased command name
@@ -44,7 +57,10 @@ export default abstract class Command {
     type?: RequirmentsType;
     args: unknown;
   }> {
-    const { valid: validArgs, parsedArgs } = this.isValidArgs(args, message);
+    const { valid: validArgs, parsedArgs } = await this.isValidArgs(
+      args,
+      message
+    );
     if (!this.options?.requirments && validArgs)
       return { valid: true, message: null, type: null, args: parsedArgs };
 
@@ -113,91 +129,91 @@ export default abstract class Command {
     return true;
   }
 
-  private isValidArgs(args: string[], message: Message) {
+  private async isValidArgs(args: string[], message: Message) {
     let validArgs = true;
     const _args = [...args];
     const parsedArgs = {};
-    if (this.options?.arguments) {
-      const parseDefault = (
-        argDefault: string | ((message: Message) => string),
-        msg: Message
-      ) => {
-        if (!argDefault) return null;
-        if (typeof argDefault === 'string') return argDefault;
 
-        return argDefault(msg);
-      };
+    if (!this.options?.arguments) return { valid: validArgs, parsedArgs };
 
-      // console.log(this.options.args);
-      this.options.arguments.map((arg) => {
-        if (_args.length === 0) {
-          // if (arg.parse && !arg.optional) {
-          //   const parsed = arg.parse(message, _args, 0);
-          //   if (!parsed) return (validArgs = false);
-          //   parsedArgs[arg.name] = parsed;
-          // }
-          if (!arg.default && arg.optional)
-            return (parsedArgs[arg.name] = null);
-          else if (!arg.default && !arg.optional) return (validArgs = false);
-          const isDefault = parseDefault(arg.default, message);
-          if (isDefault) parsedArgs[arg.name] = isDefault;
-          else if (!arg.optional) validArgs = false;
+    const parseDefault = (
+      argDefault: string | ((message: Message) => string),
+      msg: Message
+    ) => {
+      if (!argDefault) return null;
+      if (typeof argDefault === 'string') return argDefault;
 
-          return;
+      return argDefault(msg);
+    };
+
+    const argums = this.options.arguments;
+    // console.log(this.options.args);
+    for (let i = 0; i < argums.length; i++) {
+      const arg = this.options.arguments[i];
+      if (_args.length === 0) {
+        // if (arg.parse && !arg.optional) {
+        //   const parsed = arg.parse(message, _args, 0);
+        //   if (!parsed) return (validArgs = false);
+        //   parsedArgs[arg.name] = parsed;
+        // }
+        if (!arg.default && arg.optional) return (parsedArgs[arg.name] = null);
+        else if (!arg.default && !arg.optional) {
+          validArgs = false;
+          continue;
         }
 
-        if (!arg.parse) {
-          const curArgs = [..._args];
-          if (arg.type === ArgumentTypes.SINGLE) {
-            parsedArgs[arg.name] = _args[0];
-            _args.shift();
-          } else if (arg.type === ArgumentTypes.FULL_SENTANCE) {
-            //Join remainder of arg into one string
-            parsedArgs[arg.name] = curArgs.join(' ');
-            _args.splice(curArgs.length - 1);
-          } else if (arg.type === ArgumentTypes.DENOMENATED_WORD) {
-            //Parse String Denomanted Via Denomentatror
-            const joined = curArgs.join(' ');
-            const split = joined.split(ARGUMENT_DENOMENATOR);
-            parsedArgs[arg.name] = split[0];
-            _args.splice(0, split[0].split(' ').length + 1); //+1 because we also want to remove the Denomenator
-          } else if (arg.type === ArgumentTypes.INTEGER) {
-            const parsedInt = parseInt(_args[0]);
-            if (isNaN(parsedInt)) {
-              validArgs = false;
-            } else {
-              parsedArgs[arg.name] = parsedInt;
-            }
-            _args.shift();
+        const isDefault = parseDefault(arg.default, message);
+        if (isDefault) parsedArgs[arg.name] = isDefault;
+        else if (!arg.optional) validArgs = false;
+
+        continue;
+      }
+
+      if (!arg.parse) {
+        const curArgs = [..._args];
+        if (arg.type === ArgumentTypes.SINGLE) {
+          parsedArgs[arg.name] = _args[0];
+          _args.shift();
+        } else if (arg.type === ArgumentTypes.FULL_SENTANCE) {
+          //Join remainder of arg into one string
+          parsedArgs[arg.name] = curArgs.join(' ');
+          _args.splice(curArgs.length - 1);
+        } else if (arg.type === ArgumentTypes.DENOMENATED_WORD) {
+          //Parse String Denomanted Via Denomentatror
+          const joined = curArgs.join(' ');
+          const split = joined.split(ARGUMENT_DENOMENATOR);
+          parsedArgs[arg.name] = split[0];
+          _args.splice(0, split[0].split(' ').length + 1); //+1 because we also want to remove the Denomenator
+        } else if (arg.type === ArgumentTypes.INTEGER) {
+          const parsedInt = parseInt(_args[0]);
+          if (isNaN(parsedInt)) {
+            validArgs = false;
+          } else {
+            parsedArgs[arg.name] = parsedInt;
           }
-          return;
-        }
-
-        const parsedArg = arg.parse(message, _args, 0);
-
-        if (!parsedArg) {
-          const defaultArg = parseDefault(arg.default, message);
-          if (defaultArg) parsedArgs[arg.name] = defaultArg;
-          else if (!arg.optional) validArgs = false;
-        } else {
-          parsedArgs[arg.name] = parsedArg;
           _args.shift();
         }
-      });
+        continue;
+      }
+
+      const parsedArg = await arg.parse(message, _args, 0);
+
+      if (!parsedArg) {
+        const defaultArg = parseDefault(arg.default, message);
+        if (defaultArg) parsedArgs[arg.name] = defaultArg;
+        else if (!arg.optional) validArgs = false;
+      } else {
+        parsedArgs[arg.name] = parsedArg;
+        _args.shift();
+      }
     }
 
     return { valid: validArgs, parsedArgs };
   }
 
-  private checkSubcommand(client: DiscordClient, args: string[]) {
-    if (this.options.isSubcommand) {
-      const commandName = args.slice(0, 2).join(' ');
-      return client.commands.get(commandName);
-    }
-  }
-
   async execute(client: DiscordClient, message: Message, args: string[]) {
     let subcommand: Command;
+    console.log(this.name);
     if (this.options.isSubcommand) {
       const commandName = `${this.name} ${args[0]}`;
       subcommand = client.commands.get(commandName);

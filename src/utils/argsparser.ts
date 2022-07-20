@@ -1,11 +1,14 @@
 import { Message, MessageMentions } from 'discord.js';
 
-export const StringToColour = (message: Message, args: string[]) => {
+export const StringToColour = async (message: Message, args: string[]) => {
   if (args.length > 0) return args[0].toUpperCase();
   else return null;
 };
 
-export const ImageUrlOrAttachment = (message: Message, args: string[]) => {
+export const ImageUrlOrAttachment = async (
+  message: Message,
+  args: string[]
+) => {
   if (message.attachments.size > 0) {
     return message.attachments.first().url;
   }
@@ -15,17 +18,26 @@ export const ImageUrlOrAttachment = (message: Message, args: string[]) => {
   return null;
 };
 
-export const MentionUserId = (
+export const MentionUserId = async (
   message: Message,
   args: string[],
   index: number
 ) => {
+  const client = message.client;
   if (args.length > 0) {
     const isMention = args[index]
       .matchAll(MessageMentions.USERS_PATTERN)
       .next().value;
     if (isMention) {
       return isMention[1];
+    } else {
+      try {
+        const user = await client.users.fetch(args[index]);
+        if (user) return user.id;
+        else return null;
+      } catch (err) {
+        return null;
+      }
     }
   }
 

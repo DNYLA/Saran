@@ -8,20 +8,8 @@ import { CommandOptions } from '../../utils/types';
 
 export default class LastFMCommand extends Command {
   constructor(subcommand: string, options?: CommandOptions) {
-    let commandName = 'lastfm';
-
-    if (options && options.aliases) {
-      const newAliases = [];
-      options.aliases.forEach((alias) => {
-        newAliases.push(`${commandName} ${alias}`);
-      });
-      options.aliases = newAliases;
-    }
-
-    if (subcommand) commandName = `${commandName} ${subcommand}`;
-
     super(
-      commandName,
+      'lastfm',
       options ?? {
         requirments: {
           custom: UsernameCheck,
@@ -40,7 +28,8 @@ export default class LastFMCommand extends Command {
             type: ArgumentTypes.SINGLE,
           },
         ],
-      }
+      },
+      subcommand
     );
   }
 

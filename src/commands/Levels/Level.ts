@@ -4,10 +4,11 @@ import { MentionUserId, SelfUserId } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
 
-export default class Rank extends Command {
+export default class UserLevel extends Command {
   constructor() {
-    super('rank', {
-      invalidUsage: `Do ,rank <UserMention>(Optional)`,
+    super('level', {
+      aliases: ['rank'],
+      invalidUsage: `Do ,level <UserMention>(Optional)`,
       hooks: {
         preCommand: StartTyping,
       },

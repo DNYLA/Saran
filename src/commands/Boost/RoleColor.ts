@@ -3,31 +3,39 @@ import StartTyping from '../../hooks/StartTyping';
 import { StringToColour } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
+import { CommandOptions } from '../../utils/types';
 
-export default class BoosterRoleColour extends Command {
-  constructor() {
-    super('boostcol', {
-      requirments: {
-        permissions: {
-          administrator: false,
+export default class BoosterRoleCommand extends Command {
+  constructor(subcommand: string, options?: CommandOptions) {
+    super(
+      'boosterrole',
+      options ?? {
+        aliases: ['br'],
+        requirments: {
+          permissions: {
+            administrator: false,
+          },
         },
-      },
-      invalidPermissions: 'You must be admin to use this!',
-      invalidUsage: `Do ,boostcol <#hex>`,
-      hooks: {
-        preCommand: StartTyping,
-      },
-      arguments: [
-        {
-          name: 'colour',
-          type: ArgumentTypes.SINGLE,
-          parse: StringToColour,
+        invalidPermissions: 'You must be admin to use this!',
+        invalidUsage: `Do ,boosterrole <#hex>`,
+        hooks: {
+          preCommand: StartTyping,
         },
-      ],
-    });
+        arguments: [
+          {
+            name: 'colour',
+            type: ArgumentTypes.SINGLE,
+            parse: StringToColour,
+          },
+        ],
+      },
+      subcommand
+    );
   }
 
-  async run(message: Message, args: { colour: string }) {
+  async run(message: Message, args: unknown) {
+    const argums = args as { colour: string };
+
     const guildUsersService = (message.client as DiscordClient).db.guildUsers;
     const user = await message.client.users.fetch(message.author.id);
     if (!user) return message.reply('User doesnt exist!');
@@ -69,14 +77,14 @@ export default class BoosterRoleColour extends Command {
       }
     }
 
-    if (!args.colour) return message.reply('Pass through a valid colour');
+    if (!argums.colour) return message.reply('Pass through a valid colour');
 
     try {
       // guildUser.roles.premiumSubscriberRole
       // console.log(guildUser.roles.premiumSubscriberRole);
       // await boosterRole.setIcon(args.iconLink);
 
-      await boosterRole.setColor(args.colour as ColorResolvable);
+      await boosterRole.setColor(argums.colour as ColorResolvable);
       if (storedUser.customBoostRoleId !== boosterRole.id)
         await guildUsersService.updateById(guild.id, user.id, {
           customBoostRoleId: boosterRole.id,

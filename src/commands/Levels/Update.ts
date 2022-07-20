@@ -4,10 +4,11 @@ import StartTyping from '../../hooks/StartTyping';
 import { RoleMentionIdOrArg } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
+import LevelsCommand from './Levels';
 
-export default class LevelsUpdate extends Command {
+export default class LevelsUpdate extends LevelsCommand {
   constructor() {
-    super('levels update', {
+    super('update', {
       requirments: {
         permissions: {
           administrator: true,

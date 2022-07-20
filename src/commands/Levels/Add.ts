@@ -4,10 +4,11 @@ import StartTyping from '../../hooks/StartTyping';
 import { RoleMentionIdOrArg } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
+import LevelsCommand from './Levels';
 
-export default class LevelsAdd extends Command {
+export default class LevelsAdd extends LevelsCommand {
   constructor() {
-    super('levels add', {
+    super('add', {
       requirments: {
         permissions: {
           administrator: true,
@@ -39,6 +40,7 @@ export default class LevelsAdd extends Command {
     let role: Role;
     const level = Math.round(Number(args.level));
     console.log(level);
+    console.log(args);
     try {
       role = guild.roles.cache.get(args.roleId);
     } catch (err) {

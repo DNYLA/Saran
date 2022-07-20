@@ -22,7 +22,7 @@ export type CommandOptions = {
 export type Arguments = {
   optional?: boolean;
   default?: string | ((message: Message) => string);
-  parse?: (message: Message, args: string[], index: number) => string;
+  parse?: (message: Message, args: string[], index: number) => Promise<string>;
   name: string;
   type: ArgumentTypes; //Type is required however
   // type: ArgumentType;

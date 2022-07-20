@@ -1,18 +1,19 @@
 import { Message, Role } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
-import Command, { ArgumentTypes } from '../../utils/base/command';
+import { ArgumentTypes } from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
+import BoosterRoleCommand from './RoleColor';
 
-export default class BoosterRoleName extends Command {
+export default class BoosterRoleName extends BoosterRoleCommand {
   constructor() {
-    super('boostname', {
+    super('name', {
       requirments: {
         permissions: {
           administrator: false,
         },
       },
       invalidPermissions: 'You must be admin to use this!',
-      invalidUsage: `Do ,boostname <name>`,
+      invalidUsage: `Do ,boosterrole <name>`,
       hooks: {
         preCommand: StartTyping,
       },

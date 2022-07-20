@@ -1,19 +1,20 @@
 import { Message, Role } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import { ImageUrlOrAttachment } from '../../utils/argsparser';
-import Command, { ArgumentTypes } from '../../utils/base/command';
+import { ArgumentTypes } from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
+import BoosterRoleCommand from './RoleColor';
 
-export default class BoosterRole extends Command {
+export default class BoosterRoleIcon extends BoosterRoleCommand {
   constructor() {
-    super('boost', {
+    super('icon', {
       requirments: {
         permissions: {
           administrator: false,
         },
       },
       invalidPermissions: 'You must be admin to use this!',
-      invalidUsage: `Do ,boost <imageurl>`,
+      invalidUsage: `Do ,boosterrole icon <imageurl>`,
       hooks: {
         preCommand: StartTyping,
       },
