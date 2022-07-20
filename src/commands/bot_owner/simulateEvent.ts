@@ -1,5 +1,4 @@
 import { Message } from 'discord.js';
-import { userInfo } from 'os';
 import OwnerOnly from '../../checks/OwnerOnly';
 import StartTyping from '../../hooks/StartTyping';
 import { MentionUserId, SelfUserId } from '../../utils/argsparser';

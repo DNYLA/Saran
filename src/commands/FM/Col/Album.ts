@@ -3,7 +3,7 @@ import UsernameCheck from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
 import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
-import Command, { ArgumentTypes } from '../../../utils/base/command';
+import { ArgumentTypes } from '../../../utils/base/command';
 import {
   getPeriodFromString,
   getTopTenStatsNoEmbed,
@@ -13,11 +13,12 @@ import { convertPeriodToText } from '../../../utils/helpers';
 import { TopTenArguments } from '../TopTen/topartists';
 import { createCollage } from '@wylie39/image-collage';
 import DiscordClient from '../../../utils/client';
+import LastFMCommand from '../LastFM';
 
-export default class AlbumCollage extends Command {
+export default class AlbumCollage extends LastFMCommand {
   constructor() {
-    super('lf col', {
-      aliases: ['lf collage'],
+    super('collage', {
+      aliases: ['col'],
       requirments: {
         custom: UsernameCheck,
       },
@@ -44,8 +45,6 @@ export default class AlbumCollage extends Command {
   }
 
   async run(message: Message, args: TopTenArguments) {
-    console.log('Here');
-
     const user = await (message.client as DiscordClient).db.users.findById(
       args.targetUserId
     );
@@ -58,13 +57,15 @@ export default class AlbumCollage extends Command {
     );
 
     const imageUrls = [];
+    const noImageUrl =
+      'https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png';
     for (let i = 0; i < topTen.length; i++) {
       if (i === 9) continue;
       const item = topTen[i];
       try {
         const url = item.image[3]['#text'];
-        if (!url) continue;
-        imageUrls.push(url);
+        if (url) imageUrls.push(url);
+        else imageUrls.push(noImageUrl);
         // const response = await axios.get(url, { responseType: 'arraybuffer' });
         // const buffer = Buffer.from(response.data, 'utf-8');
         // imgbuffers.push(buffer);

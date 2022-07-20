@@ -5,13 +5,13 @@ import {
   fetchUserTracks,
 } from '../../api/lastfm';
 import StartTyping from '../../hooks/StartTyping';
-import Command, { ArgumentTypes } from '../../utils/base/command';
+import { ArgumentTypes } from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
+import LastFMCommand from './LastFM';
 
-export default class SetUsername extends Command {
+export default class SetUsername extends LastFMCommand {
   constructor() {
-    super('lf set', {
-      aliases: ['lfset'],
+    super('set', {
       // requirments: {
       //   custom: UsernameCheck,
       // },

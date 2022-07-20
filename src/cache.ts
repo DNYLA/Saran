@@ -1,5 +1,4 @@
 import { User } from '@prisma/client';
-import Redis from 'ioredis';
 
 const users = new Map<string, User>();
 

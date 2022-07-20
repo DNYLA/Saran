@@ -3,7 +3,6 @@ import StartTyping from '../../hooks/StartTyping';
 import { MentionUserId, SelfUserId } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
-import { getGuildUser } from '../../utils/database/User';
 
 export default class Rank extends Command {
   constructor() {

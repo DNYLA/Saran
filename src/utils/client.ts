@@ -10,6 +10,7 @@ export default class DiscordClient extends Client {
   private _images = new Collection<string, GoogleImagesSearch>();
   // private _configs = new Array<GuildConfig>();
   private _deletedMessages = new Collection<string, Message>();
+  private _editedMessages = new Collection<string, Message>();
   private _database = new DatabaseManager();
   constructor(options?: ClientOptions) {
     super(options);
@@ -51,7 +52,15 @@ export default class DiscordClient extends Client {
     return this._deletedMessages[serverId];
   }
 
+  getEditedMessage(serverId: string): Message {
+    return this._editedMessages[serverId];
+  }
+
   setDeletedMessage(message: Message) {
     this._deletedMessages[message.guildId] = message;
+  }
+
+  setEditedMessage(message: Message) {
+    this._editedMessages[message.guildId] = message;
   }
 }

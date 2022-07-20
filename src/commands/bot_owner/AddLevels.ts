@@ -1,6 +1,6 @@
 import { Message } from 'discord.js';
 import OwnerOnly from '../../checks/OwnerOnly';
-import Command, { ArgumentTypes } from '../../utils/base/command';
+import Command from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
 
 export default class ArgsTest extends Command {
@@ -22,7 +22,7 @@ export default class ArgsTest extends Command {
     });
 
     const guild = await message.guild.fetch();
-    const roles = await guild.roles.fetch();
+    await guild.roles.fetch();
 
     if (!levels) return message.reply('Done');
 

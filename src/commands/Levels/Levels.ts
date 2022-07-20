@@ -1,8 +1,6 @@
-import { Prisma } from '@prisma/client';
-import { Message, MessageEmbed, Role } from 'discord.js';
+import { Message, MessageEmbed } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
-import { MentionIdOrArg, RoleMentionIdOrArg } from '../../utils/argsparser';
-import Command, { ArgumentTypes } from '../../utils/base/command';
+import Command from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
 
 export default class Levels extends Command {
@@ -15,11 +13,10 @@ export default class Levels extends Command {
     });
   }
 
-  async run(message: Message, args: { roleId: string }) {
+  async run(message: Message) {
     const client = message.client as DiscordClient;
     const guild = await message.guild.fetch();
-    const roles = await guild.roles.fetch();
-    let role: Role;
+    await guild.roles.fetch();
     const db = client.db;
 
     const levels = await db.levels.repo.findMany({

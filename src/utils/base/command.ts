@@ -189,7 +189,28 @@ export default abstract class Command {
     return { valid: validArgs, parsedArgs };
   }
 
+  private checkSubcommand(client: DiscordClient, args: string[]) {
+    if (this.options.isSubcommand) {
+      const commandName = args.slice(0, 2).join(' ');
+      return client.commands.get(commandName);
+    }
+  }
+
   async execute(client: DiscordClient, message: Message, args: string[]) {
+    let subcommand: Command;
+    if (this.options.isSubcommand) {
+      const commandName = `${this.name} ${args[0]}`;
+      subcommand = client.commands.get(commandName);
+      console.log(subcommand);
+    }
+    if (subcommand) {
+      try {
+        await subcommand.execute(client, message, args.slice(1));
+        return;
+      } catch (err) {
+        return;
+      }
+    }
     const hooks = this.options?.hooks;
 
     // Runn PreCommand()
@@ -237,6 +258,7 @@ export default abstract class Command {
 
     //Run Command if checks passed
     let success = true;
+
     try {
       if (passedChecks) await this.run(message, parsedArgs);
     } catch (err) {
@@ -261,8 +283,5 @@ export default abstract class Command {
     } catch (err) {} //Message Probably already deleted
   }
 
-  abstract run(
-    message: Message,
-    args?: unknown
-  ): Promise<Message> | Promise<void>;
+  abstract run(message: Message, args?: unknown): Promise<Message | void>;
 }

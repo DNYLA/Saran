@@ -1,7 +1,6 @@
 import { Message } from 'discord.js';
 import Event from '../../utils/base/event';
 import DiscordClient from '../../utils/client';
-import { getArgsFromMsg } from '../../utils/helpers';
 
 export default class MessageEvent extends Event {
   constructor() {

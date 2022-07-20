@@ -29,7 +29,6 @@ export default class MessageEvent extends Event {
     if (!user) return;
 
     let messageCommand = message.content.toLowerCase();
-    console.log(config);
 
     //Replace custom lastfm tag with ,lf
     //Update to allow it to replace lf instead
@@ -53,7 +52,6 @@ export default class MessageEvent extends Event {
     );
 
     const command = client.commands.get(commandName.toLowerCase());
-    console.log(commandName);
 
     if (!command) return; //Invalid Command
 
@@ -65,9 +63,6 @@ export default class MessageEvent extends Event {
         'There was an error when attempting to execute this command'
       );
     }
-  }
-  catch(err) {
-    console.log(err);
   }
 }
 

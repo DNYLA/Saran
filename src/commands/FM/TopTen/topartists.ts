@@ -3,16 +3,18 @@ import UsernameCheck from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
 import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
-import Command, { ArgumentTypes } from '../../../utils/base/command';
+import { ArgumentTypes } from '../../../utils/base/command';
 import { getTopTenStats, SearchType } from '../../../utils/fmHelpers';
+import LastFMCommand from '../LastFM';
 
 export type TopTenArguments = {
   targetUserId: string;
   period: string;
 };
-export default class TopArtists extends Command {
+export default class TopArtists extends LastFMCommand {
   constructor() {
-    super('lf tar', {
+    super('topartists', {
+      aliases: ['tar'],
       requirments: {
         custom: UsernameCheck,
       },

@@ -4,6 +4,7 @@ import { ArgumentTypes, RequirmentsType } from './base/command';
 export type CommandOptions = {
   aliases?: string[]; //Done
   module?: string;
+  isSubcommand?: boolean;
   description?: string;
   errorMessage?: string; //Done
   invalidUsage?: string; //Done

@@ -3,7 +3,7 @@ import UsernameCheck from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
 import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
-import Command, { ArgumentTypes } from '../../../utils/base/command';
+import { ArgumentTypes } from '../../../utils/base/command';
 import DiscordClient from '../../../utils/client';
 import {
   fetchRecentArtistInfo,
@@ -12,10 +12,12 @@ import {
 } from '../../../utils/fmHelpers';
 import { FormatWhoKnows } from '../../../utils/lastfm/wkHelpers';
 import { Artist } from '../../../utils/types';
+import LastFMCommand from '../LastFM';
 
-export default class WhoKnows extends Command {
+export default class WhoKnows extends LastFMCommand {
   constructor() {
-    super('lf wk', {
+    super('whoknows', {
+      aliases: ['wk'],
       requirments: {
         custom: UsernameCheck,
       },

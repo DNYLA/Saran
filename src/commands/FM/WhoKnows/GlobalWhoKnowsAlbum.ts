@@ -3,7 +3,7 @@ import UsernameCheck from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
 import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
-import Command, { ArgumentTypes } from '../../../utils/base/command';
+import { ArgumentTypes } from '../../../utils/base/command';
 import DiscordClient from '../../../utils/client';
 
 import {
@@ -13,10 +13,12 @@ import {
 } from '../../../utils/fmHelpers';
 import { FormatWhoKnows } from '../../../utils/lastfm/wkHelpers';
 import { Album } from '../../../utils/types';
+import LastFMCommand from '../LastFM';
 
-export default class GlobalWhoKnowsAlbum extends Command {
+export default class GlobalWhoKnowsAlbum extends LastFMCommand {
   constructor() {
-    super('lf gwka', {
+    super('globalwhoknowsalbum', {
+      aliases: ['gwka'],
       requirments: {
         custom: UsernameCheck,
       },

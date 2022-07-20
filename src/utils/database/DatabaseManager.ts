@@ -6,7 +6,6 @@ import {
   PrismaClient,
   User,
 } from '@prisma/client';
-import { GuildMember } from 'discord.js';
 import { client } from '../../main';
 
 const prisma = new PrismaClient();

@@ -6,13 +6,13 @@ import {
 } from '../../api/lastfm';
 import UsernameCheck from '../../checks/UsernameCheck';
 import StartTyping from '../../hooks/StartTyping';
-import Command from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
+import LastFMCommand from './LastFM';
 
-export default class SetUsername extends Command {
+export default class SetUsername extends LastFMCommand {
   constructor() {
-    super('lf update', {
-      aliases: ['lf u'],
+    super('update', {
+      aliases: ['u'],
       requirments: {
         custom: UsernameCheck,
       },

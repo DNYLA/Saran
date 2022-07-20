@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client';
 import { Message, Role } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
-import { MentionIdOrArg, RoleMentionIdOrArg } from '../../utils/argsparser';
+import { RoleMentionIdOrArg } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
 
@@ -35,7 +35,7 @@ export default class LevelsUpdate extends Command {
   async run(message: Message, args: { roleId: string; level: string }) {
     const client = message.client as DiscordClient;
     const guild = await message.guild.fetch();
-    const roles = await guild.roles.fetch();
+    await guild.roles.fetch();
     let role: Role;
     const level = Math.round(Number(args.level));
     console.log(level);

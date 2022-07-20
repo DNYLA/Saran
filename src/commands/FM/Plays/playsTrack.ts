@@ -3,7 +3,7 @@ import UsernameCheck from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
 import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
-import Command, { ArgumentTypes } from '../../../utils/base/command';
+import { ArgumentTypes } from '../../../utils/base/command';
 import DiscordClient from '../../../utils/client';
 import { setCachedPlays } from '../../../utils/database/redisManager';
 import {
@@ -12,6 +12,7 @@ import {
   SearchType,
 } from '../../../utils/fmHelpers';
 import { Track } from '../../../utils/types';
+import LastFMCommand from '../LastFM';
 
 export type SearchTrackArguments = {
   targetUserId: string;
@@ -19,10 +20,10 @@ export type SearchTrackArguments = {
   artistName: string;
 };
 
-export default class PlaysTrack extends Command {
+export default class PlaysTrack extends LastFMCommand {
   constructor() {
-    super('lf playst', {
-      aliases: ['lf playstrack', 'lf pt', 'lf tp', 'lf ptrack'],
+    super('playstrack', {
+      aliases: ['playst', 'pt', 'tp', 'ptrack'],
       requirments: {
         custom: UsernameCheck,
       },

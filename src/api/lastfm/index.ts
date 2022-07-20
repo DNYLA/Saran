@@ -39,6 +39,22 @@ AXIOS.interceptors.request.use((request) => {
   return request;
 });
 
+export async function fetchUser(username: string) {
+  try {
+    const { data } = await AXIOS.get(
+      new EscapedURI('user.getInfo').addUser(username).URI
+    );
+
+    return {
+      tracks: data.recenttracks.track,
+      user: data.recenttracks['@attr'],
+    };
+  } catch (err) {
+    console.log(err);
+    return { tracks: [], user: null };
+  }
+}
+
 export async function fetchRecentTracks(
   username: string,
   limit: number

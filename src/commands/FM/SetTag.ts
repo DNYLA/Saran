@@ -2,13 +2,14 @@ import { Message } from 'discord.js';
 import UsernameCheck from '../../checks/UsernameCheck';
 import NoUsernameSet from '../../hooks/NoUsernameSet';
 import StartTyping from '../../hooks/StartTyping';
-import Command, { ArgumentTypes } from '../../utils/base/command';
+import { ArgumentTypes } from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
+import LastFMCommand from './LastFM';
 
-export default class SetTag extends Command {
+export default class SetTag extends LastFMCommand {
   constructor() {
-    super('lf tag', {
-      aliases: ['lftag'],
+    super('tag', {
+      aliases: ['cc'],
       requirments: {
         custom: UsernameCheck,
       },
@@ -32,9 +33,11 @@ export default class SetTag extends Command {
       await userService.updateById(message.author.id, {
         lastFMTag: args.tag,
       });
-      message.reply(`Successfully set custom tag to ${args.tag}`);
+      return message.reply(`Successfully set custom tag to ${args.tag}`);
     } catch (err) {
-      message.reply('Error Occured whilst trying to set your custom tag.');
+      return message.reply(
+        'Error Occured whilst trying to set your custom tag.'
+      );
     }
   }
 }
