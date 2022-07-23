@@ -17,7 +17,7 @@ export default class BoosterRoleCommand extends Command {
           },
         },
         invalidPermissions: 'You must be admin to use this!',
-        invalidUsage: `Do ,boosterrole <#hex>`,
+        invalidUsage: `Do ,boosterrole <colour | #hex>`,
         hooks: {
           preCommand: StartTyping,
         },

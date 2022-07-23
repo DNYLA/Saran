@@ -213,11 +213,9 @@ export default abstract class Command {
 
   async execute(client: DiscordClient, message: Message, args: string[]) {
     let subcommand: Command;
-    console.log(this.name);
     if (this.options.isSubcommand) {
       const commandName = `${this.name} ${args[0]}`;
       subcommand = client.commands.get(commandName);
-      console.log(subcommand);
     }
     if (subcommand) {
       try {

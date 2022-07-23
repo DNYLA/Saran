@@ -1,7 +1,7 @@
 import { Message, Role } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import { RoleMentionIdOrArg } from '../../utils/argsparser';
-import Command, { ArgumentTypes } from '../../utils/base/command';
+import { ArgumentTypes } from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
 import LevelsCommand from './Levels';
 

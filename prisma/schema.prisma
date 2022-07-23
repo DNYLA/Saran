@@ -46,6 +46,8 @@ model GuildConfig {
   jailChannel          String?
   jailLogChannel       String?
   jailRole             String?
+  joinLog String?
+  messageLog String?
   rbMessages           ReactionBoardMessages[]
   levels Levels[]
 }
