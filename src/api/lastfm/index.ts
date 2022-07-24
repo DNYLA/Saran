@@ -5,6 +5,7 @@ import {
   Album,
   Artist,
   GlobalAttributes,
+  LastFMUser,
   PartialUser,
   RecentTrack,
   SearchedItem,
@@ -39,19 +40,30 @@ AXIOS.interceptors.request.use((request) => {
   return request;
 });
 
-export async function fetchUser(username: string) {
+export async function fetchUser(
+  username: string,
+  id: string
+): Promise<LastFMUser> {
   try {
     const { data } = await AXIOS.get(
       new EscapedURI('user.getInfo').addUser(username).URI
     );
 
-    return {
-      tracks: data.recenttracks.track,
-      user: data.recenttracks['@attr'],
-    };
+    const user = data.user as LastFMUser;
+
+    try {
+      console.log(user);
+      await client.db.users.updateById(id, {
+        lastFMImage: user.image[3]['#text'],
+      });
+    } catch (err) {
+      console.log(err);
+    }
+
+    return data.user;
   } catch (err) {
     console.log(err);
-    return { tracks: [], user: null };
+    return null;
   }
 }
 

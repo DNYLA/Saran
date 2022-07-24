@@ -2,7 +2,6 @@ import { Message } from 'discord.js';
 import UsernameCheck from '../../checks/UsernameCheck';
 import NoUsernameSet from '../../hooks/NoUsernameSet';
 import StartTyping from '../../hooks/StartTyping';
-import { MentionUserId, SelfUserId } from '../../utils/argsparser';
 import { ArgumentTypes } from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
 import { CONSTANTS } from '../../utils/constants';

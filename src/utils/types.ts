@@ -170,6 +170,11 @@ export type PartialUser = {
   total: number;
 };
 
+export type LastFMUser = {
+  name: string;
+  image: FMImage[];
+};
+
 export type TopTrack = {
   name: string;
   url: string;

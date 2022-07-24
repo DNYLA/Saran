@@ -1,5 +1,6 @@
 import { Message, MessageEmbed } from 'discord.js';
 import {
+  fetchUser,
   fetchUserAlbums,
   fetchUserArtists,
   fetchUserTracks,
@@ -64,6 +65,7 @@ export default class SetUsername extends LastFMCommand {
           `Indexing tracks for user ${args.username}. You will be notified when finished!`
       );
     const embedMessage = await message.channel.send({ embeds: [embed] });
+    await fetchUser(args.username, message.author.id);
     await fetchUserTracks(args.username, message.author.id);
     embed.setDescription(baseDescription + `Indexing Artists!`);
     embedMessage.edit({ embeds: [embed] });

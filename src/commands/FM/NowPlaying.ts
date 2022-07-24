@@ -93,7 +93,7 @@ export default class NowPlaying extends Command {
     let description = '';
     let globalTrackplays = '0';
 
-    const mode = user.lastFMMode.toLowerCase();
+    const mode = user.lastFMMode ? user.lastFMMode.toLowerCase() : null;
     let embed: MessageEmbedData | string;
 
     if (!user.donator || mode === 'normal')
@@ -103,6 +103,7 @@ export default class NowPlaying extends Command {
           name: user.lastFMName,
           url: `https://www.last.fm/user/${user.lastFMName}`,
           iconURL:
+            user.lastFMImage ??
             'https://lastfm.freetls.fastly.net/i/u/avatar170s/a7ff67ef791aaba0c0c97e9c8a97bf04.png',
         },
         thumbnail: recentTrack.image[3]['#text'],
@@ -233,6 +234,7 @@ const parseLastFM = (
     username,
     fm_username: user.lastFMName,
     fm_avatar:
+      user.lastFMImage ??
       'https://lastfm.freetls.fastly.net/i/u/avatar170s/a7ff67ef791aaba0c0c97e9c8a97bf04.png',
     fm_link: `https://www.last.fm/user/${user.lastFMName}`,
     track_name: currentTrack.name,
@@ -249,8 +251,13 @@ const parseLastFM = (
   let parsed = data;
 
   for (const key of Object.keys(json)) {
-    parsed = parsed.replace('{' + key + '}', json[key as keyof VariableTypes]);
+    // parsed = parsed.replace('{' + key + '}', json[key as keyof VariableTypes]);
+
+    var re = new RegExp(`{${key}}`, 'g');
+    parsed = parsed.replace(re, json[key as keyof VariableTypes]);
   }
+
+  parsed = parsed.replace('iconurl', 'iconURL');
 
   if (!isValidEmbed(parsed)) {
     return {
@@ -260,7 +267,7 @@ const parseLastFM = (
   }
 
   const embed: MessageEmbedData = JSON.parse(parsed);
-
+  console.log(embed);
   return {
     author: embed.author,
     color: embed.color ?? CONSTANTS.COLORS.INFO,
