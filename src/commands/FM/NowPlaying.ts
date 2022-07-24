@@ -1,3 +1,4 @@
+import { User } from '@prisma/client';
 import { Message, MessageEmbed } from 'discord.js';
 import { fetchAlbumInfo, fetchArtistInfo } from '../../api/lastfm';
 import UsernameCheck from '../../checks/UsernameCheck';
@@ -6,9 +7,21 @@ import StartTyping from '../../hooks/StartTyping';
 import { MentionUserId, SelfUserId } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
+import { CONSTANTS } from '../../utils/constants';
 import { setCachedPlays } from '../../utils/database/redisManager';
+import {
+  buildEmbed,
+  isValidEmbed,
+  MessageEmbedData,
+} from '../../utils/embedbuilder';
 import { fetchRecentTrackInfo, SearchType } from '../../utils/fmHelpers';
-import { PartialUser, RecentTrack, Track } from '../../utils/types';
+import {
+  Album,
+  Artist,
+  PartialUser,
+  RecentTrack,
+  Track,
+} from '../../utils/types';
 
 export default class NowPlaying extends Command {
   constructor() {
@@ -38,14 +51,6 @@ export default class NowPlaying extends Command {
       args.targetUserId
     );
     const username = user.lastFMName;
-    let donatorEmbed = false;
-
-    // if (!user.lastFMName) return
-
-    // if !args.includes('alt') &&
-    if (user.donator) {
-      donatorEmbed = true;
-    }
 
     let track: Track;
     let recentTrack: RecentTrack;
@@ -87,7 +92,40 @@ export default class NowPlaying extends Command {
 
     let description = '';
     let globalTrackplays = '0';
-    if (donatorEmbed) {
+
+    const mode = user.lastFMMode.toLowerCase();
+    let embed: MessageEmbedData | string;
+
+    if (!user.donator || mode === 'normal')
+      embed = {
+        color: '#0a090b',
+        author: {
+          name: user.lastFMName,
+          url: `https://www.last.fm/user/${user.lastFMName}`,
+          iconURL:
+            'https://lastfm.freetls.fastly.net/i/u/avatar170s/a7ff67ef791aaba0c0c97e9c8a97bf04.png',
+        },
+        thumbnail: recentTrack.image[3]['#text'],
+        fields: [
+          {
+            name: 'Track',
+            value: `[${trackName}](${recentTrack.url})`,
+            inline: true,
+          },
+          {
+            name: 'Artist',
+            value: `[${artistName}](${artistUrl})`,
+            inline: true,
+          },
+        ],
+        footer: {
+          text: `Playcount: ${track?.userplaycount ?? 0}  ∙ Album: ${
+            recentTrack.album['#text']
+          }`,
+        },
+      };
+    else if (user.donator && (!mode || mode === 'donator')) {
+      //Custom Mode
       const albumInfo = await fetchAlbumInfo(username, albumName, artistName);
       const artistInfo = await fetchArtistInfo(username, artistName);
       const trackPlays = track?.userplaycount ?? 0;
@@ -98,59 +136,48 @@ export default class NowPlaying extends Command {
       description = `>>> **${trackName}** ${'`x' + trackPlays + '`'}
     by **${artistName}** ${'`x' + artistPlays + '`'}
     on **${albumName}** ${'`x' + albumPlays + '`'}`;
+      embed = {
+        color: '#0a090b',
+        author: {
+          name: user.lastFMName,
+          url: `https://www.last.fm/user/${user.lastFMName}`,
+          iconURL:
+            'https://lastfm.freetls.fastly.net/i/u/avatar170s/a7ff67ef791aaba0c0c97e9c8a97bf04.png',
+        },
+        description,
+        thumbnail: recentTrack.image[3]['#text'],
+        footer: {
+          text: `Total Scrobbles: ${
+            userInfo?.total ?? 0
+          }  ∙ Global Plays: ${globalTrackplays}`,
+        },
+      };
+    } else {
+      //Custom Mode
+      const albumInfo = await fetchAlbumInfo(username, albumName, artistName);
+      const artistInfo = await fetchArtistInfo(username, artistName);
+
+      embed = parseLastFM(
+        mode,
+        user,
+        userInfo,
+        track,
+        albumInfo,
+        artistInfo,
+        {
+          name: trackName,
+          artist: artistName,
+          artistUrl,
+          album: albumName,
+        },
+        message.author.username,
+        recentTrack.image[3]['#text']
+      );
     }
 
     try {
-      let messageEmbed;
-      if (!donatorEmbed)
-        messageEmbed = new MessageEmbed()
-          // .setColor('#4a5656')
-          .setColor('#0a090b')
-          .setAuthor({
-            name: user.lastFMName,
-            url: `https://www.last.fm/user/${user.lastFMName}`,
-            iconURL:
-              'https://lastfm.freetls.fastly.net/i/u/avatar170s/a7ff67ef791aaba0c0c97e9c8a97bf04.png',
-          })
-          .setThumbnail(recentTrack.image[3]['#text'])
-          .addFields(
-            // GenerateField('Track', value, true)
-            {
-              name: 'Track',
-              value: `[${trackName}](${recentTrack.url})`,
-              inline: true,
-            },
-            {
-              name: 'Artist',
-              value: `[${artistName}](${artistUrl})`,
-              inline: true,
-            }
-          )
-          .setFooter({
-            text: `Playcount: ${track ? track.userplaycount : 0}  ∙ Album: ${
-              recentTrack.album['#text']
-            }`,
-          });
-      else
-        messageEmbed = new MessageEmbed()
-          // .setColor('#2F3136')
-          .setColor('#0a090b')
-          // .setCo
-          // .setTitle(recentTrack.name)
-          // .setURL(recentTrack.url)
-          .setAuthor({
-            name: user.lastFMName,
-            url: `https://www.last.fm/user/${user.lastFMName}`,
-            iconURL:
-              'https://lastfm.freetls.fastly.net/i/u/avatar170s/a7ff67ef791aaba0c0c97e9c8a97bf04.png',
-          })
-          .setThumbnail(recentTrack.image[3]['#text'])
-          .setDescription(description)
-          .setFooter({
-            text: `Total Scrobbles: ${
-              userInfo?.total ?? 0
-            }  ∙ Global Plays: ${globalTrackplays}`,
-          });
+      const messageEmbed = buildEmbed(embed);
+
       const npMessage = await message.channel.send({
         embeds: [messageEmbed],
       });
@@ -162,3 +189,88 @@ export default class NowPlaying extends Command {
     }
   }
 }
+
+type VariableTypes = {
+  username: string;
+  fm_username: string;
+  fm_avatar: string;
+  fm_link: string;
+  track_name: string;
+  track_plays: string;
+  track_image: string;
+  artist_name: string;
+  artist_plays: string;
+  album_name: string;
+  album_plays: string;
+  total_scrobbles: string;
+  global_scrobbles: string;
+};
+
+const parseLastFM = (
+  data: string,
+  user: User,
+  fmuser: PartialUser,
+  track: Track,
+  album: Album,
+  artist: Artist,
+  currentTrack: {
+    name: string;
+    artist: string;
+    artistUrl: string;
+    album: string;
+  },
+  username: string,
+  imageUrl: string
+): MessageEmbedData => {
+  const formatter = Intl.NumberFormat('en-uk');
+  const trackPlays = track?.userplaycount ?? 0;
+  const albumPlays = album?.userplaycount ?? 0;
+  const artistPlays = artist?.stats?.userplaycount ?? 0;
+  const totalScrobbles = fmuser?.total ?? 0;
+  const globalTrackplays = formatter.format(track?.playcount ?? 0);
+
+  const json: VariableTypes = {
+    username,
+    fm_username: user.lastFMName,
+    fm_avatar:
+      'https://lastfm.freetls.fastly.net/i/u/avatar170s/a7ff67ef791aaba0c0c97e9c8a97bf04.png',
+    fm_link: `https://www.last.fm/user/${user.lastFMName}`,
+    track_name: currentTrack.name,
+    track_plays: trackPlays.toString(),
+    track_image: imageUrl,
+    artist_name: currentTrack.artist,
+    artist_plays: artistPlays.toString(),
+    album_name: currentTrack.album,
+    album_plays: albumPlays.toString(),
+    total_scrobbles: totalScrobbles.toString(),
+    global_scrobbles: globalTrackplays,
+  };
+
+  let parsed = data;
+
+  for (const key of Object.keys(json)) {
+    parsed = parsed.replace('{' + key + '}', json[key as keyof VariableTypes]);
+  }
+
+  if (!isValidEmbed(parsed)) {
+    return {
+      color: CONSTANTS.COLORS.ERROR,
+      description: `<@${user.id}>: **Invalid embed data. Use ,lf mode to reset your embed.**`,
+    };
+  }
+
+  const embed: MessageEmbedData = JSON.parse(parsed);
+
+  return {
+    author: embed.author,
+    color: embed.color ?? CONSTANTS.COLORS.INFO,
+    description: embed.description,
+    fields: embed.fields,
+    footer: embed.footer,
+    image: embed.image,
+    thumbnail: embed.thumbnail,
+    timestamp: embed.timestamp,
+    title: embed.title,
+    url: embed.url,
+  };
+};

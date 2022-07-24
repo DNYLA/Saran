@@ -12,6 +12,7 @@ model User {
   id         String        @id
   lastFMName String?
   lastFMTag  String?
+  lastFMMode String?
   donator    Boolean       @default(false)
   afkMessage String?
   afkTime    DateTime?

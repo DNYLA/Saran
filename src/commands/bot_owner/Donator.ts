@@ -53,7 +53,10 @@ export default class Donator extends Command {
     // }
 
     if (type === 'add') {
-      await usersService.updateById(userId, { donator: true });
+      await usersService.updateById(userId, {
+        donator: true,
+        lastFMMode: 'donator',
+      });
       return message.reply(`Successfully given <@${userId}> donator`);
     } else if (type === 'remove') {
       await usersService.updateById(userId, { donator: false });
