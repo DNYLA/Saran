@@ -169,7 +169,10 @@ export default class NowPlaying extends Command {
           album: albumName,
         },
         message.author.username,
-        recentTrack.image[3]['#text']
+        {
+          track: recentTrack.image[3]['#text'],
+          album: albumInfo.image[3]['#text'],
+        }
       );
     }
 
@@ -200,6 +203,7 @@ type VariableTypes = {
   artist_plays: string;
   album_name: string;
   album_plays: string;
+  album_cover: string;
   total_scrobbles: string;
   global_scrobbles: string;
 };
@@ -218,7 +222,7 @@ const parseLastFM = (
     album: string;
   },
   username: string,
-  imageUrl: string
+  cover: { track: string; album?: string }
 ): MessageEmbedData => {
   const formatter = Intl.NumberFormat('en-uk');
   const trackPlays = track?.userplaycount ?? 0;
@@ -236,11 +240,12 @@ const parseLastFM = (
     fm_link: `https://www.last.fm/user/${user.lastFMName}`,
     track_name: currentTrack.name,
     track_plays: trackPlays.toString(),
-    track_image: imageUrl,
+    track_image: cover.track,
     artist_name: currentTrack.artist,
     artist_plays: artistPlays.toString(),
     album_name: currentTrack.album,
     album_plays: albumPlays.toString(),
+    album_cover: cover.album ?? cover.track,
     total_scrobbles: totalScrobbles.toString(),
     global_scrobbles: globalTrackplays,
   };
