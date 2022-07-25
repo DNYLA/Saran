@@ -1,5 +1,6 @@
 import { Message, MessageEmbed } from 'discord.js';
 import {
+  fetchUser,
   fetchUserAlbums,
   fetchUserArtists,
   fetchUserTracks,
@@ -56,9 +57,17 @@ export default class SetUsername extends LastFMCommand {
       .setColor('#49b166')
       .setDescription(
         baseDescription +
-          `Indexing tracks for user ${username}. You will be notified when finished!`
+          `Fetching user info for ${username}. You will be notified when finished!`
       );
     const embedMessage = await message.channel.send({ embeds: [embed] });
+
+    await fetchUser(username, message.author.id);
+    embed.setDescription(
+      baseDescription +
+        `Indexing tracks for user ${username}. You will be notified when finished!`
+    );
+    embedMessage.edit({ embeds: [embed] });
+
     await fetchUserTracks(username, message.author.id);
     embed.setDescription(baseDescription + `Indexing Artists!`);
     embedMessage.edit({ embeds: [embed] });

@@ -13,6 +13,7 @@ model User {
   lastFMName String?
   lastFMTag  String?
   lastFMMode String?
+  lastFMImage String?
   donator    Boolean       @default(false)
   afkMessage String?
   afkTime    DateTime?
