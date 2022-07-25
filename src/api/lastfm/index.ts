@@ -116,6 +116,7 @@ export async function fetchUserTracks(
     }
   } catch (err) {
     console.log(err);
+    console.log('errord');
     return null;
   }
 
@@ -134,6 +135,7 @@ export async function fetchUserTracks(
     await client.db.tracks.repo.createMany({ data: strippedTracks });
   } catch (err) {
     console.log(err);
+    console.log('errord2');
   }
 
   // return {

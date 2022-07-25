@@ -15,20 +15,20 @@ export default class GetAvatar extends Command {
     });
   }
 
-  async run(message: Message, args: { reason: string }) {
+  async run(message: Message, args: { reason?: string }) {
     const currentTime = new Date();
 
     await (message.client as DiscordClient).db.users.updateById(
       message.author.id,
-      { afkTime: currentTime, afkMessage: args.reason ?? '' }
+      { afkTime: currentTime, afkMessage: args.reason ?? '😴' }
     );
 
     const afkembed = new MessageEmbed()
       .setColor('#49b166')
       .setDescription(
-        `😴 <@${message.author.id}> is now AFK with status: ${
+        `😴 <@${message.author.id}> is now **AFK** with status: **${
           args.reason ?? '😴'
-        }`
+        }**`
       );
 
     await message.channel.send({ embeds: [afkembed] });

@@ -14,19 +14,6 @@ export default class MessageEvent extends Event {
   async run(client: DiscordClient, message: Message) {
     if (message.author.bot) return;
 
-    if (message.content.startsWith(',')) {
-      await message.channel.send({
-        embeds: [
-          {
-            description:
-              '**Saran is currently under maintance. Estimated downtime is 1 hour.**',
-            color: CONSTANTS.COLORS.ERROR,
-          },
-        ],
-      });
-    }
-
-    return;
     const db = client.db;
     console.log(
       `Author: ${message.author.id} Id: ${message.id}; Guild: ${message.guild.name}-${message.guildId}`
@@ -68,14 +55,13 @@ export default class MessageEvent extends Event {
     );
 
     const command = client.commands.get(commandName.toLowerCase());
-
     if (!command) return; //Invalid Command
 
     try {
-      command.execute(client, message, args);
+      await command.execute(client, message, args);
     } catch (err) {
       console.log(err);
-      message.channel.send(
+      message.reply(
         'There was an error when attempting to execute this command'
       );
     }

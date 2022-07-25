@@ -43,8 +43,9 @@ export default class WhoKnows extends LastFMCommand {
 
   async run(
     message: Message,
-    args: { targetUserId: string; artistName: string }
+    args: { targetUserId: string; artistName?: string }
   ) {
+    console.log('running?');
     const client = message.client as DiscordClient;
     const user = await client.db.users.findById(args.targetUserId);
     let artist: Artist;
@@ -62,7 +63,11 @@ export default class WhoKnows extends LastFMCommand {
       null,
       message.guildId
     );
+    console.log(filter);
+
     const guildPlays = await artistService.repo.findMany(filter);
+    console.log(guildPlays);
+
     const { sum, description, requester } = await FormatWhoKnows(
       message,
       guildPlays,

@@ -70,7 +70,6 @@ export default class WhoKnowstrack extends LastFMCommand {
       message.guildId
     );
     const guildPlays = await trackService.repo.findMany(filter);
-
     const { sum, requester, description } = await FormatWhoKnows(
       message,
       guildPlays,

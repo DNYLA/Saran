@@ -5,8 +5,7 @@ import DiscordClient from '../../utils/client';
 
 export default class MessageEvent extends Event {
   constructor() {
-    // super('messageCreate');
-    super('no');
+    super('messageCreate');
   }
 
   async run(client: DiscordClient, message: Message) {
@@ -25,7 +24,7 @@ export default class MessageEvent extends Event {
         const afkembed = new MessageEmbed()
           .setColor('#49b166')
           .setDescription(
-            `😴 <@${mentionedUser.id}> has been AFK since ${timeAfk}: ${reason}`
+            `😴 <@${mentionedUser.id}> has been **AFK** for **${timeAfk}**: **${reason}**`
           );
 
         await message.channel.send({ embeds: [afkembed] });

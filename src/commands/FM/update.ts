@@ -51,7 +51,6 @@ export default class SetUsername extends LastFMCommand {
     } catch (err) {
       message.reply('Error Occured whilst trying to update.');
     }
-
     const baseDescription = `<a:loading:996589331944841287>  <@${message.author.id}>:  `;
     const embed = new MessageEmbed()
       .setColor('#49b166')

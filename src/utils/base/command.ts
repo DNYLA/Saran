@@ -156,8 +156,10 @@ export default abstract class Command {
         //   if (!parsed) return (validArgs = false);
         //   parsedArgs[arg.name] = parsed;
         // }
-        if (!arg.default && arg.optional) return (parsedArgs[arg.name] = null);
-        else if (!arg.default && !arg.optional) {
+        if (!arg.default && arg.optional) {
+          parsedArgs[arg.name] = null;
+          continue;
+        } else if (!arg.default && !arg.optional) {
           validArgs = false;
           continue;
         }
@@ -217,13 +219,10 @@ export default abstract class Command {
       const commandName = `${this.name} ${args[0]}`;
       subcommand = client.commands.get(commandName);
     }
+    console.log(subcommand);
     if (subcommand) {
-      try {
-        await subcommand.execute(client, message, args.slice(1));
-        return;
-      } catch (err) {
-        return;
-      }
+      await subcommand.execute(client, message, args.slice(1));
+      return;
     }
     const hooks = this.options?.hooks;
 
