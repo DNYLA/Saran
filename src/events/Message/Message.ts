@@ -2,6 +2,8 @@ import { GuildConfig } from '@prisma/client';
 import { Message } from 'discord.js';
 import Event from '../../utils/base/event';
 import DiscordClient from '../../utils/client';
+import { CONSTANTS } from '../../utils/constants';
+import { buildEmbed } from '../../utils/embedbuilder';
 import { getArgsFromMsg } from '../../utils/helpers';
 
 export default class MessageEvent extends Event {
@@ -11,6 +13,20 @@ export default class MessageEvent extends Event {
 
   async run(client: DiscordClient, message: Message) {
     if (message.author.bot) return;
+
+    if (message.content.startsWith(',')) {
+      await message.channel.send({
+        embeds: [
+          {
+            description:
+              '**Saran is currently under maintance. Estimated downtime is 1 hour.**',
+            color: CONSTANTS.COLORS.ERROR,
+          },
+        ],
+      });
+    }
+
+    return;
     const db = client.db;
     console.log(
       `Author: ${message.author.id} Id: ${message.id}; Guild: ${message.guild.name}-${message.guildId}`

@@ -5,7 +5,8 @@ import DiscordClient from '../../utils/client';
 
 export default class MessageEvent extends Event {
   constructor() {
-    super('messageCreate');
+    // super('messageCreate');
+    super('no');
   }
 
   async run(client: DiscordClient, message: Message) {
