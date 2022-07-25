@@ -31,7 +31,6 @@ export async function GetWhoKnowsInfo(
   const guildService = client.db.guildUsers;
   const user = await client.db.users.findById(userId);
   let users: WhoKnowsUser[];
-  console.log('here');
   if (!globalSearch) {
     users = await guildService.findAllWithLastFm(message.guildId);
   } else {
@@ -41,7 +40,6 @@ export async function GetWhoKnowsInfo(
   }
 
   let recent: Track | Album | Artist;
-  console.log('here');
 
   if (!users || users.length === 0) {
     message.reply('Server hasnt been indexed use ,lf index');

@@ -35,7 +35,6 @@ export default class IndexLevels extends Command {
             messagePage.size === 1 ? messagePage.at(0) : null
           );
         while (message) {
-          console.log(messages.length);
           await channel.messages
             .fetch({ limit: 100, before: message.id })
             .then((messagePage) => {

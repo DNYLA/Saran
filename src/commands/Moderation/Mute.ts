@@ -49,7 +49,6 @@ export default class Mute extends Command {
 
     try {
       const timeout = await user.timeout(amount * 60 * 1000, args.reason ?? '');
-      console.log(timeout);
       return message.reply('He got timeouted out or she');
     } catch (err) {
       console.log(err);

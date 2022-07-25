@@ -15,7 +15,6 @@ export default class MessageEvent extends Event {
     if (!config || !config.messageLog) return;
     const guild = await message.guild.fetch();
     const auditLog = await guild.fetchAuditLogs({ type: 72 });
-    console.log(auditLog);
 
     let channel;
 

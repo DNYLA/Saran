@@ -52,7 +52,6 @@ export async function fetchUser(
     const user = data.user as LastFMUser;
 
     try {
-      console.log(user);
       await client.db.users.updateById(id, {
         lastFMImage: user.image[3]['#text'],
       });
@@ -116,7 +115,6 @@ export async function fetchUserTracks(
     }
   } catch (err) {
     console.log(err);
-    console.log('errord');
     return null;
   }
 
@@ -135,7 +133,6 @@ export async function fetchUserTracks(
     await client.db.tracks.repo.createMany({ data: strippedTracks });
   } catch (err) {
     console.log(err);
-    console.log('errord2');
   }
 
   // return {
@@ -188,15 +185,11 @@ export async function fetchUserArtists(
     });
   });
 
-  console.log(strippedArtists.length);
-
   try {
     await client.db.artists.repo.createMany({ data: strippedArtists });
   } catch (err) {
     console.log(err);
   }
-
-  console.log(artists.length);
 
   // return {
   //   tracks: data.recenttracks.track,
@@ -249,15 +242,11 @@ export async function fetchUserAlbums(
     });
   });
 
-  console.log(strippedAlbums.length);
-
   try {
     await client.db.albums.repo.createMany({ data: strippedAlbums });
   } catch (err) {
     console.log(err);
   }
-
-  console.log(strippedAlbums.length);
 
   // return {
   //   tracks: data.recenttracks.track,

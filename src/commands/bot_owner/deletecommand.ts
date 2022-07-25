@@ -24,7 +24,6 @@ export default class ArgsTest extends Command {
   }
 
   async run(message: Message, args: { messageID: string }) {
-    console.log(args);
     try {
       const messageToDelete = await message.channel.messages.fetch(
         args.messageID

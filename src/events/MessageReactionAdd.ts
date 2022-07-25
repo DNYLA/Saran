@@ -22,8 +22,6 @@ export default class MessageReactionAdd extends Event {
 
     const alreadySet = await getReactionBoardInfo(message.id, guild.id);
 
-    console.log(alreadySet);
-
     try {
       const rbChannel = await message.guild.channels.fetch(
         config.reactionBoardChannel
@@ -116,7 +114,6 @@ export default class MessageReactionAdd extends Event {
       );
     } catch (err) {
       console.log(err);
-      console.log('Caught Error');
     }
   }
 }

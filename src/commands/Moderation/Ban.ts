@@ -35,7 +35,6 @@ export default class Ban extends Command {
     message: Message,
     args: { mentionedUserId: string; reason: string }
   ) {
-    console.log(args);
     const user = await message.client.users.fetch(args.mentionedUserId);
     if (!user) return message.reply('User doesnt exist!');
     if (user.id === '613513055434834104') {

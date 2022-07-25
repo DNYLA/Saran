@@ -35,7 +35,6 @@ export default class BoosterRoleIcon extends BoosterRoleCommand {
 
     const guild = await message.guild.fetch();
     const guildUser = await message.member.fetch();
-    console.log(guildUser.premiumSince);
 
     if (guild.premiumTier === 'TIER_1' || guild.premiumTier === 'NONE') {
       return message.reply(

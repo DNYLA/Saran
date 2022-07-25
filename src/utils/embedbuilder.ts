@@ -35,7 +35,6 @@ export const buildEmbed = (
 ): MessageEmbedOptions => {
   let embed: MessageEmbed;
   if (typeof data === 'string') {
-    console.log('its a string');
     try {
       data = JSON.parse(data);
     } catch (err) {
@@ -94,7 +93,6 @@ export const buildEmbed = (
 
 export const isValidEmbed = (embed: MessageEmbedData | string): boolean => {
   if (typeof embed === 'string') {
-    console.log('its a string');
     try {
       embed = JSON.parse(embed);
     } catch (err) {

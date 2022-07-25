@@ -24,7 +24,6 @@ export default class Sanar extends Command {
 
   async run(message: Message, args: { videoUrl: string }) {
     const links: InstagramLinkType = await instagramGetUrl(args.videoUrl);
-    console.log(links);
 
     if (links.url_list.length === 0)
       return message.reply(

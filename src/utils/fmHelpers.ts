@@ -156,7 +156,6 @@ export async function getTopTenStats(
     args.targetUserId
   );
 
-  console.log(args.period);
   const period: Periods = getPeriodFromString(args.period);
   let topStats: TopTrack[] | TopArtist[] | TopAlbum[];
 

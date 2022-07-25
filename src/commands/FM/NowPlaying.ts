@@ -73,9 +73,6 @@ export default class NowPlaying extends Command {
     if (!track && !recentTrack)
       return message.reply('Unable to display this track!');
 
-    console.log(track);
-    console.log(recentTrack);
-
     const baseUrl = 'https://www.last.fm/';
     const trackName = recentTrack.name;
     const artistName = track?.artist
@@ -253,7 +250,7 @@ const parseLastFM = (
   for (const key of Object.keys(json)) {
     // parsed = parsed.replace('{' + key + '}', json[key as keyof VariableTypes]);
 
-    var re = new RegExp(`{${key}}`, 'g');
+    const re = new RegExp(`{${key}}`, 'g');
     parsed = parsed.replace(re, json[key as keyof VariableTypes]);
   }
 
@@ -267,7 +264,6 @@ const parseLastFM = (
   }
 
   const embed: MessageEmbedData = JSON.parse(parsed);
-  console.log(embed);
   return {
     author: embed.author,
     color: embed.color ?? CONSTANTS.COLORS.INFO,

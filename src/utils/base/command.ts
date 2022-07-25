@@ -219,7 +219,6 @@ export default abstract class Command {
       const commandName = `${this.name} ${args[0]}`;
       subcommand = client.commands.get(commandName);
     }
-    console.log(subcommand);
     if (subcommand) {
       await subcommand.execute(client, message, args.slice(1));
       return;

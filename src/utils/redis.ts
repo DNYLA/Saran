@@ -10,7 +10,6 @@ client.on('connect', async () => {
 });
 
 client.on('error', (err) => {
-  console.log('here');
   console.log(err);
 });
 

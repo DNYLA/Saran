@@ -27,10 +27,8 @@ export class GoogleCSESearch {
       this.addField('q', query) +
       this.addField('safe', 'active');
 
-    console.log(uri);
     try {
       const { data } = await axios.get(uri);
-      console.log(data);
       return data.items ?? [];
     } catch (err) {
       console.log(err);

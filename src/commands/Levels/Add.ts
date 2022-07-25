@@ -39,8 +39,6 @@ export default class LevelsAdd extends LevelsCommand {
     await guild.roles.fetch();
     let role: Role;
     const level = Math.round(Number(args.level));
-    console.log(level);
-    console.log(args);
     try {
       role = guild.roles.cache.get(args.roleId);
     } catch (err) {

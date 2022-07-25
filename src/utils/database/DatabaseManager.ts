@@ -54,9 +54,6 @@ export class UserRepository {
       include: { guilds: { where: { serverId: serverId } } },
     });
 
-    console.log('FindGuildUser');
-    console.log(user);
-
     if (!user)
       return await this.repo.create({
         data: { id, guilds: { create: { serverId } } },
@@ -175,7 +172,6 @@ export class GuildUserRepository {
         where: { id: userId },
         include: { guilds: { where: { serverId } } },
       });
-      console.log(user);
       if (user && user.guilds.length > 0) return user.guilds[0]; //returns guilduser
       if (!user) {
         const newUser = await this.userRepo.create({

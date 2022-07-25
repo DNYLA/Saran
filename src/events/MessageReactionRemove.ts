@@ -68,7 +68,6 @@ export default class MessageReactionAdd extends Event {
       }
     } catch (err) {
       console.log(err);
-      console.log('Caught Error');
     }
   }
 }

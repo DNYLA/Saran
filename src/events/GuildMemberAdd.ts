@@ -8,10 +8,8 @@ export default class InteractionCreated extends Event {
   }
 
   async run(client: DiscordClient, member: GuildMember) {
-    console.log('Running guild member add');
     const db = client.db;
     const user = await db.users.findGuildUser(member.id, member.guild.id);
-    console.log(user);
 
     if (user.guilds.length === 0) {
       await db.guildUsers.create(member.id, member.guild.id);

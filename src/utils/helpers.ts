@@ -27,15 +27,6 @@ export enum MessageType {
   Mention = '@',
 }
 
-export function getIdFromTag(msg: string, messageType: MessageType) {
-  console.log(messageType);
-  console.log(msg);
-  if (msg.includes(messageType)) {
-    const index = msg.indexOf(messageType);
-    console.log(index);
-  }
-}
-
 export function mentionUser(userId: string): string {
   return `<@${userId}>`;
 }
