@@ -4,6 +4,8 @@ import {
   EmbedBuilder,
   EmbedAuthorData,
   EmbedFooterData,
+  Colors,
+  resolveColor,
 } from 'discord.js';
 import { CONSTANTS } from './constants';
 
@@ -17,7 +19,7 @@ import { CONSTANTS } from './constants';
 
 export interface EmbedBuilderData {
   author?: EmbedAuthorData;
-  color?: ColorResolvable;
+  color?: number | string | ColorResolvable;
   fields?: APIEmbedField[];
   footer?: EmbedFooterData;
   description?: string;
@@ -60,10 +62,25 @@ export const buildEmbed = (
     });
   }
 
+  let colorNumber = NaN;
+  if (typeof data.color === 'string') {
+    const col = data.color.replace('#', '');
+    colorNumber = parseInt(col, 16);
+  } else if (typeof data.color === 'number') {
+    colorNumber = data.color;
+  }
+
+  if (isNaN(colorNumber)) {
+    return new EmbedBuilder({
+      description: 'Invalid embed color passed.',
+      color: CONSTANTS.COLORS.ERROR,
+    });
+  }
+
   try {
     embed = new EmbedBuilder({
       author: data.author,
-      color: CONSTANTS.COLORS.INFO,
+      color: colorNumber || CONSTANTS.COLORS.INFO,
       description: data.description,
       fields: data.fields,
       footer: data.footer,
