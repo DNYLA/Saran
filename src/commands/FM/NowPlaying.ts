@@ -1,5 +1,5 @@
 import { User } from '@prisma/client';
-import { Message, MessageEmbed } from 'discord.js';
+import { Message, EmbedBuilder } from 'discord.js';
 import { fetchAlbumInfo, fetchArtistInfo } from '../../api/lastfm';
 import UsernameCheck from '../../checks/UsernameCheck';
 import NoUsernameSet from '../../hooks/NoUsernameSet';
@@ -12,7 +12,7 @@ import { setCachedPlays } from '../../utils/database/redisManager';
 import {
   buildEmbed,
   isValidEmbed,
-  MessageEmbedData,
+  EmbedBuilderData,
 } from '../../utils/embedbuilder';
 import { fetchRecentTrackInfo, SearchType } from '../../utils/fmHelpers';
 import {
@@ -91,7 +91,7 @@ export default class NowPlaying extends Command {
     let globalTrackplays = '0';
 
     const mode = user.lastFMMode ? user.lastFMMode.toLowerCase() : null;
-    let embed: MessageEmbedData | string;
+    let embed: EmbedBuilderData | string;
 
     if (!user.donator || mode === 'normal')
       embed = {
@@ -177,10 +177,10 @@ export default class NowPlaying extends Command {
     }
 
     try {
-      const messageEmbed = buildEmbed(embed);
+      const EmbedBuilder = buildEmbed(embed);
 
       const npMessage = await message.channel.send({
-        embeds: [messageEmbed],
+        embeds: [EmbedBuilder],
       });
       npMessage.react('987085166285553715');
       npMessage.react('987085556733321247');
@@ -199,6 +199,7 @@ type VariableTypes = {
   track_name: string;
   track_plays: string;
   track_image: string;
+  track_cover: string;
   artist_name: string;
   artist_plays: string;
   album_name: string;
@@ -223,7 +224,7 @@ const parseLastFM = (
   },
   username: string,
   cover: { track: string; album?: string }
-): MessageEmbedData => {
+): EmbedBuilderData => {
   const formatter = Intl.NumberFormat('en-uk');
   const trackPlays = track?.userplaycount ?? 0;
   const albumPlays = album?.userplaycount ?? 0;
@@ -241,6 +242,7 @@ const parseLastFM = (
     track_name: currentTrack.name,
     track_plays: trackPlays.toString(),
     track_image: cover.track,
+    track_cover: cover.track,
     artist_name: currentTrack.artist,
     artist_plays: artistPlays.toString(),
     album_name: currentTrack.album,
@@ -268,7 +270,7 @@ const parseLastFM = (
     };
   }
 
-  const embed: MessageEmbedData = JSON.parse(parsed);
+  const embed: EmbedBuilderData = JSON.parse(parsed);
   return {
     author: embed.author,
     color: embed.color ?? CONSTANTS.COLORS.INFO,

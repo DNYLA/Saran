@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Message, MessageEmbed } from 'discord.js';
+import { Message, EmbedBuilder } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import Command, { ArgumentTypes } from '../../utils/base/command';
 import { SearchQueryArgs } from './ImageSearch';
@@ -46,17 +46,19 @@ export default class ImageSearch extends Command {
       return message.reply(`No lookup found for term ${term}`);
 
     const res = responses[0];
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
       .setColor('#008efb')
       .setAuthor({
         name: author.displayName,
-        iconURL: author.displayAvatarURL({ dynamic: true }),
+        iconURL: author.displayAvatarURL(),
       })
       .setTitle(term)
       .setURL(res.permalink)
       .setDescription(res.definition)
-      .addField('Example', res.example)
-      .addField('Votes', `👍 ${res.thumbs_up} / ${res.thumbs_down} 👎`);
+      .addFields([
+        { name: 'Example', value: res.example },
+        { name: 'Votes', value: `👍 ${res.thumbs_up} / ${res.thumbs_down} 👎` },
+      ]);
 
     return message.channel.send({ embeds: [embed] });
   }

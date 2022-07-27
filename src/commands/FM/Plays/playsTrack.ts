@@ -1,4 +1,4 @@
-import { Message, MessageEmbed } from 'discord.js';
+import { Message, EmbedBuilder } from 'discord.js';
 import UsernameCheck from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
@@ -75,7 +75,7 @@ export default class PlaysTrack extends LastFMCommand {
 
     if (!track) return message.reply('No track found!');
 
-    // const messageEmbed = CreateEmbed({
+    // const EmbedBuilder = CreateEmbed({
     //   color: '#fff',
     //   author: GetAuthorDetails(message, user),
     //   thumbnail: '',
@@ -94,7 +94,7 @@ export default class PlaysTrack extends LastFMCommand {
     }
 
     try {
-      const messageEmbed = new MessageEmbed()
+      const embed = new EmbedBuilder()
         .setColor('#2F3136')
         .setTitle(imageUrl ? '\u200B' : '')
         .setThumbnail(imageUrl)
@@ -103,7 +103,7 @@ export default class PlaysTrack extends LastFMCommand {
         );
 
       message.channel.send({
-        embeds: [messageEmbed],
+        embeds: [embed],
       });
     } catch (err) {
       message.reply('Unable to display track! Try checking another one');

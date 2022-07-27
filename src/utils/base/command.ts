@@ -119,12 +119,12 @@ export default abstract class Command {
     const permsRequired = this.options.requirments.permissions;
     const authorId = message.author.id;
     if (authorId === message.guild.ownerId) return true;
-    if (message.member.permissions.has('ADMINISTRATOR')) return true;
+    if (message.member.permissions.has('Administrator')) return true;
 
     if (permsRequired.administrator)
-      if (!message.member.permissions.has('ADMINISTRATOR')) return false;
+      if (!message.member.permissions.has('Administrator')) return false;
     if (permsRequired.manageMessage)
-      if (!message.member.permissions.has('MANAGE_MESSAGES')) return false;
+      if (!message.member.permissions.has('ManageMessages')) return false;
 
     return true;
   }

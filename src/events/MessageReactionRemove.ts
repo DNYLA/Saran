@@ -1,4 +1,4 @@
-import { MessageEmbed, MessageReaction, User } from 'discord.js';
+import { EmbedBuilder, MessageReaction, User } from 'discord.js';
 import Event from '../utils/base/event';
 import DiscordClient from '../utils/client';
 import {
@@ -29,7 +29,7 @@ export default class MessageReactionAdd extends Event {
       const reactions = message.reactions.cache;
       const sobEmoji = reactions.get('😭');
       if (!channel) return;
-      if (!channel.isText()) return;
+      if (!channel.isTextBased()) return;
       if (reaction.emoji.name != '😭') return;
       if (!sobEmoji) return;
 
@@ -38,7 +38,7 @@ export default class MessageReactionAdd extends Event {
       );
       const preSet = await channel.messages.fetch(alreadySet.embedMessageId);
       if (preSet) {
-        const messageEmbed = new MessageEmbed()
+        const embed = new EmbedBuilder()
           .setColor('#1e7842')
           .setAuthor({
             name: message.author.username,
@@ -59,7 +59,7 @@ export default class MessageReactionAdd extends Event {
           )
           .setFooter({ text: 'Emoji Score: 15' })
           .setTimestamp();
-        preSet.edit({ embeds: [messageEmbed] });
+        preSet.edit({ embeds: [embed] });
         await updateReactionBoardInfo(
           message.id,
           guild.id,

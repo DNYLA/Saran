@@ -32,31 +32,31 @@ export default class JailSetup extends Command {
     }
 
     const jailRole = await guild.roles.create({ name: 'Jailed' });
-    const jailChannel = await guild.channels.create('jail');
-    const jailLog = await guild.channels.create('jail-log');
+    const jailChannel = await guild.channels.create({ name: 'jail' });
+    const jailLog = await guild.channels.create({ name: 'jail-log' });
 
     channels.map((chan) => {
       chan.permissionOverwrites.create(jailRole, {
-        VIEW_CHANNEL: false,
-        SEND_MESSAGES: false,
+        ViewChannel: false,
+        SendMessages: false,
       });
     });
 
     await jailChannel.permissionOverwrites.create(guild.roles.everyone, {
-      VIEW_CHANNEL: false,
-      SEND_MESSAGES: false,
+      ViewChannel: false,
+      SendMessages: false,
     });
 
     await jailChannel.permissionOverwrites.edit(jailRole, {
-      VIEW_CHANNEL: true,
-      SEND_MESSAGES: true,
-      CREATE_PUBLIC_THREADS: false,
-      CREATE_PRIVATE_THREADS: false,
+      ViewChannel: true,
+      SendMessages: true,
+      CreatePublicThreads: false,
+      CreatePrivateThreads: false,
     });
 
     await jailLog.permissionOverwrites.create(guild.roles.everyone, {
-      VIEW_CHANNEL: false,
-      SEND_MESSAGES: false,
+      ViewChannel: false,
+      SendMessages: false,
     });
 
     await guildService.updateById(message.guildId, {

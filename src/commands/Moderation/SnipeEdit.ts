@@ -1,4 +1,4 @@
-import { Message, MessageEmbed } from 'discord.js';
+import { Message, EmbedBuilder } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import Command from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
@@ -26,7 +26,7 @@ export default class Snipe extends Command {
       attachmentUrl = editedMessage.attachments.first().url;
     }
 
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
       .setAuthor({
         name: editedMessage.member.displayName,
         iconURL: editedMessage.member.displayAvatarURL(),

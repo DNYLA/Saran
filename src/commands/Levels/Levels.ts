@@ -1,4 +1,4 @@
-import { Message, MessageEmbed } from 'discord.js';
+import { Message, EmbedBuilder } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import Command from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
@@ -38,11 +38,11 @@ export default class LevelsCommand extends Command {
       description += `<@&${level.roleId}>: ${level.level}\n`;
     }
 
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
       .setColor('#2F3136')
       .setAuthor({
         name: guild.name,
-        iconURL: guild.iconURL({ dynamic: true }),
+        iconURL: guild.iconURL(),
       })
       .setTitle(`Levels Overview`)
       .setDescription(description)

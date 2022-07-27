@@ -1,4 +1,4 @@
-import { Message, MessageEmbed } from 'discord.js';
+import { Message, EmbedBuilder } from 'discord.js';
 import moment from 'moment';
 import Event from '../../utils/base/event';
 import DiscordClient from '../../utils/client';
@@ -21,7 +21,7 @@ export default class MessageEvent extends Event {
         const timeAfk = moment(mentionedUser.afkTime).fromNow();
         const reason = mentionedUser.afkMessage ?? '😴';
 
-        const afkembed = new MessageEmbed()
+        const afkembed = new EmbedBuilder()
           .setColor('#49b166')
           .setDescription(
             `😴 <@${mentionedUser.id}> has been **AFK** for **${timeAfk}**: **${reason}**`
@@ -36,7 +36,7 @@ export default class MessageEvent extends Event {
     if (user.afkTime) {
       const timeAfk = moment(user.afkTime).fromNow();
 
-      const afkembed = new MessageEmbed()
+      const afkembed = new EmbedBuilder()
         .setColor('#49b166')
         .setDescription(
           `Welcome <@${message.author.id}> you were away for ${timeAfk}: ${

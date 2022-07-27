@@ -22,7 +22,7 @@ export default class Mute extends Command {
 
     await Promise.all(
       channel.permissionOverwrites.cache.map(async (overwrite) => {
-        await overwrite.edit({ SEND_MESSAGES: true });
+        await overwrite.edit({ SendMessages: true });
       })
     );
 

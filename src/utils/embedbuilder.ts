@@ -1,10 +1,9 @@
 import {
   ColorResolvable,
-  EmbedFieldData,
-  MessageEmbed,
-  MessageEmbedAuthor,
-  MessageEmbedFooter,
-  MessageEmbedOptions,
+  APIEmbedField,
+  EmbedBuilder,
+  EmbedAuthorData,
+  EmbedFooterData,
 } from 'discord.js';
 import { CONSTANTS } from './constants';
 
@@ -16,11 +15,11 @@ import { CONSTANTS } from './constants';
   Originally wasnt going to copy how they did it however extra data needs to be stripped (Video, Image Size etc)
 */
 
-export interface MessageEmbedData {
-  author?: MessageEmbedAuthor;
+export interface EmbedBuilderData {
+  author?: EmbedAuthorData;
   color?: ColorResolvable;
-  fields?: EmbedFieldData[];
-  footer?: MessageEmbedFooter;
+  fields?: APIEmbedField[];
+  footer?: EmbedFooterData;
   description?: string;
   image?: string;
   thumbnail?: string;
@@ -30,10 +29,10 @@ export interface MessageEmbedData {
 }
 
 export const buildEmbed = (
-  data: MessageEmbedData | string,
+  data: EmbedBuilderData | string,
   timestamp?: boolean
-): MessageEmbedOptions => {
-  let embed: MessageEmbed;
+): EmbedBuilder => {
+  let embed: EmbedBuilder;
   if (typeof data === 'string') {
     try {
       data = JSON.parse(data);
@@ -45,7 +44,7 @@ export const buildEmbed = (
   }
 
   if (typeof data === 'string') {
-    embed = new MessageEmbed({
+    embed = new EmbedBuilder({
       description: data,
       color: CONSTANTS.COLORS.INFO,
     });
@@ -55,16 +54,16 @@ export const buildEmbed = (
   }
 
   if (!isValidEmbed(data)) {
-    return new MessageEmbed({
+    return new EmbedBuilder({
       description: 'Invalid embed data passed.',
       color: CONSTANTS.COLORS.ERROR,
     });
   }
 
   try {
-    embed = new MessageEmbed({
+    embed = new EmbedBuilder({
       author: data.author,
-      color: data.color || CONSTANTS.COLORS.INFO,
+      color: CONSTANTS.COLORS.INFO,
       description: data.description,
       fields: data.fields,
       footer: data.footer,
@@ -80,7 +79,7 @@ export const buildEmbed = (
     });
   } catch (err) {
     console.log(err);
-    return new MessageEmbed({
+    return new EmbedBuilder({
       description: 'Invalid embed data passed.',
       color: CONSTANTS.COLORS.ERROR,
     });
@@ -91,7 +90,7 @@ export const buildEmbed = (
   return embed;
 };
 
-export const isValidEmbed = (embed: MessageEmbedData | string): boolean => {
+export const isValidEmbed = (embed: EmbedBuilderData | string): boolean => {
   if (typeof embed === 'string') {
     try {
       embed = JSON.parse(embed);

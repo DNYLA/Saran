@@ -1,4 +1,4 @@
-import { Message, MessageEmbed } from 'discord.js';
+import { Message, EmbedBuilder } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import Command, { ArgumentTypes } from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
@@ -23,7 +23,7 @@ export default class GetAvatar extends Command {
       { afkTime: currentTime, afkMessage: args.reason ?? '😴' }
     );
 
-    const afkembed = new MessageEmbed()
+    const afkembed = new EmbedBuilder()
       .setColor('#49b166')
       .setDescription(
         `😴 <@${message.author.id}> is now **AFK** with status: **${

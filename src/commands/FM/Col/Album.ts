@@ -1,4 +1,4 @@
-import { Message, MessageAttachment, MessageEmbed } from 'discord.js';
+import { Message, AttachmentBuilder, EmbedBuilder } from 'discord.js';
 import UsernameCheck from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
@@ -78,8 +78,10 @@ export default class AlbumCollage extends LastFMCommand {
       const embedTitle = `${user.lastFMName} ${convertPeriodToText(
         period
       )} top albums`;
-      const attachment = new MessageAttachment(imageBuffer, 'collage.jpg');
-      const embed = new MessageEmbed()
+      const attachment = new AttachmentBuilder(imageBuffer, {
+        name: 'collage.jpg',
+      });
+      const embed = new EmbedBuilder()
         .setTitle(embedTitle)
         .setImage('attachment://collage.jpg');
       message.channel.send({ embeds: [embed], files: [attachment] });

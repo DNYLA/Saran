@@ -1,4 +1,4 @@
-import { Interaction, MessageEmbed } from 'discord.js';
+import { Interaction, EmbedBuilder } from 'discord.js';
 import Event from '../utils/base/event';
 import DiscordClient from '../utils/client';
 
@@ -9,11 +9,13 @@ export default class InteractionCreated extends Event {
 
   async run(client: DiscordClient, interaction: Interaction) {
     if (!interaction.isButton()) return;
-    if (!interaction.customId.startsWith('image'))
-      return interaction.reply({
+    if (!interaction.customId.startsWith('image')) {
+      await interaction.reply({
         content: 'Invalid Interaction!',
         ephemeral: true,
       });
+      return;
+    }
 
     let query;
     let forward = true;
@@ -29,22 +31,25 @@ export default class InteractionCreated extends Event {
     const results = client.getImage(query);
 
     if (!results) {
-      return interaction.reply({
+      await interaction.reply({
         content: 'Request Timedout!',
         ephemeral: true,
       });
+      return;
     }
 
     if (results.requester !== interaction.user.id) {
-      return interaction.reply({
+      await interaction.reply({
         content: 'Only the person who requested the image can interact!',
         ephemeral: true,
       });
+      return;
     }
 
     if (interaction.customId.startsWith('image-delete')) {
-      const embed = new MessageEmbed().setTitle('Request Deleted');
-      return interaction.update({ embeds: [embed], components: [] });
+      const embed = new EmbedBuilder().setTitle('Request Deleted');
+      await interaction.update({ embeds: [embed], components: [] });
+      return;
     }
 
     let newPos = results.currentPos;
@@ -52,22 +57,25 @@ export default class InteractionCreated extends Event {
     if (forward) {
       newPos++;
       if (newPos > results.images.length - 1)
-        return interaction.reply({
+        await interaction.reply({
           content: 'No More Images!',
           ephemeral: true,
         });
+      return;
     } else {
       newPos--;
-      if (newPos < 0)
-        return interaction.reply({
+      if (newPos < 0) {
+        await interaction.reply({
           content: 'Cant go back!',
           ephemeral: true,
         });
+        return;
+      }
     }
 
     try {
       const image = results.images[newPos];
-      const imageEmbed = new MessageEmbed()
+      const imageEmbed = new EmbedBuilder()
         .setImage(image.link)
         .setTitle(image.title)
         .setURL(image.link)
@@ -81,7 +89,7 @@ export default class InteractionCreated extends Event {
       results.currentPos = newPos;
       client.setImage(results);
     } catch (err) {
-      return interaction.reply({
+      await interaction.reply({
         content: 'Undiagnosable error occred',
         ephemeral: true,
       });

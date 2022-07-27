@@ -1,8 +1,12 @@
 import {
   Message,
-  MessageActionRow,
-  MessageButton,
-  MessageEmbed,
+  ActionRow,
+  ButtonBuilder,
+  EmbedBuilder,
+  ActionRowBuilder,
+  ButtonStyle,
+  APIActionRowComponent,
+  APIMessageActionRowComponent,
 } from 'discord.js';
 import { GoogleCSESearch } from '../../api/WebSearch';
 import StartTyping from '../../hooks/StartTyping';
@@ -61,7 +65,7 @@ export default class ImageSearch extends Command {
     }
     client.setImage(results);
     const firstImage = results.images[0];
-    const imageEmbed = new MessageEmbed()
+    const imageEmbed = new EmbedBuilder()
       .setImage(firstImage.link)
       // .setAuthor({ name: firstImage.title, url: firstImage.url })
       .setTitle(firstImage.snippet)
@@ -70,24 +74,25 @@ export default class ImageSearch extends Command {
         text: `Page 1/${results.images.length} ∙ Requested by ${message.author.username}`,
       });
 
-    const row = new MessageActionRow().addComponents(
-      new MessageButton()
+    const row = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
         .setCustomId(`image-backward-${query}`)
         .setLabel('<')
-        .setStyle('PRIMARY'),
-      new MessageButton()
+        .setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
         .setCustomId(`image-forward-${query}`)
         .setLabel('>')
-        .setStyle('PRIMARY'),
-      new MessageButton()
+        .setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
         .setCustomId(`image-delete-${query}`)
         .setLabel('X')
-        .setStyle('DANGER')
+        .setStyle(ButtonStyle.Danger)
     );
+    if (!message.channel.isTextBased()) return;
 
     const imgMessage = await message.channel.send({
       embeds: [imageEmbed],
-      components: [row],
+      // components: [row],
     });
 
     setTimeout(() => {

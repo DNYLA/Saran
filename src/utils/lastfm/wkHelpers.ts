@@ -198,7 +198,7 @@ export async function FormatWhoKnowsArray(
 //   totalListeners: number,
 //   sum: number
 // ) {
-//   return new MessageEmbed()
+//   return new EmbedBuilder()
 //     .setColor('#2F3136')
 //     .setAuthor({
 //       name: `Requested by ${username}`,

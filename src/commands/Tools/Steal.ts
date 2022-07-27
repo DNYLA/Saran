@@ -1,4 +1,4 @@
-import { Message, Util } from 'discord.js';
+import { Message, parseEmoji } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import Command, { ArgumentTypes } from '../../utils/base/command';
 
@@ -38,12 +38,12 @@ export default class StealEmote extends Command {
     //   }
     // }
 
-    const emoji = Util.parseEmoji(args.emojiText);
+    const emoji = parseEmoji(args.emojiText);
     if (emoji.id) {
       const type = emoji.animated ? '.gif' : '.png';
       console.log(emoji.id);
       const url = `https://cdn.discordapp.com/emojis/${emoji.id + type}`;
-      await message.guild.emojis.create(url, emoji.name);
+      await message.guild.emojis.create({ attachment: url, name: emoji.name });
       message.reply(`Created emoji :${emoji.name}:`);
     } else {
       message.reply('Invalid Emoji');

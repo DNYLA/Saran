@@ -1,4 +1,4 @@
-import { Message, MessageEmbed } from 'discord.js';
+import { Message, EmbedBuilder } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import Command from '../../utils/base/command';
 
@@ -19,7 +19,7 @@ export default class GetAvatar extends Command {
     if (!guild.banner)
       return message.channel.send({
         embeds: [
-          new MessageEmbed().setAuthor({ name: 'No Server Banner Set' }),
+          new EmbedBuilder().setAuthor({ name: 'No Server Banner Set' }),
         ],
       });
 
@@ -28,7 +28,7 @@ export default class GetAvatar extends Command {
     try {
       message.channel.send({
         embeds: [
-          new MessageEmbed()
+          new EmbedBuilder()
             .setImage(`${bannerUrl}`)
             .setFooter({ text: `Requested by ${message.author.username}` }),
         ],

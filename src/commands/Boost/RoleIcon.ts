@@ -1,4 +1,4 @@
-import { Message, Role } from 'discord.js';
+import { GuildPremiumTier, Message, Role } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import { ImageUrlOrAttachment } from '../../utils/argsparser';
 import { ArgumentTypes } from '../../utils/base/command';
@@ -36,7 +36,10 @@ export default class BoosterRoleIcon extends BoosterRoleCommand {
     const guild = await message.guild.fetch();
     const guildUser = await message.member.fetch();
 
-    if (guild.premiumTier === 'TIER_1' || guild.premiumTier === 'NONE') {
+    if (
+      guild.premiumTier === GuildPremiumTier.Tier1 ||
+      guild.premiumTier === GuildPremiumTier.None
+    ) {
       return message.reply(
         'This guild is not level 2 so this feature cannot be accessed!'
       );
@@ -51,7 +54,7 @@ export default class BoosterRoleIcon extends BoosterRoleCommand {
     if (!roleId) {
       boosterRole = await guild.roles.create({
         name: guildUser.displayName,
-        color: 'AQUA',
+        color: 'Aqua',
       });
     } else {
       try {
@@ -59,13 +62,13 @@ export default class BoosterRoleIcon extends BoosterRoleCommand {
         if (!boosterRole) {
           boosterRole = await guild.roles.create({
             name: guildUser.displayName,
-            color: 'AQUA',
+            color: 'Aqua',
           });
         }
       } catch (err) {
         boosterRole = await guild.roles.create({
           name: guildUser.displayName,
-          color: 'AQUA',
+          color: 'Aqua',
         });
       }
     }

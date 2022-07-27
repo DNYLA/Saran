@@ -25,8 +25,8 @@ export default class InteractionCreated extends Event {
     }
 
     channel.permissionOverwrites.edit(role, {
-      VIEW_CHANNEL: false,
-      SEND_MESSAGES: false,
+      ViewChannel: false,
+      SendMessages: false,
     });
   }
 }

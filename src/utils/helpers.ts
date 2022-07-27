@@ -1,4 +1,4 @@
-import { MessageMentions } from 'discord.js';
+import { Message, MessageMentions } from 'discord.js';
 import { Periods } from '../api/lastfm';
 
 export function getArgsFromMsg(
@@ -7,7 +7,6 @@ export function getArgsFromMsg(
 ): { commandName: string; args?: string[] } {
   // Args including the command name
   const args = msg.slice(prefixLn).split(/ +/);
-  console.log(args);
   // if ((args[0] === 'lf' || args[0] === 'levels') && args.length >= 2) {
   //   console.log('Here');
   //   return {
@@ -42,9 +41,8 @@ export function joinArgs(args: string[]) {
 }
 
 export function getIdFromMention(mention: string) {
-  const isMention = mention
-    .matchAll(MessageMentions.USERS_PATTERN)
-    .next().value;
+  const UsersPattern = new RegExp(MessageMentions.UsersPattern, 'g');
+  const isMention = mention.matchAll(UsersPattern).next().value;
   if (isMention) return isMention[1];
   else return null;
 }

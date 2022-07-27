@@ -3,7 +3,7 @@ import NoUsernameSet from '../hooks/NoUsernameSet';
 import StartTyping from '../hooks/StartTyping';
 import Command from '../utils/base/command';
 import { CONSTANTS } from '../utils/constants';
-import { buildEmbed, MessageEmbedData } from '../utils/embedbuilder';
+import { buildEmbed, EmbedBuilderData } from '../utils/embedbuilder';
 
 export default class EmbedTest extends Command {
   constructor() {
@@ -26,7 +26,7 @@ export default class EmbedTest extends Command {
   }
 
   async run(message: Message) {
-    const data: MessageEmbedData = {
+    const data: EmbedBuilderData = {
       color: CONSTANTS.COLORS.INFO,
       author: {
         name: 'Lamar',

@@ -30,7 +30,6 @@ export default class MessageEvent extends Event {
     await handleLevelUp(client, message, config);
 
     if (!user) return;
-
     let messageCommand = message.content.toLowerCase();
 
     //Replace custom lastfm tag with ,lf
@@ -50,7 +49,7 @@ export default class MessageEvent extends Event {
 
     //Re-Write getArgsFromMsg to concat modules which have space names.
     const { commandName, args } = getArgsFromMsg(
-      messageCommand,
+      message.content,
       config.prefix.length
     );
 

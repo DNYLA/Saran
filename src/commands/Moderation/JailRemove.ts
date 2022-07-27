@@ -1,4 +1,4 @@
-import { Message, MessageEmbed } from 'discord.js';
+import { Message, EmbedBuilder } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import { MentionIdOrArg } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
@@ -64,7 +64,7 @@ export default class Jail extends Command {
       preJailedRoles: [],
     });
 
-    const embed = new MessageEmbed({
+    const embed = new EmbedBuilder({
       title: `${user.displayName} Un-Jailed`,
       color: 3993982,
       fields: [
@@ -76,7 +76,7 @@ export default class Jail extends Command {
       ],
       author: {
         name: message.author.username,
-        iconURL: message.author.displayAvatarURL({ dynamic: true }),
+        iconURL: message.author.displayAvatarURL(),
       },
     }).setTimestamp();
 
@@ -87,7 +87,7 @@ export default class Jail extends Command {
         .fetch(config.jailLogChannel)
         .catch(() => console.log('No Jail Log channel'));
 
-      if (logChannel && logChannel.isText())
+      if (logChannel && logChannel.isTextBased())
         logChannel.send({ embeds: [embed] });
       // if (logChannel);
     } catch (err) {

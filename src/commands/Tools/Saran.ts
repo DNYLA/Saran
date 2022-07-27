@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import axios from 'axios';
-import { Message, MessageAttachment, MessageEmbed } from 'discord.js';
+import { Message, EmbedBuilder, AttachmentBuilder } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import Command, { ArgumentTypes } from '../../utils/base/command';
 const instagramGetUrl = require('instagram-url-direct');
@@ -42,8 +42,8 @@ export default class Sanar extends Command {
       const fileType = contentType.includes('jpeg') ? 'jpg' : 'png';
       const title = `image.${fileType}`;
 
-      const attachment = new MessageAttachment(buffer, title);
-      const embed = new MessageEmbed()
+      const attachment = new AttachmentBuilder(buffer, { name: title });
+      const embed = new EmbedBuilder()
         .setTitle(title)
         .setImage(`attachment://${title}`);
       await message.channel.send({ embeds: [embed], files: [attachment] });

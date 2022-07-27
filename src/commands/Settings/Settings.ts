@@ -1,7 +1,7 @@
 import {
   Channel,
   Message,
-  MessageEmbed,
+  EmbedBuilder,
   NonThreadGuildBasedChannel,
 } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';

@@ -1,5 +1,5 @@
 import { User } from '@prisma/client';
-import { Message, MessageEmbed, MessageMentions } from 'discord.js';
+import { Message, EmbedBuilder, MessageMentions } from 'discord.js';
 import {
   fetchAlbumInfo,
   fetchArtistInfo,
@@ -55,7 +55,7 @@ export function getPeriodFromString(arg: string): Periods {
 
 export function hasUsernameSet(message: Message, user: User): boolean {
   if (!user.lastFMName) {
-    const usernameNotSetEmbed = new MessageEmbed()
+    const usernameNotSetEmbed = new EmbedBuilder()
       .setColor('#cb0f0f')
       .setDescription(
         `${mentionUser(
@@ -118,7 +118,7 @@ export function convertTopStatsToEmbed(
   });
 
   try {
-    const messageEmbed = new MessageEmbed()
+    const embed = new EmbedBuilder()
       .setColor('#4a5656')
       .setAuthor({
         name: user.lastFMName,
@@ -129,7 +129,7 @@ export function convertTopStatsToEmbed(
       .setTitle(embedTitle)
       .setDescription(description);
 
-    return messageEmbed;
+    return embed;
   } catch (err) {
     return null;
   }
@@ -137,7 +137,7 @@ export function convertTopStatsToEmbed(
 
 //Will update embed to look better in the future
 export function sendNoDataEmbed(message: Message) {
-  const embed = new MessageEmbed().setTitle('No Data Availble!');
+  const embed = new EmbedBuilder().setTitle('No Data Availble!');
   return message.channel.send({ embeds: [embed] });
 }
 
@@ -336,9 +336,8 @@ export function getTargetUserId(
   let userId = message.author.id;
 
   if (args.length > 0) {
-    const isMention = args[0]
-      .matchAll(MessageMentions.USERS_PATTERN)
-      .next().value;
+    const UsersPattern = new RegExp(MessageMentions.UsersPattern, 'g');
+    const isMention = args[0].matchAll(UsersPattern).next().value;
     if (isMention) {
       userId = isMention[1];
       if (shiftArgs) args.shift();
@@ -360,7 +359,7 @@ export function WhoKnowsEmbed(
   if (requester.rank > 0) {
     description += `\n**Rank:** \`#${requester.rank}\` | **Plays:** \`${requester.plays}\``;
   }
-  return new MessageEmbed()
+  return new EmbedBuilder()
     .setColor('#2F3136')
     .setAuthor({
       name: `Requested by ${requester.username}`,

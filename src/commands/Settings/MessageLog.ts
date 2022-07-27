@@ -42,7 +42,7 @@ export default class MessageLog extends SettingsCommand {
     }
 
     if (!channel) return message.reply('Channel doesnt exist');
-    if (channel.isVoice() || channel.isThread())
+    if (channel.isVoiceBased() || channel.isThread())
       return message.reply('Not a text channel!');
 
     await db.guilds.updateById(message.guildId, { messageLog: channel.id });

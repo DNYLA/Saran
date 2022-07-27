@@ -1,4 +1,4 @@
-import { Message, MessageEmbed } from 'discord.js';
+import { Message, EmbedBuilder } from 'discord.js';
 import {
   fetchUser,
   fetchUserAlbums,
@@ -52,7 +52,7 @@ export default class SetUsername extends LastFMCommand {
       message.reply('Error Occured whilst trying to update.');
     }
     const baseDescription = `<a:loading:996589331944841287>  <@${message.author.id}>:  `;
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
       .setColor('#49b166')
       .setDescription(
         baseDescription +

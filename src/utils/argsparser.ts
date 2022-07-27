@@ -1,4 +1,4 @@
-import { Message, MessageMentions } from 'discord.js';
+import { Message, MessageMentions, SnowflakeUtil } from 'discord.js';
 
 export const StringToColour = async (message: Message, args: string[]) => {
   if (args.length > 0) return args[0].toUpperCase();
@@ -24,10 +24,10 @@ export const MentionUserId = async (
   index: number
 ) => {
   const client = message.client;
+
   if (args.length > 0) {
-    const isMention = args[index]
-      .matchAll(MessageMentions.USERS_PATTERN)
-      .next().value;
+    const UserPattern = new RegExp(MessageMentions.UsersPattern, 'g');
+    const isMention = args[index].matchAll(UserPattern).next().value;
     if (isMention) {
       return isMention[1];
     } else {
@@ -51,9 +51,8 @@ export const MentionIdOrArg = (
   index: number
 ) => {
   if (args.length > 0) {
-    const isMention = args[index]
-      .matchAll(MessageMentions.USERS_PATTERN)
-      .next().value;
+    const UserPattern = new RegExp(MessageMentions.UsersPattern, 'g');
+    const isMention = args[index].matchAll(UserPattern).next().value;
     if (isMention) {
       return isMention[1];
     }
@@ -62,15 +61,14 @@ export const MentionIdOrArg = (
   return args[index];
 };
 
-export const ChannelMentionIdOrArg = (
+export const ChannelMentionIdOrArg = async (
   message: Message,
   args: string[],
   index: number
 ) => {
   if (args.length > 0) {
-    const isMention = args[index]
-      .matchAll(MessageMentions.CHANNELS_PATTERN)
-      .next().value;
+    const ChannelPattern = new RegExp(MessageMentions.ChannelsPattern, 'g');
+    const isMention = args[index].matchAll(ChannelPattern).next().value;
     if (isMention) {
       return isMention[1];
     }
@@ -85,9 +83,8 @@ export const RoleMentionIdOrArg = (
   index: number
 ) => {
   if (args.length > 0) {
-    const isMention = args[index]
-      .matchAll(MessageMentions.ROLES_PATTERN)
-      .next().value;
+    const RolePattern = new RegExp(MessageMentions.RolesPattern, 'g');
+    const isMention = args[index].matchAll(RolePattern).next().value;
     if (isMention) {
       return isMention[1];
     }

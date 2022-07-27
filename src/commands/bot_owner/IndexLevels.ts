@@ -27,7 +27,7 @@ export default class IndexLevels extends Command {
 
     await Promise.all(
       channels.map(async (channel) => {
-        if (!channel.isText()) return;
+        if (!channel.isTextBased()) return;
         const messages = [];
         let message = await channel.messages
           .fetch({ limit: 1 })

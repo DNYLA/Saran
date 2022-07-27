@@ -1,4 +1,4 @@
-import { Message, MessageEmbed } from 'discord.js';
+import { Message, EmbedBuilder } from 'discord.js';
 import { RequirmentsType } from '../utils/base/command';
 import { mentionUser } from '../utils/helpers';
 
@@ -10,7 +10,7 @@ export default (
 ): void => {
   if (!valid && type === RequirmentsType.Custom) {
     if (!args.targetUserId) {
-      const unknownError = new MessageEmbed()
+      const unknownError = new EmbedBuilder()
         .setColor('#cb0f0f')
         .setDescription(
           `ErrorID: {error_id}, if this issue continues join Saran disocrd and create a ticket`
@@ -19,7 +19,7 @@ export default (
     }
     const userId = args.targetUserId;
 
-    const usernameNotSetEmbed = new MessageEmbed()
+    const usernameNotSetEmbed = new EmbedBuilder()
       .setColor('#cb0f0f')
       .setDescription(
         `${mentionUser(

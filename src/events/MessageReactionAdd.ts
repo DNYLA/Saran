@@ -1,4 +1,4 @@
-import { MessageEmbed, MessageReaction, User } from 'discord.js';
+import { EmbedBuilder, MessageReaction, User } from 'discord.js';
 import Event from '../utils/base/event';
 import DiscordClient from '../utils/client';
 import {
@@ -30,7 +30,7 @@ export default class MessageReactionAdd extends Event {
       const reactions = message.reactions.cache;
       const sobEmoji = reactions.get('😭');
       if (!rbChannel) return;
-      if (!rbChannel.isText()) return;
+      if (!rbChannel.isTextBased()) return;
       if (reaction.emoji.name != '😭') return;
       const messageChannel = await guild.channels.fetch(
         reaction.message.channelId
@@ -42,7 +42,7 @@ export default class MessageReactionAdd extends Event {
             alreadySet.embedMessageId
           );
           if (preSet) {
-            const messageEmbed = new MessageEmbed()
+            const embed = new EmbedBuilder()
               .setColor('#1e7842')
               .setAuthor({
                 name: message.author.username,
@@ -63,7 +63,7 @@ export default class MessageReactionAdd extends Event {
               )
               .setFooter({ text: 'Emoji Score: 15' })
               .setTimestamp();
-            preSet.edit({ embeds: [messageEmbed] });
+            preSet.edit({ embeds: [embed] });
             await updateReactionBoardInfo(message.id, guild.id, sobEmoji.count);
             return;
           }
@@ -75,7 +75,7 @@ export default class MessageReactionAdd extends Event {
       if (alreadySet) return;
       if (!sobEmoji) return;
       if (config.reactionBoardLimit > sobEmoji.count) return;
-      if (!reaction.message.channel.isText()) return;
+      if (!reaction.message.channel.isTextBased()) return;
 
       // const attachemnt = reaction.message.attachments.first();
       // console.log(reaction.message.url);
@@ -83,7 +83,7 @@ export default class MessageReactionAdd extends Event {
 
       // console.log(attachemnt);
 
-      const messageEmbed = new MessageEmbed()
+      const embed = new EmbedBuilder()
         .setColor('#1e7842')
         .setAuthor({
           name: message.author.username,
@@ -105,7 +105,7 @@ export default class MessageReactionAdd extends Event {
         .setFooter({ text: 'Emoji Score: 15' })
         .setTimestamp();
 
-      const sentMessage = await rbChannel.send({ embeds: [messageEmbed] });
+      const sentMessage = await rbChannel.send({ embeds: [embed] });
       await createReactionBoardInfo(
         sobEmoji.count,
         sobEmoji.emoji.name,

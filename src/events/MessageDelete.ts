@@ -1,4 +1,4 @@
-import { Message, MessageEmbed, Util } from 'discord.js';
+import { Message, EmbedBuilder } from 'discord.js';
 import Event from '../utils/base/event';
 import DiscordClient from '../utils/client';
 
@@ -30,7 +30,7 @@ export default class MessageEvent extends Event {
       return;
     }
 
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
       .setAuthor({
         name: message.member.displayName,
         iconURL: message.member.displayAvatarURL(),
@@ -39,8 +39,8 @@ export default class MessageEvent extends Event {
         `Message from ${message.author.tag} at ${message.createdTimestamp}`
       )
       .setFooter({ text: `UserID: ${message.member.id}` })
-      .setColor('RED')
-      .addField('Content', message.content)
+      .setColor('Red')
+      .addFields([{ name: 'Content', value: message.content }])
       .setTimestamp();
 
     channel.send({ embeds: [embed] });

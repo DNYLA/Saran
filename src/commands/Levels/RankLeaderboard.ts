@@ -1,4 +1,4 @@
-import { Message, MessageEmbed } from 'discord.js';
+import { Message, EmbedBuilder } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import Command from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
@@ -42,11 +42,11 @@ export default class RankLeaderboard extends Command {
     }
 
     try {
-      const embed = new MessageEmbed()
+      const embed = new EmbedBuilder()
         .setColor('#2F3136')
         .setAuthor({
           name: `Requested by ${user.displayName}`,
-          iconURL: user.displayAvatarURL({ dynamic: true }),
+          iconURL: user.displayAvatarURL(),
         })
         .setTitle(`Rank Leaderboard for ${message.guild.name}`)
         .setDescription(description)

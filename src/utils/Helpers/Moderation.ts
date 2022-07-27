@@ -4,7 +4,7 @@ import DiscordClient from '../client';
 //This is added incase i decide to improve how permissions are handled.
 export function hasAdminPermissions(message: Message) {
   const isOwner = message.guild.ownerId === message.member.id;
-  if (message.member.permissions.has('ADMINISTRATOR') || isOwner) {
+  if (message.member.permissions.has('Administrator') || isOwner) {
     return true;
   }
 
@@ -85,7 +85,8 @@ export async function getDiscordUserFromMention(
   mention: string,
   forceCheck?: boolean
 ) {
-  const matches = mention.matchAll(MessageMentions.USERS_PATTERN).next().value;
+  const UsersPattern = new RegExp(MessageMentions.UsersPattern, 'g');
+  const matches = mention.matchAll(UsersPattern).next().value;
 
   if (!matches && forceCheck === true)
     try {
@@ -99,7 +100,9 @@ export async function getDiscordUserFromMention(
 }
 
 export async function getUserFromId(client: DiscordClient, mention: string) {
-  const matches = mention.matchAll(MessageMentions.USERS_PATTERN).next().value;
+  const UsersPattern = new RegExp(MessageMentions.UsersPattern, 'g');
+
+  const matches = mention.matchAll(UsersPattern).next().value;
 
   if (!matches) return;
 }
@@ -108,7 +111,8 @@ export async function getGuildMemberFromMention(
   guild: Guild,
   mention: string
 ): Promise<GuildMember> {
-  const matches = mention.matchAll(MessageMentions.USERS_PATTERN).next().value;
+  const UsersPattern = new RegExp(MessageMentions.UsersPattern, 'g');
+  const matches = mention.matchAll(UsersPattern).next().value;
 
   if (!matches)
     try {
