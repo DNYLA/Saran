@@ -39,10 +39,13 @@ export default class UnmuteRemote extends Command {
     if (!member) return;
 
     if (args.type === 'add') {
-      await client.db.users.repo.delete({ where: { id: member.id } });
       client.emit('guildMemberAdd', member);
     } else if (args.type === 'remove') {
       client.emit('guildMemberRemove', message.member);
+    } else if (args.type === 'clearTracks') {
+      await client.db.tracks.repo.deleteMany({});
+      await client.db.artists.repo.deleteMany({});
+      await client.db.albums.repo.deleteMany({});
     }
   }
 }

@@ -7,6 +7,7 @@ import {
   User,
 } from '@prisma/client';
 import { client } from '../../main';
+import { convertTopStatsToEmbed } from '../fmHelpers';
 
 const prisma = new PrismaClient();
 

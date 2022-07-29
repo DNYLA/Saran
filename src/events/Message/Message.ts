@@ -30,26 +30,29 @@ export default class MessageEvent extends Event {
     await handleLevelUp(client, message, config);
 
     if (!user) return;
-    let messageCommand = message.content.toLowerCase();
+    let messageCommand = message.content;
 
     //Replace custom lastfm tag with ,lf
     //Update to allow it to replace lf instead
-    if (user.lastFMTag)
+    if (user.lastFMTag) {
+      console.log(messageCommand);
       if (messageCommand.startsWith(user.lastFMTag.toLowerCase())) {
         messageCommand = messageCommand.replace(
           user.lastFMTag.toLowerCase(),
           `${config.prefix}np`
         );
       }
+    }
 
     //Not a valid command
-    if (!messageCommand.startsWith(config.prefix)) return;
+    if (!messageCommand.toLowerCase().startsWith(config.prefix.toLowerCase()))
+      return;
     // If message is only <Prefix>
-    if (messageCommand === config.prefix) return; //Command/message is only prefix
+    if (messageCommand.toLowerCase() === config.prefix.toLowerCase()) return; //Command/message is only prefix: ;
 
     //Re-Write getArgsFromMsg to concat modules which have space names.
     const { commandName, args } = getArgsFromMsg(
-      message.content,
+      messageCommand,
       config.prefix.length
     );
 
