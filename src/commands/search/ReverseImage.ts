@@ -97,9 +97,6 @@ export default class ImageSearch extends Command {
       });
     };
 
-    reverseImageSearch(
-      'https://cdn.discordapp.com/attachments/987380648819974185/1002745461746171904/unknown.png',
-      cb
-    );
+    reverseImageSearch(imageToSearch, cb);
   }
 }
