@@ -25,12 +25,17 @@ export default class GetAvatar extends Command {
 
   async run(message: Message, args: { targetUserId: string }) {
     try {
+      const embed = await getAvatarEmbed(
+        AvatarType.Profile,
+        message,
+        args.targetUserId
+      );
+
       message.channel.send({
-        embeds: [
-          await getAvatarEmbed(AvatarType.Profile, message, args.targetUserId),
-        ],
+        embeds: [embed],
       });
     } catch (err) {
+      console.log(err);
       message.channel.send('Unable to process request');
     }
   }

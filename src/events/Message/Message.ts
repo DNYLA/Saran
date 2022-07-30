@@ -35,8 +35,6 @@ export default class MessageEvent extends Event {
     //Replace custom lastfm tag with ,lf
     //Update to allow it to replace lf instead
     if (user.lastFMTag) {
-      console.log(messageCommand.toLowerCase());
-      console.log(user.lastFMTag.toLowerCase());
       if (
         messageCommand.toLowerCase().startsWith(user.lastFMTag.toLowerCase())
       ) {

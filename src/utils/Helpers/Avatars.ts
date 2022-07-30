@@ -29,18 +29,15 @@ export async function getAvatarEmbed(
   }
 
   if (type === AvatarType.Profile) {
-    return new EmbedBuilder()
-      .setImage(`${avatarUrl}?size=1024`)
-      .setFooter({ text: requestedText });
+    return new EmbedBuilder().setImage(`${avatarUrl}?size=1024`);
+    // .setFooter({ text: requestedText });
   } else if (type === AvatarType.Banner) {
     if (!bannerUrl)
       return new EmbedBuilder().setAuthor({ name: 'No Banner Set' });
-    return new EmbedBuilder()
-      .setImage(`${bannerUrl}?size=1024`)
-      .setFooter({ text: requestedText });
+    return new EmbedBuilder().setImage(`${bannerUrl}?size=1024`);
+    // .setFooter({ text: requestedText });
   } else if (type === AvatarType.GuildProfile) {
-    return new EmbedBuilder()
-      .setImage(`${guildAvUrl ?? avatarUrl}?size=1024`)
-      .setFooter({ text: requestedText });
+    return new EmbedBuilder().setImage(`${guildAvUrl ?? avatarUrl}?size=1024`);
+    // .setFooter({ text: requestedText });
   }
 }
