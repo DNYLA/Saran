@@ -36,7 +36,9 @@ export default class MessageEvent extends Event {
     //Update to allow it to replace lf instead
     if (user.lastFMTag) {
       console.log(messageCommand);
-      if (messageCommand.startsWith(user.lastFMTag.toLowerCase())) {
+      if (
+        messageCommand.toLowerCase().startsWith(user.lastFMTag.toLowerCase())
+      ) {
         messageCommand = messageCommand.replace(
           user.lastFMTag.toLowerCase(),
           `${config.prefix}np`
