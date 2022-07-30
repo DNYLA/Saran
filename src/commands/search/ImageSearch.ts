@@ -74,7 +74,7 @@ export default class ImageSearch extends Command {
         text: `Page 1/${results.images.length} ∙ Requested by ${message.author.username}`,
       });
 
-    const row = new ActionRowBuilder().addComponents(
+    const row = new ActionRowBuilder<ButtonBuilder>().setComponents(
       new ButtonBuilder()
         .setCustomId(`image-backward-${query}`)
         .setLabel('<')
@@ -92,7 +92,7 @@ export default class ImageSearch extends Command {
 
     const imgMessage = await message.channel.send({
       embeds: [imageEmbed],
-      // components: [row],
+      components: [row],
     });
 
     setTimeout(() => {

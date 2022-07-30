@@ -45,7 +45,6 @@ export default class MessageEvent extends Event {
         );
       }
     }
-    console.log(messageCommand);
 
     //Not a valid command
     if (!messageCommand.toLowerCase().startsWith(config.prefix.toLowerCase()))

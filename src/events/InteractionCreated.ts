@@ -35,6 +35,7 @@ export default class InteractionCreated extends Event {
         content: 'Request Timedout!',
         ephemeral: true,
       });
+      console.log('no result');
       return;
     }
 
@@ -56,12 +57,13 @@ export default class InteractionCreated extends Event {
 
     if (forward) {
       newPos++;
-      if (newPos > results.images.length - 1)
+      if (newPos > results.images.length - 1) {
         await interaction.reply({
           content: 'No More Images!',
           ephemeral: true,
         });
-      return;
+        return;
+      }
     } else {
       newPos--;
       if (newPos < 0) {
