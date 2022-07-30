@@ -220,6 +220,13 @@ export type GoogleImagesSearch = {
   images: WebSearchImage[];
 };
 
+export type ReverseImageSearch = {
+  query: string;
+  currentPos: number;
+  requester: string;
+  images: { url: string; title: string }[];
+};
+
 export type WebSearchImage = {
   link: string;
   snippet: string;

@@ -2,12 +2,13 @@ import { Client, ClientOptions, Collection, Message } from 'discord.js';
 import Command from './base/command';
 import Event from './base/event';
 import { DatabaseManager } from './database/DatabaseManager';
-import { GoogleImagesSearch } from './types';
+import { GoogleImagesSearch, ReverseImageSearch } from './types';
 
 export default class DiscordClient extends Client {
   private _commands = new Collection<string, Command>();
   private _events = new Collection<string, Event>();
   private _images = new Collection<string, GoogleImagesSearch>();
+  private _reverseImages = new Collection<string, ReverseImageSearch>();
   // private _configs = new Array<GuildConfig>();
   private _deletedMessages = new Collection<string, Message>();
   private _editedMessages = new Collection<string, Message>();
@@ -35,6 +36,14 @@ export default class DiscordClient extends Client {
 
   setImage(images: GoogleImagesSearch) {
     this._images[images.query] = images;
+  }
+
+  getReverseImage(url: string): ReverseImageSearch {
+    return this._reverseImages[url];
+  }
+
+  setReverseImage(image: ReverseImageSearch) {
+    this._reverseImages[image.query] = image;
   }
 
   // getConfig(id: string): GuildConfig {

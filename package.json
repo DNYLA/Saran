@@ -27,6 +27,7 @@
     "instagram-url-downloader": "^1.1.0",
     "ioredis": "5.1.0",
     "moment": "^2.29.4",
+    "node-reverse-image-search": "^1.0.2",
     "prisma-redis-middleware": "^4.0.6",
     "redis": "^4.1.0",
     "request": "^2.88.2",
