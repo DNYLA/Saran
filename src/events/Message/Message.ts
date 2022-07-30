@@ -35,16 +35,19 @@ export default class MessageEvent extends Event {
     //Replace custom lastfm tag with ,lf
     //Update to allow it to replace lf instead
     if (user.lastFMTag) {
-      console.log(messageCommand);
+      console.log(messageCommand.toLowerCase());
+      console.log(user.lastFMTag.toLowerCase());
       if (
         messageCommand.toLowerCase().startsWith(user.lastFMTag.toLowerCase())
       ) {
+        messageCommand = messageCommand.toLowerCase(); //Lowercase doesnt matter when queerying for data only when inputting.
         messageCommand = messageCommand.replace(
           user.lastFMTag.toLowerCase(),
           `${config.prefix}np`
         );
       }
     }
+    console.log(messageCommand);
 
     //Not a valid command
     if (!messageCommand.toLowerCase().startsWith(config.prefix.toLowerCase()))
