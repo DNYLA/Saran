@@ -43,6 +43,7 @@ export default class ImageSearch extends Command {
   }
 
   async run(message: Message, args: { query?: string }) {
+    return message.reply('Currently Disabled.');
     const { query } = args;
 
     let imageToSearch = query;
