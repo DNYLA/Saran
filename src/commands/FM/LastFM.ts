@@ -36,7 +36,7 @@ export default class LastFMCommand extends Command {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async run(message: Message, args: unknown): Promise<Message | void> {
     return message.reply(
-      'To view a list of last.fm commands go to http://www.saran.vercel.app'
+      'To view a list of last.fm commands go to https://www.saran.vercel.app'
     );
   }
 }

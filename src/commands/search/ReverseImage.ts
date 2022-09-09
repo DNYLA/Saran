@@ -1,103 +1,107 @@
-import {
-  Message,
-  ActionRow,
-  ButtonBuilder,
-  EmbedBuilder,
-  ActionRowBuilder,
-  ButtonStyle,
-  APIActionRowComponent,
-  APIMessageActionRowComponent,
-  embedLength,
-  EmbedField,
-} from 'discord.js';
-import { GoogleCSESearch } from '../../api/WebSearch';
-import StartTyping from '../../hooks/StartTyping';
-import Command, { ArgumentTypes } from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
-import reverseImageSearch from 'node-reverse-image-search';
+// *
+// * Disabled due to package having a compatibility issue with linux.
+// * //
 
-export default class ImageSearch extends Command {
-  constructor() {
-    super('reverseImage', {
-      aliases: [
-        'revImage',
-        'ri',
-        'reversei',
-        'rImage',
-        'rImg',
-        'rimg',
-        'reverseimg',
-      ],
-      hooks: {
-        preCommand: StartTyping,
-      },
-      invalidUsage: 'Do ,img <Query>',
-      arguments: [
-        {
-          name: 'query',
-          optional: true,
-          type: ArgumentTypes.FULL_SENTANCE,
-        },
-      ],
-    });
-  }
+// import {
+//   Message,
+//   ActionRow,
+//   ButtonBuilder,
+//   EmbedBuilder,
+//   ActionRowBuilder,
+//   ButtonStyle,
+//   APIActionRowComponent,
+//   APIMessageActionRowComponent,
+//   embedLength,
+//   EmbedField,
+// } from 'discord.js';
+// import { GoogleCSESearch } from '../../api/WebSearch';
+// import StartTyping from '../../hooks/StartTyping';
+// import Command, { ArgumentTypes } from '../../utils/base/command';
+// import DiscordClient from '../../utils/client';
+// import reverseImageSearch from 'node-reverse-image-search';
 
-  async run(message: Message, args: { query?: string }) {
-    return message.reply('Currently Disabled.');
-    const { query } = args;
+// export default class ImageSearch extends Command {
+//   constructor() {
+//     super('reverseImage', {
+//       aliases: [
+//         'revImage',
+//         'ri',
+//         'reversei',
+//         'rImage',
+//         'rImg',
+//         'rimg',
+//         'reverseimg',
+//       ],
+//       hooks: {
+//         preCommand: StartTyping,
+//       },
+//       invalidUsage: 'Do ,img <Query>',
+//       arguments: [
+//         {
+//           name: 'query',
+//           optional: true,
+//           type: ArgumentTypes.FULL_SENTANCE,
+//         },
+//       ],
+//     });
+//   }
 
-    let imageToSearch = query;
+//   async run(message: Message, args: { query?: string }) {
+//     return message.reply('Currently Disabled.');
+//     const { query } = args;
 
-    if (!query || query === '') {
-      //Check for attachments
-      if (message.attachments.size > 0) {
-        imageToSearch = message.attachments.first().url;
-      } else if (message.reference) {
-        console.log('There isa  reply');
-        const fetchedMessage = await message.channel.messages.fetch(
-          message.reference.messageId
-        );
+//     let imageToSearch = query;
 
-        if (fetchedMessage && fetchedMessage.attachments.size > 0) {
-          imageToSearch = fetchedMessage.attachments.first().url;
-        }
-      }
-    }
+//     if (!query || query === '') {
+//       //Check for attachments
+//       if (message.attachments.size > 0) {
+//         imageToSearch = message.attachments.first().url;
+//       } else if (message.reference) {
+//         console.log('There isa  reply');
+//         const fetchedMessage = await message.channel.messages.fetch(
+//           message.reference.messageId
+//         );
 
-    if (!imageToSearch) {
-      return message.reply('No valid Image URL or Attachment provided.');
-    }
+//         if (fetchedMessage && fetchedMessage.attachments.size > 0) {
+//           imageToSearch = fetchedMessage.attachments.first().url;
+//         }
+//       }
+//     }
 
-    const cb = async (results: { url: string; title: string }[]) => {
-      if (!results || results.length === 0)
-        return message.reply('Unable to find any data on this image!');
+//     if (!imageToSearch) {
+//       return message.reply('No valid Image URL or Attachment provided.');
+//     }
 
-      const embed = new EmbedBuilder()
-        // .setAuthor({ name: firstImage.title, url: firstImage.url })
-        .setTitle('Reverse Image:')
-        .setDescription(`[Jump To Image](${message.url})`);
+//     const cb = async (results: { url: string; title: string }[]) => {
+//       if (!results || results.length === 0)
+//         return message.reply('Unable to find any data on this image!');
 
-      let validCounter = 0;
-      for (let i = 0; i < 5; i++) {
-        if (i > results.length - 1) break;
-        const image = results[i];
-        console.log(image);
-        if (!image.title || !image.url) continue;
-        embed.addFields({ name: image.title, value: image.url });
-        validCounter++;
-      }
+//       const embed = new EmbedBuilder()
+//         // .setAuthor({ name: firstImage.title, url: firstImage.url })
+//         .setTitle('Reverse Image:')
+//         .setDescription(`[Jump To Image](${message.url})`);
 
-      embed.setFooter({
-        text: `Total Results: ${validCounter} ∙ Requested by ${message.author.username}`,
-      });
-      // console.log(fields);
-      // embed.addFields(fields);
+//       let validCounter = 0;
+//       for (let i = 0; i < 5; i++) {
+//         if (i > results.length - 1) break;
+//         const image = results[i];
+//         console.log(image);
+//         if (!image.title || !image.url) continue;
+//         embed.addFields({ name: image.title, value: image.url });
+//         validCounter++;
+//       }
 
-      await message.channel.send({
-        embeds: [embed],
-      });
-    };
+//       embed.setFooter({
+//         text: `Total Results: ${validCounter} ∙ Requested by ${message.author.username}`,
+//       });
+//       // console.log(fields);
+//       // embed.addFields(fields);
 
-    reverseImageSearch(imageToSearch, cb);
-  }
-}
+//       await message.channel.send({
+//         embeds: [embed],
+//       });
+//     };
+
+//     reverseImageSearch(imageToSearch, cb);
+//   }
+// }

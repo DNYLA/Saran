@@ -23,12 +23,8 @@
     "cheerio": "^1.0.0-rc.11",
     "discord.js": "^14.0.3",
     "dotenv": "^16.0.1",
-    "instagram-url-direct": "^1.0.9",
-    "instagram-url-downloader": "^1.1.0",
     "ioredis": "5.1.0",
     "moment": "^2.29.4",
-    "node-reverse-image-search": "^1.0.2",
-    "prisma-redis-middleware": "^4.0.6",
     "redis": "^4.1.0",
     "request": "^2.88.2",
     "youtube-search": "^1.1.6"
