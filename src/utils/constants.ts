@@ -11,5 +11,6 @@ export const CONSTANTS = {
     INFO: 0x58b9ff,
     SUCCESS: 0x32ff53,
     ERROR: 0xff3232,
+    WARNING: 0xffbd32,
   },
 };

@@ -8,6 +8,7 @@ import {
 import StartTyping from '../../hooks/StartTyping';
 import { ArgumentTypes } from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
+import { CONSTANTS } from '../../utils/constants';
 import LastFMCommand from './LastFM';
 
 export default class SetUsername extends LastFMCommand {
@@ -29,10 +30,33 @@ export default class SetUsername extends LastFMCommand {
     });
   }
 
+  //Update this to a transaction
   async run(message: Message, args: { username: string }) {
     const userService = (message.client as DiscordClient).db.users;
     const user = await userService.findById(message.author.id);
+    const fmUser = await fetchUser(args.username, message.author.id);
+
+    if (!fmUser) {
+      const embed = new EmbedBuilder()
+        .setColor(CONSTANTS.COLORS.WARNING)
+        .setDescription(
+          `⚠️ <@${message.author.id}>: **${args.username}** is not a valid lastfm user.`
+        );
+      await message.channel.send({ embeds: [embed] });
+      return;
+    }
+
+    const baseDescription = `<a:loading:996589331944841287>  <@${message.author.id}>:  `;
+    const embed = new EmbedBuilder()
+      .setColor('#49b166')
+      .setDescription(
+        baseDescription +
+          `Indexing tracks for user ${args.username}. You will be notified when finished!`
+      );
+    const embedMessage = await message.channel.send({ embeds: [embed] });
+
     try {
+      //Delete old/current data
       if (user.lastFMName) {
         await userService.repo.update({
           where: { id: message.author.id },
@@ -54,18 +78,14 @@ export default class SetUsername extends LastFMCommand {
         lastFMName: args.username,
       });
     } catch (err) {
-      message.reply('Error Occured whilst trying to set your username.');
+      const embed = new EmbedBuilder()
+        .setColor(CONSTANTS.COLORS.ERROR)
+        .setDescription(
+          `❌ <@${message.author.id}>: An Unknown error has occured whilst trying to set your username. Contact an administrator if this persists.`
+        );
+      await message.channel.send({ embeds: [embed] });
     }
 
-    const baseDescription = `<a:loading:996589331944841287>  <@${message.author.id}>:  `;
-    const embed = new EmbedBuilder()
-      .setColor('#49b166')
-      .setDescription(
-        baseDescription +
-          `Indexing tracks for user ${args.username}. You will be notified when finished!`
-      );
-    const embedMessage = await message.channel.send({ embeds: [embed] });
-    await fetchUser(args.username, message.author.id);
     await fetchUserTracks(args.username, message.author.id);
     embed.setDescription(baseDescription + `Indexing Artists!`);
     embedMessage.edit({ embeds: [embed] });

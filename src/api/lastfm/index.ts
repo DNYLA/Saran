@@ -61,7 +61,14 @@ export async function fetchUser(
 
     return data.user;
   } catch (err) {
-    console.log(err);
+    console.log('Invalid Username Provided');
+    // if (err.response.data.error === 6) {
+    //   console.log('Test');
+    //   return null;
+    // } else {
+    //   return;
+    // }
+    //Handle Later
     return null;
   }
 }
