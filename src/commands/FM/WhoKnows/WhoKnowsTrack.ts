@@ -1,10 +1,11 @@
-import { Message } from 'discord.js';
+import { Message, EmbedBuilder } from 'discord.js';
 import { UsernameCheckNoMentions } from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
 import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
 import { ArgumentTypes } from '../../../utils/base/command';
 import DiscordClient from '../../../utils/client';
+import { CONSTANTS } from '../../../utils/constants';
 import {
   fetchRecentTrackInfo,
   fetchSearchTrackInfo,
@@ -63,13 +64,24 @@ export default class WhoKnowstrack extends LastFMCommand {
       track = (await fetchRecentTrackInfo(user.lastFMName)).track;
     }
 
+    if (!track) {
+      const embed = new EmbedBuilder()
+        .setColor(CONSTANTS.COLORS.INFO)
+        .setDescription(
+          `<@${message.author.id}>: **Unable to find track named ${args.trackName}. Try seperating the track name and artist name with |**`
+        );
+      return message.channel.send({ embeds: [embed] });
+    }
+
     const trackService = client.db.tracks;
     const filter = trackService.WhoKnowsFilter(
       track.name,
       track.artist.name,
       message.guildId
     );
+
     const guildPlays = await trackService.repo.findMany(filter);
+
     const { sum, requester, description } = await FormatWhoKnows(
       message,
       guildPlays,

@@ -1,4 +1,5 @@
 import { User } from '@prisma/client';
+import { last } from 'cheerio/lib/api/traversing';
 import { Message, EmbedBuilder, MessageMentions } from 'discord.js';
 import {
   fetchAlbumInfo,
@@ -235,6 +236,7 @@ export async function fetchRecentTrackInfo(
 
     return { track, recentTrack: recentTrack, user: user };
   } catch (err) {
+    console.log('errord over here');
     console.log(err);
     return { track: null, recentTrack: null, user: null };
   }
@@ -356,6 +358,22 @@ export function WhoKnowsEmbed(
   listeners: number,
   totalPlays: number
 ) {
+  if (totalPlays === 0) {
+    return new EmbedBuilder()
+      .setColor('#2F3136')
+      .setAuthor({
+        name: `Requested by ${requester.username}`,
+        url: `https://www.last.fm/user/${lastfmName}`,
+        iconURL:
+          'https://lastfm.freetls.fastly.net/i/u/avatar170s/a7ff67ef791aaba0c0c97e9c8a97bf04.png',
+      })
+      .setTitle(title)
+      .setDescription('**No Listeners found!**')
+      .setFooter({
+        text: `run ,lf update if you have recently listened to the track.`,
+      });
+  }
+
   if (requester.rank > 0) {
     description += `\n**Rank:** \`#${requester.rank}\` | **Plays:** \`${requester.plays}\``;
   }
