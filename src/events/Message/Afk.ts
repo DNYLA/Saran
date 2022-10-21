@@ -10,8 +10,6 @@ export default class MessageEvent extends Event {
   }
 
   async run(client: DiscordClient, message: Message) {
-    return;
-
     const user = await client.db.users.findById(message.author.id);
 
     await Promise.all(

@@ -24,6 +24,7 @@ export default class IndexFM extends Command {
   }
 
   async run(message: Message) {
+    //TRUNCATE TABLE "UserAlbums" RESTART IDENTITY;
     const client = message.client as DiscordClient;
     const guild = await client.guilds.fetch(message.guildId);
 

@@ -13,7 +13,7 @@ export default class MessageEvent extends Event {
 
   async run(client: DiscordClient, message: Message) {
     if (message.author.bot) return;
-    return await UnderMaintance(message);
+    // return await UnderMaintance(message);
 
     const db = client.db;
     console.log(
