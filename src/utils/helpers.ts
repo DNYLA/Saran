@@ -1,4 +1,4 @@
-import { Message, MessageMentions } from 'discord.js';
+import { EmbedBuilder, Message, MessageMentions } from 'discord.js';
 import { Periods } from '../api/lastfm';
 
 export function getArgsFromMsg(
@@ -68,4 +68,16 @@ export function convertPeriodToText(period: Periods) {
     default:
       return 'overall';
   }
+}
+
+export async function UnderMaintance(message: Message) {
+  if (!message.content.startsWith(',')) return;
+  const maintanceEmbed = new EmbedBuilder()
+    .setColor('#49b166')
+    .setDescription(
+      `<@${message.author.id}> Saran is currently under maintance! **ETA: 60minutes.**`
+    );
+  await message.channel.send({ embeds: [maintanceEmbed] });
+
+  return;
 }

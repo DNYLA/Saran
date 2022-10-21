@@ -2,6 +2,7 @@ import { Message, EmbedBuilder } from 'discord.js';
 import moment from 'moment';
 import Event from '../../utils/base/event';
 import DiscordClient from '../../utils/client';
+import { UnderMaintance } from '../../utils/helpers';
 
 export default class MessageEvent extends Event {
   constructor() {
@@ -9,7 +10,7 @@ export default class MessageEvent extends Event {
   }
 
   async run(client: DiscordClient, message: Message) {
-    if (message.author.bot) return;
+    return;
 
     const user = await client.db.users.findById(message.author.id);
 

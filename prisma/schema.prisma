@@ -51,6 +51,7 @@ model GuildConfig {
   joinLog String?
   joinMessage String?
   joinMessageChannel String?
+  afkLog String?
   messageLog String?
   rbMessages           ReactionBoardMessages[]
   levels Levels[]

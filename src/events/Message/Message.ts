@@ -4,7 +4,7 @@ import Event from '../../utils/base/event';
 import DiscordClient from '../../utils/client';
 import { CONSTANTS } from '../../utils/constants';
 import { buildEmbed } from '../../utils/embedbuilder';
-import { getArgsFromMsg } from '../../utils/helpers';
+import { getArgsFromMsg, UnderMaintance } from '../../utils/helpers';
 
 export default class MessageEvent extends Event {
   constructor() {
@@ -13,6 +13,7 @@ export default class MessageEvent extends Event {
 
   async run(client: DiscordClient, message: Message) {
     if (message.author.bot) return;
+    return await UnderMaintance(message);
 
     const db = client.db;
     console.log(
