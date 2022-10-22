@@ -97,22 +97,23 @@ export async function cacheTopTenStats(
   });
 }
 
+export type TopList = {
+  name: string;
+  url?: string;
+  playcount: number;
+};
+
 export function convertTopStatsToEmbed(
   user: User,
-  list: TopTrack[] | TopArtist[] | TopAlbum[],
-  period: Periods,
-  text: string
+  list: TopList[] | TopTrack[] | TopArtist[] | TopAlbum[],
+  title: string
 ) {
   let description = '';
-  const embedTitle = `${user.lastFMName} ${convertPeriodToText(
-    period
-  )} top ${text}`;
 
   list.forEach((item, i) => {
     try {
-      description += `**${i + 1}. [${item.name}](${item.url})** (${
-        item.playcount
-      })\n`;
+      const header = item.url ? `[${item.name}](${item.url})` : item.name;
+      description += `**${i + 1}. ${header}** (${item.playcount})\n`;
     } catch (err) {
       console.log(err);
     }
@@ -127,7 +128,7 @@ export function convertTopStatsToEmbed(
         iconURL:
           'https://lastfm.freetls.fastly.net/i/u/avatar170s/a7ff67ef791aaba0c0c97e9c8a97bf04.png',
       })
-      .setTitle(embedTitle)
+      .setTitle(title)
       .setDescription(description);
 
     return embed;
@@ -177,12 +178,10 @@ export async function getTopTenStats(
   if (period === Periods.overall)
     await cacheTopTenStats(user.lastFMName, topStats, type);
 
-  const embed = convertTopStatsToEmbed(
-    user,
-    topStats,
-    period,
-    type.toString() + `s`
-  );
+  const title = `${user.lastFMName} ${convertPeriodToText(
+    period
+  )} top ${type.toString()}s`;
+  const embed = convertTopStatsToEmbed(user, topStats, title);
 
   if (embed) message.channel.send({ embeds: [embed] });
   else message.reply('Unable to display top tracks!');
