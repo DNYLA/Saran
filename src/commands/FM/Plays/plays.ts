@@ -81,13 +81,11 @@ export default class Plays extends LastFMCommand {
       console.log(err);
     }
 
-    imageUrl = '';
-
     try {
       const emebed = new EmbedBuilder()
         .setColor('#2F3136')
         .setTitle(imageUrl ? '\u200B' : '')
-        // .setThumbnail(imageUrl)
+        .setThumbnail(imageUrl)
         .setDescription(
           `**${user.lastFMName}** has a total of **${plays} plays** for **[${artist.name}](${artist.url})**`
         );

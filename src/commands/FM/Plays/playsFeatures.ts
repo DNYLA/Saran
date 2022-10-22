@@ -1,4 +1,6 @@
+import { prisma, PrismaClient } from '@prisma/client';
 import { Message, EmbedBuilder } from 'discord.js';
+import { fetchRecentTracks } from '../../../api/lastfm';
 import UsernameCheck from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
@@ -16,8 +18,8 @@ import LastFMCommand from '../LastFM';
 
 export default class Plays extends LastFMCommand {
   constructor() {
-    super('plays', {
-      aliases: ['p'],
+    super('playsf', {
+      aliases: ['pf'],
       requirments: {
         custom: UsernameCheck,
       },
@@ -46,6 +48,7 @@ export default class Plays extends LastFMCommand {
     message: Message,
     args: { targetUserId: string; artistName: string }
   ) {
+    const client = message.client as DiscordClient;
     const user = await (message.client as DiscordClient).db.users.findById(
       args.targetUserId
     );
@@ -60,6 +63,35 @@ export default class Plays extends LastFMCommand {
     }
 
     if (!artist) return message.reply('No artist found!');
+    const trackService = client.db.tracks;
+    const result = await trackService.repo.findMany({
+      where: {
+        userId: args.targetUserId,
+        OR: [{ name: { contains: artist.name } }, { artistName: artist.name }],
+      },
+    });
+
+    // const result2 = await trackService.repo.aggregate({
+    //   _sum: { plays: true },
+    //   where: {
+    //     userId: args.targetUserId,
+    //     OR: [{ name: { contains: artistName } }, { artistName }],
+    //   },
+    // });
+
+    const plays = result
+      .map((t) => t.plays)
+      .reduce((prev, next) => prev + next);
+
+    // const result2 = await prisma.userTracks.findMany({
+    //   where: {
+    //     body: {
+    //       search: 'cat | dog',
+    //     },
+    //   },
+    // });
+    // console.log(result2);
+    console.log(plays);
 
     // const EmbedBuilder = CreateEmbed({
     //   color: '#fff',
@@ -68,35 +100,27 @@ export default class Plays extends LastFMCommand {
     // });
 
     let imageUrl;
-    const plays = artist.stats.userplaycount;
     try {
       imageUrl = artist.image[3]['#text'];
-      await setCachedPlays(
-        user.lastFMName,
-        artist.name,
-        plays,
-        SearchType.Artist
-      );
     } catch (err) {
       console.log(err);
     }
 
-    imageUrl = '';
-
+    console.log(imageUrl);
     try {
       const emebed = new EmbedBuilder()
         .setColor('#2F3136')
         .setTitle(imageUrl ? '\u200B' : '')
-        // .setThumbnail(imageUrl)
+        .setThumbnail(imageUrl)
         .setDescription(
-          `**${user.lastFMName}** has a total of **${plays} plays** for **[${artist.name}](${artist.url})**`
+          `**${user.lastFMName}** has a total of **${plays} plays** for **[${artist.name}](${artist.url})** including features`
         );
 
       message.channel.send({
         embeds: [emebed],
       });
     } catch (err) {
-      message.reply('Unable to display track! Try checking another one');
+      message.reply('Unable to display artist! Try checking another one');
       console.log(err);
     }
   }
