@@ -22,8 +22,8 @@ import { TopTenArguments } from './topartists';
 
 export default class TopTracks extends LastFMCommand {
   constructor() {
-    super('topartistfeatures', {
-      aliases: ['tarf'],
+    super('toptenfeatures', {
+      aliases: ['tttf'],
       requirments: {
         custom: UsernameCheck,
       },
