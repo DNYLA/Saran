@@ -3,6 +3,7 @@ import DiscordClient from './utils/client';
 import * as dotenv from 'dotenv';
 import { GatewayIntentBits, Partials } from 'discord.js';
 import { redis } from './utils/redis';
+import { registerFont } from 'canvas';
 dotenv.config();
 
 // declare global {
@@ -27,6 +28,8 @@ export const client = new DiscordClient({
 });
 
 (async () => {
+  registerFont('./fonts/anton.ttf', { family: 'Anton' });
+  registerFont('./fonts/bernadette.ttf', { family: 'Bernadette' });
   await redis.connect();
   await registerEvents(client);
   await registerCommands(client);

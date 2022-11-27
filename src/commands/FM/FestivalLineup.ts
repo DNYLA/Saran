@@ -239,31 +239,31 @@ class CanvasGenerator implements ICanvasGenerator {
       .split(', ');
 
     this.createText(day.toUpperCase(), x - titleGap, y, {
-      fontSize: '25pt',
+      fontSize: '35pt',
       col: '#ec745c',
     });
-    this.createText(headliner, x, y, { fontSize: '65pt', maxWidth: 700 });
+    this.createText(headliner, x, y, { fontSize: '75pt', maxWidth: 700 });
     this.createText(month.toUpperCase(), x + titleGap, y, {
-      fontSize: '25pt',
+      fontSize: '35pt',
       col: '#ec745c',
     });
+
+    y += 70;
+    this.createText(artist_1, x, y, {
+      fontSize: '43pt',
+    });
+
+    const altCol = '#ffffff8c';
 
     y += 60;
-    this.createText(artist_1, x, y, {
-      fontSize: '33pt',
-    });
-
-    const altCol = '#ffffffcc';
-
-    y += 50;
     this.createText(artist_2, this.hWidth, y, {
-      fontSize: '25pt',
+      fontSize: '35pt',
       col: altCol,
     });
 
-    y += 50;
+    y += 60;
     this.createText(artist_3, this.hWidth, y, {
-      fontSize: '25pt',
+      fontSize: '35pt',
       col: altCol,
     });
   }
@@ -283,7 +283,7 @@ class CanvasGenerator implements ICanvasGenerator {
     //+50
     y += 125;
     this.createText('PRESENTED BY SARAN BOT', hWidth, y, {
-      fontSize: '25pt',
+      fontSize: '40pt',
       col: '#ec745c',
     });
 
