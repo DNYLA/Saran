@@ -4,6 +4,11 @@ import Event from './base/event';
 import { DatabaseManager } from './database/DatabaseManager';
 import { GoogleImagesSearch, ReverseImageSearch } from './types';
 
+export type Riddle = {
+  riddle: string;
+  answer: string;
+  owner?: string;
+};
 export default class DiscordClient extends Client {
   private _commands = new Collection<string, Command>();
   private _events = new Collection<string, Event>();
@@ -12,6 +17,7 @@ export default class DiscordClient extends Client {
   // private _configs = new Array<GuildConfig>();
   private _deletedMessages = new Collection<string, Message>();
   private _editedMessages = new Collection<string, Message>();
+  private _riddles = new Collection<string, Riddle>();
   private _database = new DatabaseManager();
   constructor(options?: ClientOptions) {
     super(options);
@@ -71,5 +77,13 @@ export default class DiscordClient extends Client {
 
   setEditedMessage(message: Message) {
     this._editedMessages[message.guildId] = message;
+  }
+
+  getRiddle(serverId: string): Riddle {
+    return this._riddles[serverId];
+  }
+
+  setRiddle(serverId: string, riddle: Riddle) {
+    this._riddles[serverId] = riddle;
   }
 }
