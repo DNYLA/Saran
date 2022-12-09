@@ -1,4 +1,5 @@
 import { GuildChannel } from 'discord.js';
+import { fetchGuild, updateGuild } from '../services/database/guild';
 import Event from '../utils/base/event';
 import DiscordClient from '../utils/client';
 
@@ -8,7 +9,7 @@ export default class InteractionCreated extends Event {
   }
 
   async run(client: DiscordClient, channel: GuildChannel) {
-    const guild = await client.db.guilds.findById(channel.guildId);
+    const guild = await fetchGuild(channel.guildId);
     if (!guild.jailRole) return;
 
     const role = await channel.guild.roles
@@ -16,7 +17,7 @@ export default class InteractionCreated extends Event {
       .catch(console.error);
 
     if (!role) {
-      await client.db.guilds.updateById(channel.guildId, {
+      await updateGuild(channel.guildId, {
         jailRole: null,
         jailChannel: null,
         jailLogChannel: null,

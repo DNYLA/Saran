@@ -1,11 +1,15 @@
 import { GuildConfig } from '@prisma/client';
 import { Message } from 'discord.js';
+import {
+  fetchGuildUser,
+  updateGuildUser,
+} from '../../services/database/guildUser';
 import Event from '../../utils/base/event';
 import DiscordClient from '../../utils/client';
-import { CONSTANTS } from '../../utils/constants';
-import { buildEmbed } from '../../utils/embedbuilder';
-import { getArgsFromMsg, UnderMaintance } from '../../utils/helpers';
-
+import { getArgsFromMsg } from '../../utils/helpers';
+import { prisma } from '../../services/prisma';
+import { fetchGuild, updateGuild } from '../../services/database/guild';
+import { fetchDatabaseUser } from '../../services/database/user';
 export default class MessageEvent extends Event {
   constructor() {
     super('messageCreate');
@@ -15,15 +19,14 @@ export default class MessageEvent extends Event {
     if (message.author.bot) return;
     // return await UnderMaintance(message);
 
-    const db = client.db;
     console.log(
       `Author: ${message.author.id} Id: ${message.id}; Guild: ${message.guild.name}-${message.guildId}`
     );
-    const user = await db.users.findById(message.author.id);
-    const config = await db.guilds.findById(message.guildId);
+    const user = await fetchDatabaseUser(message.author.id);
+    const config = await fetchGuild(message.guildId);
 
     if (config) {
-      await db.guilds.updateById(message.guildId, {
+      await updateGuild(message.guildId, {
         name: message.guild.name,
       });
     }
@@ -78,9 +81,7 @@ async function handleLevelUp(
   message: Message,
   config: GuildConfig
 ) {
-  const db = client.db;
-
-  const user = await db.guildUsers.findById(message.guildId, message.author.id);
+  const user = await fetchGuildUser(message.guildId, message.author.id);
   const addedLevel = user.level + 1;
   const xpMultiplier = Math.floor(15 * addedLevel);
   const xpThreshhold = Math.floor(
@@ -93,13 +94,13 @@ async function handleLevelUp(
 
   if (newXp >= xpThreshhold) {
     //User Leveled Up
-    await db.guildUsers.updateById(message.guildId, message.author.id, {
+    await updateGuildUser(message.guildId, message.author.id, {
       xp: newXp - xpThreshhold,
       level: addedLevel,
     });
 
     //Check for new Roles
-    const levels = await db.levels.repo.findMany({
+    const levels = await prisma.levels.findMany({
       where: { serverId: config.id, level: addedLevel },
     });
 
@@ -118,7 +119,7 @@ async function handleLevelUp(
       }
     }
   } else {
-    await db.guildUsers.updateById(message.guildId, message.author.id, {
+    await updateGuildUser(message.guildId, message.author.id, {
       xp: newXp,
     });
   }

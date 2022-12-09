@@ -1,8 +1,8 @@
 import { Message } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
+import { fetchGuildUser } from '../../services/database/guildUser';
 import { MentionUserId, SelfUserId } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
 
 export default class UserLevel extends Command {
   constructor() {
@@ -24,12 +24,8 @@ export default class UserLevel extends Command {
   }
 
   async run(message: Message, args: { targetUserId: string }) {
-    const db = (message.client as DiscordClient).db;
     const guildUser = await message.guild.members.fetch(args.targetUserId);
-    const user = await db.guildUsers.findById(
-      message.guildId,
-      args.targetUserId
-    );
+    const user = await fetchGuildUser(message.guildId, args.targetUserId);
     const isSelf = args.targetUserId === message.author.id;
     const targetText = isSelf ? 'You are' : guildUser.displayName + ' is';
     const xpThreshhold = Math.floor(

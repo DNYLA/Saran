@@ -7,8 +7,8 @@ import {
 } from '../../api/lastfm';
 import OwnerOnly from '../../checks/OwnerOnly';
 import StartTyping from '../../hooks/StartTyping';
+import { prisma } from '../../services/prisma';
 import Command from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
 
 export default class IndexFM extends Command {
   constructor() {
@@ -25,14 +25,10 @@ export default class IndexFM extends Command {
 
   async run(message: Message) {
     //TRUNCATE TABLE "UserAlbums" RESTART IDENTITY;
-    const client = message.client as DiscordClient;
-    const guild = await client.guilds.fetch(message.guildId);
 
-    const users = await client.db.users.repo.findMany({
+    const users = await prisma.user.findMany({
       where: { lastFMName: { not: null } },
     });
-
-    const userService = (message.client as DiscordClient).db.users;
 
     console.log(users.length);
     for (let i = 0; i < users.length; i++) {
@@ -44,7 +40,7 @@ export default class IndexFM extends Command {
         console.log(`Current User: ${username}: ${i}/${users.length}`);
         try {
           //Remove old data -> Rework Only Fetch new? (Dont know if that is possible)
-          await userService.repo.update({
+          await prisma.user.update({
             where: { id: user.id },
             data: {
               Tracks: {
@@ -69,11 +65,5 @@ export default class IndexFM extends Command {
         console.log(`Finished Indexing ${username}`);
       }, delay);
     }
-
-    // } else if (args.type === 'clearTracks') {
-    //   await client.db.tracks.repo.deleteMany({});
-    //   await client.db.artists.repo.deleteMany({});
-    //   await client.db.albums.repo.deleteMany({});
-    // }
   }
 }

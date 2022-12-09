@@ -1,12 +1,12 @@
 import { User } from '@prisma/client';
-import { Message, EmbedBuilder } from 'discord.js';
+import { Message } from 'discord.js';
 import { fetchAlbumInfo, fetchArtistInfo } from '../../api/lastfm';
 import UsernameCheck from '../../checks/UsernameCheck';
 import NoUsernameSet from '../../hooks/NoUsernameSet';
 import StartTyping from '../../hooks/StartTyping';
+import { fetchDatabaseUser } from '../../services/database/user';
 import { MentionUserId, SelfUserId } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
 import { CONSTANTS } from '../../utils/constants';
 import { setCachedPlays } from '../../utils/database/redisManager';
 import {
@@ -47,9 +47,7 @@ export default class NowPlaying extends Command {
 
   async run(message: Message, args: { targetUserId: string }) {
     // const user = await getUser(args.targetUserId);
-    const user = await (message.client as DiscordClient).db.users.findById(
-      args.targetUserId
-    );
+    const user = await fetchDatabaseUser(args.targetUserId);
     const username = user.lastFMName;
 
     let track: Track;

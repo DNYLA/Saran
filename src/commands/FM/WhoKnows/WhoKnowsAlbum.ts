@@ -2,9 +2,11 @@ import { Message } from 'discord.js';
 import UsernameCheck from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
+import { WhoKnowsFilter } from '../../../services/database/fm';
+import { fetchDatabaseUser } from '../../../services/database/user';
+import { prisma } from '../../../services/prisma';
 import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
 import { ArgumentTypes } from '../../../utils/base/command';
-import DiscordClient from '../../../utils/client';
 import {
   fetchRecentAlbumInfo,
   fetchSearchAlbumInfo,
@@ -45,8 +47,7 @@ export default class WhoKnowsAlbum extends LastFMCommand {
     message: Message,
     args: { targetUserId: string; albumName: string }
   ) {
-    const client = message.client as DiscordClient;
-    const user = await client.db.users.findById(args.targetUserId);
+    const user = await fetchDatabaseUser(args.targetUserId);
 
     let album: Album;
     if (args.albumName) {
@@ -59,14 +60,12 @@ export default class WhoKnowsAlbum extends LastFMCommand {
 
     if (!album) return message.reply('Unable to find album with name!');
 
-    const albumService = client.db.albums;
-
-    const filter = albumService.WhoKnowsFilter(
+    const filter = await WhoKnowsFilter(
       album.name,
       album.artist,
       message.guildId
     );
-    const guildPlays = await albumService.repo.findMany(filter);
+    const guildPlays = await prisma.userAlbums.findMany(filter);
 
     const { sum, description, requester } = await FormatWhoKnows(
       message,

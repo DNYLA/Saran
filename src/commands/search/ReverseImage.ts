@@ -1,19 +1,6 @@
-import {
-  Message,
-  ActionRow,
-  ButtonBuilder,
-  EmbedBuilder,
-  ActionRowBuilder,
-  ButtonStyle,
-  APIActionRowComponent,
-  APIMessageActionRowComponent,
-  embedLength,
-  EmbedField,
-} from 'discord.js';
-import { GoogleCSESearch } from '../../api/WebSearch';
+import { Message } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
-import Command, { ArgumentTypes } from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
+import Command from '../../utils/base/command';
 // import reverseImageSearch from 'node-reverse-image-search';
 
 export default class ImageSearch extends Command {
@@ -43,6 +30,7 @@ export default class ImageSearch extends Command {
   }
 
   // *Disabled due to package having a compatibility issue with linux.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async run(message: Message, args: { query?: string }) {
     return message.reply('Currently Disabled.');
     // const { query } = args;

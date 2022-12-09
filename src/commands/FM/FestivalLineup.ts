@@ -4,7 +4,6 @@ import NoUsernameSet from '../../hooks/NoUsernameSet';
 import StartTyping from '../../hooks/StartTyping';
 import { MentionUserId, SelfUserId } from '../../utils/argsparser';
 import { ArgumentTypes } from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
 import LastFMCommand from './LastFM';
 import {
   createCanvas,
@@ -12,10 +11,11 @@ import {
   Canvas,
   CanvasRenderingContext2D,
 } from 'canvas';
-import { writeFileSync } from 'fs';
 // import * as cover from 'canvas-image-cover';
 // import {cove} from 'canvas-image-cover';
 import cover from 'canvas-image-cover';
+import { prisma } from '../../services/prisma';
+import { fetchDatabaseUser } from '../../services/database/user';
 
 export default class Plays extends LastFMCommand {
   constructor() {
@@ -41,13 +41,9 @@ export default class Plays extends LastFMCommand {
   }
 
   async run(message: Message, args: { targetUserId: string }) {
-    const client = message.client as DiscordClient;
-    const artistService = client.db.artists;
-    const user = await (message.client as DiscordClient).db.users.findById(
-      args.targetUserId
-    );
+    const user = await fetchDatabaseUser(args.targetUserId);
 
-    const artists = await artistService.repo.findMany({
+    const artists = await prisma.userArtists.findMany({
       where: { userId: args.targetUserId },
       orderBy: [{ plays: 'desc' }],
       take: 39,

@@ -1,7 +1,7 @@
 import { registerCommands, registerEvents } from './handler';
 import DiscordClient from './utils/client';
 import * as dotenv from 'dotenv';
-import { GatewayIntentBits, Partials } from 'discord.js';
+import { GatewayIntentBits } from 'discord.js';
 import { redis } from './utils/redis';
 import { registerFont } from 'canvas';
 import { prisma } from './services/prisma';
@@ -30,18 +30,18 @@ export const client = new DiscordClient({
 
 prisma.$connect().then(async () => {
   console.log('Connected to database');
+  console.log(process.env.REDIS_HOST);
 
   //Fonts for image generation
   registerFont('./fonts/anton.ttf', { family: 'Anton' });
   registerFont('./fonts/bernadette.ttf', { family: 'Bernadette' });
 
-  //Connect to third party services
-  await redis.connect();
-
   //Initialise Commands/Events
   await registerEvents(client);
   await registerCommands(client);
 
+  //Connect to third party services
+  await redis.connect();
   //Login
   await client.login(process.env.BOT_TOKEN);
 });

@@ -26,6 +26,7 @@ export default class EmbedTest extends Command {
   }
 
   async run(message: Message) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const data: EmbedBuilderData = {
       color: CONSTANTS.COLORS.INFO,
       author: {
@@ -58,7 +59,6 @@ export default class EmbedTest extends Command {
       ],
     };
 
-    const name = 'Dan';
     const embed = buildEmbed(
       '{ "description": "${name}", "axaxa": "yes", "color": "#FFFFFF"  }'
     );

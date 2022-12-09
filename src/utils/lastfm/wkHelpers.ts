@@ -1,6 +1,8 @@
 import { User } from '@prisma/client';
 import { Message } from 'discord.js';
-import DiscordClient from '../client';
+import { fetchGuildUsersWithFM } from '../../services/database/guildUser';
+import { fetchDatabaseUser } from '../../services/database/user';
+import { prisma } from '../../services/prisma';
 import { getCachedPlays, setCachedPlays } from '../database/redisManager';
 import {
   fetchRecentAlbumInfo,
@@ -27,14 +29,12 @@ export async function GetWhoKnowsInfo(
   recentType: SearchType,
   globalSearch?: boolean
 ) {
-  const client = message.client as DiscordClient;
-  const guildService = client.db.guildUsers;
-  const user = await client.db.users.findById(userId);
+  const user = await fetchDatabaseUser(userId);
   let users: WhoKnowsUser[];
   if (!globalSearch) {
-    users = await guildService.findAllWithLastFm(message.guildId);
+    users = await fetchGuildUsersWithFM(message.guildId);
   } else {
-    users = await client.db.users.repo.findMany({
+    users = await prisma.user.findMany({
       where: { lastFMName: { not: null } },
     });
   }

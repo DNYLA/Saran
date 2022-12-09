@@ -1,4 +1,4 @@
-import { Message, MessageMentions, SnowflakeUtil } from 'discord.js';
+import { Message, MessageMentions } from 'discord.js';
 
 export const StringToColour = async (message: Message, args: string[]) => {
   if (args.length > 0) return args[0].toUpperCase();

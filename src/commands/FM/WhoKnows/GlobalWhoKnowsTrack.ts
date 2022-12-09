@@ -2,9 +2,11 @@ import { Message } from 'discord.js';
 import { UsernameCheckNoMentions } from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
+import { WhoKnowsFilter } from '../../../services/database/fm';
+import { fetchDatabaseUser } from '../../../services/database/user';
+import { prisma } from '../../../services/prisma';
 import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
 import { ArgumentTypes } from '../../../utils/base/command';
-import DiscordClient from '../../../utils/client';
 import {
   fetchRecentTrackInfo,
   fetchSearchTrackInfo,
@@ -48,8 +50,8 @@ export default class GlobalWhoKnowstrack extends LastFMCommand {
   }
 
   async run(message: Message, args: SearchTrackArguments) {
-    const client = message.client as DiscordClient;
-    const user = await client.db.users.findById(args.targetUserId);
+    const user = await fetchDatabaseUser(args.targetUserId);
+
     let track: Track;
     if (args.trackName) {
       track = await fetchSearchTrackInfo(
@@ -60,9 +62,9 @@ export default class GlobalWhoKnowstrack extends LastFMCommand {
     } else {
       track = (await fetchRecentTrackInfo(user.lastFMName)).track;
     }
-    const trackService = client.db.tracks;
-    const filter = trackService.WhoKnowsFilter(track.name, track.artist.name);
-    const guildPlays = await trackService.repo.findMany(filter);
+
+    const filter = await WhoKnowsFilter(track.name, track.artist.name);
+    const guildPlays = await prisma.userTracks.findMany(filter);
 
     const { sum, description, requester } = await FormatWhoKnows(
       message,

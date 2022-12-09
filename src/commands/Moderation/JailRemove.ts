@@ -1,8 +1,12 @@
 import { Message, EmbedBuilder } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
+import { fetchGuild } from '../../services/database/guild';
+import {
+  fetchGuildUser,
+  updateGuildUser,
+} from '../../services/database/guildUser';
 import { MentionIdOrArg } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
 
 export default class Jail extends Command {
   constructor() {
@@ -28,8 +32,7 @@ export default class Jail extends Command {
   }
 
   async run(message: Message, args: { mentionedUserId: string }) {
-    const db = (message.client as DiscordClient).db;
-    const config = await db.guilds.findById(message.guildId);
+    const config = await fetchGuild(message.guildId);
     if (!config.jailRole)
       return message.reply('Use ,jailsetup to setup the jail');
 
@@ -37,7 +40,7 @@ export default class Jail extends Command {
     const user = await message.guild.members.fetch(args.mentionedUserId);
     if (!user) return message.reply('Cant find guild member');
 
-    const guildMember = await db.guildUsers.findById(
+    const guildMember = await fetchGuildUser(
       args.mentionedUserId,
       message.guildId
     );
@@ -59,7 +62,7 @@ export default class Jail extends Command {
       } //Role might not exist anymores
     }
 
-    await db.guildUsers.updateById(message.guildId, guildMember.userId, {
+    await updateGuildUser(message.guildId, guildMember.userId, {
       displayName: user.displayName,
       preJailedRoles: [],
     });

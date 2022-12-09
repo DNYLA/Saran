@@ -1,6 +1,7 @@
 import { Message } from 'discord.js';
 import OwnerOnly from '../../checks/OwnerOnly';
 import StartTyping from '../../hooks/StartTyping';
+import { prisma } from '../../services/prisma';
 import { MentionUserId, SelfUserId } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
 import DiscordClient from '../../utils/client';
@@ -43,9 +44,9 @@ export default class UnmuteRemote extends Command {
     } else if (args.type === 'remove') {
       client.emit('guildMemberRemove', message.member);
     } else if (args.type === 'clearTracks') {
-      await client.db.tracks.repo.deleteMany({});
-      await client.db.artists.repo.deleteMany({});
-      await client.db.albums.repo.deleteMany({});
+      await prisma.userTracks.deleteMany({});
+      await prisma.userArtists.deleteMany({});
+      await prisma.userAlbums.deleteMany({});
     }
   }
 }

@@ -1,7 +1,7 @@
 import { Message } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
+import { fetchGuild, updateGuild } from '../../services/database/guild';
 import Command from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
 
 export default class JailSetup extends Command {
   constructor() {
@@ -20,8 +20,7 @@ export default class JailSetup extends Command {
   }
 
   async run(message: Message) {
-    const guildService = (message.client as DiscordClient).db.guilds;
-    const config = await guildService.findById(message.guildId);
+    const config = await fetchGuild(message.guildId);
     const guild = await message.guild.fetch();
     const channels = await guild.channels.fetch();
 
@@ -59,7 +58,7 @@ export default class JailSetup extends Command {
       SendMessages: false,
     });
 
-    await guildService.updateById(message.guildId, {
+    await updateGuild(message.guildId, {
       jailChannel: jailChannel.id,
       jailRole: jailRole.id,
       jailLogChannel: jailLog.id,

@@ -1,8 +1,8 @@
 import { Message, Role } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
+import { prisma } from '../../services/prisma';
 import { RoleMentionIdOrArg } from '../../utils/argsparser';
 import { ArgumentTypes } from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
 import LevelsCommand from './Levels';
 
 export default class LevelsRemove extends LevelsCommand {
@@ -29,13 +29,11 @@ export default class LevelsRemove extends LevelsCommand {
   }
 
   async run(message: Message, args: { roleId: string }) {
-    const client = message.client as DiscordClient;
     const guild = await message.guild.fetch();
     await guild.roles.fetch();
     let role: Role;
-    const db = client.db;
 
-    const alreadyExists = await db.levels.repo.findUnique({
+    const alreadyExists = await prisma.levels.findUnique({
       where: { roleId_serverId: { roleId: args.roleId, serverId: guild.id } },
     });
 
@@ -51,7 +49,7 @@ export default class LevelsRemove extends LevelsCommand {
       return message.reply('Successfully deleted level!');
     }
 
-    const users = await db.guildUsers.repo.findMany({
+    const users = await prisma.guildUser.findMany({
       where: { serverId: guild.id, xp: { gte: alreadyExists.level * 2000 } },
     });
 
@@ -67,7 +65,7 @@ export default class LevelsRemove extends LevelsCommand {
       }, i * 1000);
     }
 
-    await db.levels.repo.delete({
+    await prisma.levels.delete({
       where: { roleId_serverId: { roleId: role.id, serverId: guild.id } },
     });
     return message.reply('Successfully deleted level!');

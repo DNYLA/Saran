@@ -1,9 +1,9 @@
 import { Prisma } from '@prisma/client';
 import { Message, Role } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
+import { prisma } from '../../services/prisma';
 import { RoleMentionIdOrArg } from '../../utils/argsparser';
 import { ArgumentTypes } from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
 import LevelsCommand from './Levels';
 
 export default class LevelsAdd extends LevelsCommand {
@@ -34,7 +34,6 @@ export default class LevelsAdd extends LevelsCommand {
   }
 
   async run(message: Message, args: { roleId: string; level: string }) {
-    const client = message.client as DiscordClient;
     const guild = await message.guild.fetch();
     await guild.roles.fetch();
     let role: Role;
@@ -48,9 +47,8 @@ export default class LevelsAdd extends LevelsCommand {
     if (!role) return message.reply('Could not find this role!');
     if (isNaN(level)) return message.reply('Invalid number passed!');
     if (level <= 0) return message.reply('Level must be greater than 0');
-    const db = client.db;
 
-    const alreadyExists = await db.levels.repo.findUnique({
+    const alreadyExists = await prisma.levels.findUnique({
       where: { roleId_serverId: { roleId: role.id, serverId: guild.id } },
     });
 
@@ -59,7 +57,7 @@ export default class LevelsAdd extends LevelsCommand {
 
     //Instead of throwing error we can update
     const xp = level * 2000;
-    db.levels.repo.upsert({
+    prisma.levels.upsert({
       where: { roleId_serverId: { roleId: role.id, serverId: guild.id } },
       create: { roleId: role.id, serverId: guild.id, level },
       update: { level },
@@ -73,7 +71,7 @@ export default class LevelsAdd extends LevelsCommand {
       let filter: Prisma.GuildUserWhereInput = { serverId: guild.id };
       if (level > alreadyExists.level) {
         filter = { ...filter, xp: { gte: alreadyExists.level * 2000, lt: xp } };
-        const users = await db.guildUsers.repo.findMany({ where: filter });
+        const users = await prisma.guildUser.findMany({ where: filter });
 
         for (let i = 0; i < users.length; i++) {
           setTimeout(async () => {
@@ -88,7 +86,7 @@ export default class LevelsAdd extends LevelsCommand {
         }
       } else {
         filter = { ...filter, xp: { gte: xp, lt: alreadyExists.level * 2000 } };
-        const users = await db.guildUsers.repo.findMany({ where: filter });
+        const users = await prisma.guildUser.findMany({ where: filter });
 
         for (let i = 0; i < users.length; i++) {
           setTimeout(async () => {
@@ -103,14 +101,14 @@ export default class LevelsAdd extends LevelsCommand {
         }
       }
     } else {
-      await db.levels.repo.create({
+      await prisma.levels.create({
         data: { roleId: role.id, serverId: guild.id, level },
       });
       message.reply(
         'Successfully created level. Currently adding all valid users to the level.'
       );
       //Add to all users with level x
-      const validUsers = await db.guildUsers.repo.findMany({
+      const validUsers = await prisma.guildUser.findMany({
         where: { serverId: guild.id, xp: { gte: xp } },
       });
 

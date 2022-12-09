@@ -1,8 +1,8 @@
 import { Collection, Message } from 'discord.js';
 import OwnerOnly from '../../checks/OwnerOnly';
 import StartTyping from '../../hooks/StartTyping';
+import { prisma } from '../../services/prisma';
 import Command from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
 
 export default class IndexLevels extends Command {
   constructor() {
@@ -60,8 +60,6 @@ export default class IndexLevels extends Command {
       })
     );
 
-    const db = (message.client as DiscordClient).db;
-
     await Promise.all(
       collectionKeys.map(async (key) => {
         const level = Math.floor(usersCollection[key] / 250);
@@ -69,7 +67,7 @@ export default class IndexLevels extends Command {
           const member = await guild.members.fetch(key);
           if (!member || !level) return;
           console.log(`${key}:${usersCollection[key]}`);
-          await db.guildUsers.repo.upsert({
+          await prisma.guildUser.upsert({
             where: {
               userId_serverId: { serverId: member.guild.id, userId: member.id },
             },

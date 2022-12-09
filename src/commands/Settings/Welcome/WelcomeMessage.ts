@@ -1,9 +1,8 @@
 import { Message } from 'discord.js';
 import StartTyping from '../../../hooks/StartTyping';
+import { updateGuild } from '../../../services/database/guild';
 import { ChannelMentionIdOrArg } from '../../../utils/argsparser';
-import Command, { ArgumentTypes } from '../../../utils/base/command';
-import WelcomeCommand from '../../../utils/base/Welcome';
-import DiscordClient from '../../../utils/client';
+import { ArgumentTypes } from '../../../utils/base/command';
 import SettingsCommand from '../Settings';
 
 export default class WelcomeMessage extends SettingsCommand {
@@ -38,8 +37,7 @@ export default class WelcomeMessage extends SettingsCommand {
     if (!channel || !channel.isTextBased())
       return message.reply("Text channel doesn't exist.");
 
-    const guildService = (message.client as DiscordClient).db.guilds;
-    await guildService.updateById(message.guildId, {
+    await updateGuild(message.guildId, {
       joinMessageChannel: args.channelId,
       joinMessage: args.message,
     });

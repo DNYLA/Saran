@@ -1,10 +1,8 @@
-import axios from 'axios';
 import { EmbedBuilder, Message } from 'discord.js';
-import UsernameCheck from '../checks/UsernameCheck';
 import NoUsernameSet from '../hooks/NoUsernameSet';
 import StartTyping from '../hooks/StartTyping';
 import Command, { ArgumentTypes } from '../utils/base/command';
-import DiscordClient, { Riddle } from '../utils/client';
+import DiscordClient from '../utils/client';
 import { CONSTANTS } from '../utils/constants';
 import { getRiddle } from '../api/riddle';
 export default class RiddleCommand extends Command {

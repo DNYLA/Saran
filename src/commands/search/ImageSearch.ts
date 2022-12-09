@@ -1,12 +1,9 @@
 import {
   Message,
-  ActionRow,
   ButtonBuilder,
   EmbedBuilder,
   ActionRowBuilder,
   ButtonStyle,
-  APIActionRowComponent,
-  APIMessageActionRowComponent,
 } from 'discord.js';
 import { GoogleCSESearch } from '../../api/WebSearch';
 import StartTyping from '../../hooks/StartTyping';

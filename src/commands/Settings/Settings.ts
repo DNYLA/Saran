@@ -1,13 +1,6 @@
-import {
-  Channel,
-  Message,
-  EmbedBuilder,
-  NonThreadGuildBasedChannel,
-} from 'discord.js';
+import { Message } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
-import { ChannelMentionIdOrArg } from '../../utils/argsparser';
-import Command, { ArgumentTypes } from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
+import Command from '../../utils/base/command';
 import { CommandOptions } from '../../utils/types';
 
 export default class SettingsCommand extends Command {
@@ -30,8 +23,10 @@ export default class SettingsCommand extends Command {
     );
   }
 
-  async run(message: Message, args: unknown) {
-    return message.reply(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  //Child classes inherit and need this args{} to be set
+  async run(message: Message, args: { channelId?: string }) {
+    return await message.reply(
       'Visit https://www.saran.vercel.app/ on how to use this'
     );
   }

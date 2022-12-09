@@ -1,5 +1,4 @@
 import { User } from '@prisma/client';
-import { last } from 'cheerio/lib/api/traversing';
 import { Message, EmbedBuilder, MessageMentions } from 'discord.js';
 import {
   fetchAlbumInfo,
@@ -15,7 +14,7 @@ import {
   Periods,
 } from '../api/lastfm';
 import { TopTenArguments } from '../commands/FM/TopTen/topartists';
-import DiscordClient from './client';
+import { fetchDatabaseUser } from '../services/database/user';
 import { setCachedPlays } from './database/redisManager';
 import { convertPeriodToText, mentionUser } from './helpers';
 import {
@@ -42,7 +41,7 @@ export async function getUserFromMessage(
     userId = mention.id;
   }
 
-  return await (message.client as DiscordClient).db.users.findById(userId);
+  return await fetchDatabaseUser(userId);
 }
 
 export function getPeriodFromString(arg: string): Periods {
@@ -154,9 +153,7 @@ export async function getTopTenStats(
   args: TopTenArguments,
   type: SearchType
 ) {
-  const user = await (message.client as DiscordClient).db.users.findById(
-    args.targetUserId
-  );
+  const user = await fetchDatabaseUser(args.targetUserId);
 
   const period: Periods = getPeriodFromString(args.period);
   let topStats: TopTrack[] | TopArtist[] | TopAlbum[];

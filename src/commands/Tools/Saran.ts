@@ -1,16 +1,15 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import axios from 'axios';
 // import https from https;
-import { Message, EmbedBuilder, AttachmentBuilder } from 'discord.js';
+import { Message } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
-import Command, { ArgumentTypes } from '../../utils/base/command';
+import Command from '../../utils/base/command';
 // const instagramGetUrl = require('instagram-url-direct');
 // import { downloader as Downloader } from 'instagram-url-downloader';
 
-type InstagramLinkType = {
-  results_number: number;
-  url_list: string[];
-};
+// type InstagramLinkType = {
+//   results_number: number;
+//   url_list: string[];
+// };
 
 export default class Sanar extends Command {
   constructor() {
@@ -69,11 +68,10 @@ export default class Sanar extends Command {
   //   // console.log(videoString);
   //   // // message.reply(videoString);
   // }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async run(message: Message, args: { videoUrl: string }) {
-    const url = 'https://www.instagram.com/p/CjS6tPQj5AD/';
     // let tag = '',
     //   post = '';
-
     // let tagPref = 'explore/tags/';
   }
 }

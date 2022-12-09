@@ -1,7 +1,7 @@
 import { Message } from 'discord.js';
 import OwnerOnly from '../../checks/OwnerOnly';
+import { prisma } from '../../services/prisma';
 import Command from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
 
 export default class ArgsTest extends Command {
   constructor() {
@@ -16,8 +16,7 @@ export default class ArgsTest extends Command {
   }
 
   async run(message: Message) {
-    const db = (message.client as DiscordClient).db;
-    const levels = await db.levels.repo.findMany({
+    const levels = await prisma.levels.findMany({
       where: { serverId: message.guildId },
     });
 
@@ -26,7 +25,7 @@ export default class ArgsTest extends Command {
 
     if (!levels) return message.reply('Done');
 
-    const users = await db.guildUsers.repo.findMany({
+    const users = await prisma.guildUser.findMany({
       where: { serverId: message.guildId, level: { gt: 0 }, inactive: false },
     });
 

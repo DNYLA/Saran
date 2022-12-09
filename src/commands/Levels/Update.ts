@@ -1,9 +1,9 @@
 import { Prisma } from '@prisma/client';
 import { Message, Role } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
+import { prisma } from '../../services/prisma';
 import { RoleMentionIdOrArg } from '../../utils/argsparser';
 import { ArgumentTypes } from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
 import LevelsCommand from './Levels';
 
 export default class LevelsUpdate extends LevelsCommand {
@@ -34,7 +34,6 @@ export default class LevelsUpdate extends LevelsCommand {
   }
 
   async run(message: Message, args: { roleId: string; level: string }) {
-    const client = message.client as DiscordClient;
     const guild = await message.guild.fetch();
     await guild.roles.fetch();
     let role: Role;
@@ -49,9 +48,8 @@ export default class LevelsUpdate extends LevelsCommand {
     if (!role) return message.reply('Could not find this role!');
     if (isNaN(level)) return message.reply('Invalid number passed!');
     if (level <= 0) return message.reply('Level must be greater than 0');
-    const db = client.db;
 
-    const alreadyExists = await db.levels.repo.findUnique({
+    const alreadyExists = await prisma.levels.findUnique({
       where: { roleId_serverId: { roleId: role.id, serverId: guild.id } },
     });
 
@@ -59,7 +57,7 @@ export default class LevelsUpdate extends LevelsCommand {
       return message.reply('Level doesnt exist use ,levels create');
 
     const xp = level * 2000;
-    await db.levels.repo.update({
+    await prisma.levels.update({
       where: { roleId_serverId: { roleId: role.id, serverId: guild.id } },
       data: { level },
     });
@@ -72,7 +70,7 @@ export default class LevelsUpdate extends LevelsCommand {
     let filter: Prisma.GuildUserWhereInput = { serverId: guild.id };
     if (level > alreadyExists.level) {
       filter = { ...filter, xp: { gte: alreadyExists.level * 2000, lt: xp } };
-      const users = await db.guildUsers.repo.findMany({ where: filter });
+      const users = await prisma.guildUser.findMany({ where: filter });
 
       for (let i = 0; i < users.length; i++) {
         setTimeout(async () => {
@@ -87,7 +85,7 @@ export default class LevelsUpdate extends LevelsCommand {
       }
     } else {
       filter = { ...filter, xp: { gte: xp, lt: alreadyExists.level * 2000 } };
-      const users = await db.guildUsers.repo.findMany({ where: filter });
+      const users = await prisma.guildUser.findMany({ where: filter });
       for (let i = 0; i < users.length; i++) {
         setTimeout(async () => {
           try {

@@ -1,6 +1,7 @@
 import { Prisma } from '@prisma/client';
 import axios, { AxiosRequestConfig } from 'axios';
-import { client } from '../../main';
+import { updateUser } from '../../services/database/user';
+import { prisma } from '../../services/prisma';
 import {
   Album,
   Artist,
@@ -52,7 +53,7 @@ export async function fetchUser(
     const user = data.user as LastFMUser;
 
     try {
-      await client.db.users.updateById(id, {
+      await updateUser(id, {
         lastFMImage: user.image[3]['#text'],
       });
     } catch (err) {
@@ -137,7 +138,7 @@ export async function fetchUserTracks(
   });
 
   try {
-    await client.db.tracks.repo.createMany({ data: strippedTracks });
+    await prisma.userTracks.createMany({ data: strippedTracks });
   } catch (err) {
     console.log(err);
   }
@@ -193,7 +194,7 @@ export async function fetchUserArtists(
   });
 
   try {
-    await client.db.artists.repo.createMany({ data: strippedArtists });
+    await prisma.userArtists.createMany({ data: strippedArtists });
   } catch (err) {
     console.log(err);
   }
@@ -250,7 +251,7 @@ export async function fetchUserAlbums(
   });
 
   try {
-    await client.db.albums.repo.createMany({ data: strippedAlbums });
+    await prisma.userAlbums.createMany({ data: strippedAlbums });
   } catch (err) {
     console.log(err);
   }

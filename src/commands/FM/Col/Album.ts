@@ -12,8 +12,8 @@ import {
 import { convertPeriodToText } from '../../../utils/helpers';
 import { TopTenArguments } from '../TopTen/topartists';
 import { createCollage } from '@wylie39/image-collage';
-import DiscordClient from '../../../utils/client';
 import LastFMCommand from '../LastFM';
+import { fetchDatabaseUser } from '../../../services/database/user';
 
 export default class AlbumCollage extends LastFMCommand {
   constructor() {
@@ -45,9 +45,7 @@ export default class AlbumCollage extends LastFMCommand {
   }
 
   async run(message: Message, args: TopTenArguments) {
-    const user = await (message.client as DiscordClient).db.users.findById(
-      args.targetUserId
-    );
+    const user = await fetchDatabaseUser(args.targetUserId);
     const period = getPeriodFromString(args.period);
     const topTen = await getTopTenStatsNoEmbed(
       message,

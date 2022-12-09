@@ -1,7 +1,7 @@
 import { Message, EmbedBuilder } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
+import { prisma } from '../../services/prisma';
 import Command from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
 import { CommandOptions } from '../../utils/types';
 
 export default class LevelsCommand extends Command {
@@ -21,12 +21,10 @@ export default class LevelsCommand extends Command {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async run(message: Message, args: unknown): Promise<Message | void> {
-    const client = message.client as DiscordClient;
     const guild = await message.guild.fetch();
     await guild.roles.fetch();
-    const db = client.db;
 
-    const levels = await db.levels.repo.findMany({
+    const levels = await prisma.levels.findMany({
       where: { serverId: guild.id },
     });
 

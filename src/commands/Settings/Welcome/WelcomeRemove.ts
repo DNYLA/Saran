@@ -1,9 +1,6 @@
 import { Message } from 'discord.js';
 import StartTyping from '../../../hooks/StartTyping';
-import { ChannelMentionIdOrArg } from '../../../utils/argsparser';
-import Command, { ArgumentTypes } from '../../../utils/base/command';
-import WelcomeCommand from '../../../utils/base/Welcome';
-import DiscordClient from '../../../utils/client';
+import { updateGuild } from '../../../services/database/guild';
 import SettingsCommand from '../Settings';
 
 export default class WelcomeMessage extends SettingsCommand {
@@ -23,8 +20,7 @@ export default class WelcomeMessage extends SettingsCommand {
   }
 
   async run(message: Message) {
-    const guildService = (message.client as DiscordClient).db.guilds;
-    await guildService.updateById(message.guildId, {
+    await updateGuild(message.guildId, {
       joinMessage: null,
       joinMessageChannel: null,
     });

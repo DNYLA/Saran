@@ -1,4 +1,5 @@
 import { Message, EmbedBuilder } from 'discord.js';
+import { fetchGuild, updateGuild } from '../services/database/guild';
 import Event from '../utils/base/event';
 import DiscordClient from '../utils/client';
 
@@ -9,12 +10,10 @@ export default class MessageEvent extends Event {
 
   async run(client: DiscordClient, message: Message) {
     client.setDeletedMessage(message);
-    const db = client.db;
 
-    const config = await db.guilds.findById(message.guildId);
+    const config = await fetchGuild(message.guildId);
     if (!config || !config.messageLog) return;
     const guild = await message.guild.fetch();
-    const auditLog = await guild.fetchAuditLogs({ type: 72 });
 
     let channel;
 
@@ -26,7 +25,7 @@ export default class MessageEvent extends Event {
 
     if (!channel) {
       //Set log id to null since channel no longer exists
-      await db.guilds.updateById(guild.id, { messageLog: null });
+      await updateGuild(guild.id, { messageLog: null });
       return;
     }
 

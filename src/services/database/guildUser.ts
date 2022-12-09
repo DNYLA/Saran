@@ -1,6 +1,5 @@
-import { GuildConfig, GuildUser, Levels, Prisma, User } from '@prisma/client';
+import { GuildUser, Prisma } from '@prisma/client';
 import { client } from '../../main';
-import DiscordClient from '../../utils/client';
 import { prisma } from '../prisma';
 
 export async function fetchGuildUser(

@@ -22,11 +22,11 @@ export async function getAvatarEmbed(
   const guildAvUrl = guildProfile.avatarURL();
   const bannerUrl = requestedUser.bannerURL();
 
-  let requestedText = '';
+  // let requestedText = '';
 
-  if (targetUserId !== message.author.id) {
-    requestedText = `Requested by ${message.author.username}`;
-  }
+  // if (targetUserId !== message.author.id) {
+  //   requestedText = `Requested by ${message.author.username}`;
+  // }
 
   if (type === AvatarType.Profile) {
     return new EmbedBuilder().setImage(`${avatarUrl}?size=1024`);

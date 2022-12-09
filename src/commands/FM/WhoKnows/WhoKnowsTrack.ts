@@ -2,9 +2,11 @@ import { Message, EmbedBuilder } from 'discord.js';
 import { UsernameCheckNoMentions } from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
+import { WhoKnowsFilter } from '../../../services/database/fm';
+import { fetchDatabaseUser } from '../../../services/database/user';
+import { prisma } from '../../../services/prisma';
 import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
 import { ArgumentTypes } from '../../../utils/base/command';
-import DiscordClient from '../../../utils/client';
 import { CONSTANTS } from '../../../utils/constants';
 import {
   fetchRecentTrackInfo,
@@ -49,8 +51,7 @@ export default class WhoKnowstrack extends LastFMCommand {
   }
 
   async run(message: Message, args: SearchTrackArguments) {
-    const client = message.client as DiscordClient;
-    const user = await client.db.users.findById(args.targetUserId);
+    const user = await fetchDatabaseUser(args.targetUserId);
     const guildName = message.guild.name;
 
     let track: Track;
@@ -73,14 +74,12 @@ export default class WhoKnowstrack extends LastFMCommand {
       return message.channel.send({ embeds: [embed] });
     }
 
-    const trackService = client.db.tracks;
-    const filter = trackService.WhoKnowsFilter(
+    const filter = await WhoKnowsFilter(
       track.name,
       track.artist.name,
       message.guildId
     );
-
-    const guildPlays = await trackService.repo.findMany(filter);
+    const guildPlays = await prisma.userTracks.findMany(filter);
 
     const { sum, requester, description } = await FormatWhoKnows(
       message,

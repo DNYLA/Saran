@@ -1,17 +1,14 @@
-import { prisma, PrismaClient } from '@prisma/client';
 import { Message, EmbedBuilder } from 'discord.js';
-import { fetchRecentTracks } from '../../../api/lastfm';
 import UsernameCheck from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
+import { fetchDatabaseUser } from '../../../services/database/user';
+import { prisma } from '../../../services/prisma';
 import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
 import { ArgumentTypes } from '../../../utils/base/command';
-import DiscordClient from '../../../utils/client';
-import { setCachedPlays } from '../../../utils/database/redisManager';
 import {
   fetchRecentArtistInfo,
   fetchSearchArtistInfo,
-  SearchType,
 } from '../../../utils/fmHelpers';
 import { Artist } from '../../../utils/types';
 import LastFMCommand from '../LastFM';
@@ -48,10 +45,7 @@ export default class Plays extends LastFMCommand {
     message: Message,
     args: { targetUserId: string; artistName: string }
   ) {
-    const client = message.client as DiscordClient;
-    const user = await (message.client as DiscordClient).db.users.findById(
-      args.targetUserId
-    );
+    const user = await fetchDatabaseUser(args.targetUserId);
 
     let artist: Artist;
 
@@ -63,8 +57,7 @@ export default class Plays extends LastFMCommand {
     }
 
     if (!artist) return message.reply('No artist found!');
-    const trackService = client.db.tracks;
-    const result = await trackService.repo.findMany({
+    const result = await prisma.userTracks.findMany({
       where: {
         userId: args.targetUserId,
         OR: [{ name: { contains: artist.name } }, { artistName: artist.name }],

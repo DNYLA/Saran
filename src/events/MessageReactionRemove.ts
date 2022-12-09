@@ -1,10 +1,11 @@
 import { EmbedBuilder, MessageReaction, User } from 'discord.js';
+import { fetchGuild } from '../services/database/guild';
 import Event from '../utils/base/event';
 import DiscordClient from '../utils/client';
 import {
   getReactionBoardInfo,
   updateReactionBoardInfo,
-} from '../utils/database/Guild';
+} from '../services/database/Guild';
 
 export default class MessageReactionAdd extends Event {
   constructor() {
@@ -13,7 +14,7 @@ export default class MessageReactionAdd extends Event {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async run(client: DiscordClient, reaction: MessageReaction, user: User) {
-    const config = await client.db.guilds.findById(reaction.message.guildId);
+    const config = await fetchGuild(reaction.message.guildId);
     if (!config) return; //Configs should auto be fetched whenever a message is sent
     if (!config.reactionBoardChannel) return;
     const guild = reaction.message.guild;

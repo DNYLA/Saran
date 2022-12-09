@@ -7,7 +7,7 @@ import {
 } from '../../api/lastfm';
 import UsernameCheck from '../../checks/UsernameCheck';
 import StartTyping from '../../hooks/StartTyping';
-import DiscordClient from '../../utils/client';
+import { fetchDatabaseUser, updateUser } from '../../services/database/user';
 import LastFMCommand from './LastFM';
 
 export default class SetUsername extends LastFMCommand {
@@ -27,25 +27,21 @@ export default class SetUsername extends LastFMCommand {
   //Currently a replica of ,lf set command will update when i have time however this feature
   //is needed so i will release it like this.
   async run(message: Message) {
-    const userService = (message.client as DiscordClient).db.users;
-    const user = await userService.findById(message.author.id);
+    const user = await fetchDatabaseUser(message.author.id);
     const username = user.lastFMName;
     if (!username) return message.reply('Set a username with ,lf set');
 
     try {
       //Remove old data -> Rework Only Fetch new? (Dont know if that is possible)
-      await userService.repo.update({
-        where: { id: message.author.id },
-        data: {
-          Tracks: {
-            deleteMany: {},
-          },
-          Albums: {
-            deleteMany: {},
-          },
-          Artists: {
-            deleteMany: {},
-          },
+      await updateUser(message.author.id, {
+        Tracks: {
+          deleteMany: {},
+        },
+        Albums: {
+          deleteMany: {},
+        },
+        Artists: {
+          deleteMany: {},
         },
       });
     } catch (err) {

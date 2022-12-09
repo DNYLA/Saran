@@ -1,8 +1,8 @@
 import { Message, NonThreadGuildBasedChannel } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
+import { updateGuild } from '../../services/database/guild';
 import { ChannelMentionIdOrArg } from '../../utils/argsparser';
 import { ArgumentTypes } from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
 import SettingsCommand from './Settings';
 
 export default class MessageLog extends SettingsCommand {
@@ -33,7 +33,6 @@ export default class MessageLog extends SettingsCommand {
   }
 
   async run(message: Message, args: { channelId?: string }) {
-    const db = (message.client as DiscordClient).db;
     let channel: NonThreadGuildBasedChannel;
     try {
       channel = await message.guild.channels.fetch(args.channelId);
@@ -45,8 +44,10 @@ export default class MessageLog extends SettingsCommand {
     if (channel.isVoiceBased() || channel.isThread())
       return message.reply('Not a text channel!');
 
-    await db.guilds.updateById(message.guildId, { messageLog: channel.id });
+    await updateGuild(message.guildId, { messageLog: channel.id });
 
-    return message.reply(`Successfully set <#${channel.id}> as message log!`);
+    return await message.reply(
+      `Successfully set <#${channel.id}> as message log!`
+    );
   }
 }

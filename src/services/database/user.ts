@@ -9,7 +9,7 @@ export async function createUser(id: string): Promise<User> {
   }
 }
 
-export async function findUserById(id: string): Promise<User> {
+export async function fetchDatabaseUser(id: string): Promise<User> {
   try {
     const user = await prisma.user.findUnique({ where: { id } });
     if (!user) return await createUser(id);
@@ -20,7 +20,7 @@ export async function findUserById(id: string): Promise<User> {
   }
 }
 
-export async function findGuildUser(id: string, serverId: string) {
+export async function fetchGuildUser(id: string, serverId: string) {
   const user = await prisma.user.findUnique({
     where: { id },
     include: { guilds: { where: { serverId: serverId } } },
@@ -35,7 +35,7 @@ export async function findGuildUser(id: string, serverId: string) {
   return user;
 }
 
-export async function updateUserById(
+export async function updateUser(
   id: string,
   data: Prisma.UserUpdateInput
 ): Promise<void> {

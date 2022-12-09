@@ -1,7 +1,7 @@
 import { Message, EmbedBuilder } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
+import { prisma } from '../../services/prisma';
 import Command from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
 
 export default class RankLeaderboard extends Command {
   constructor() {
@@ -15,8 +15,7 @@ export default class RankLeaderboard extends Command {
   }
 
   async run(message: Message) {
-    const client = message.client as DiscordClient;
-    const users = await client.db.guildUsers.repo.findMany({
+    const users = await prisma.guildUser.findMany({
       where: { serverId: message.guildId },
       take: 10,
       orderBy: { level: 'desc' },

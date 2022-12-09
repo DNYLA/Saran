@@ -1,8 +1,8 @@
 import { Message, EmbedBuilder } from 'discord.js';
 import moment from 'moment';
+import { fetchDatabaseUser, updateUser } from '../../services/database/user';
 import Event from '../../utils/base/event';
 import DiscordClient from '../../utils/client';
-import { UnderMaintance } from '../../utils/helpers';
 
 export default class MessageEvent extends Event {
   constructor() {
@@ -10,11 +10,11 @@ export default class MessageEvent extends Event {
   }
 
   async run(client: DiscordClient, message: Message) {
-    const user = await client.db.users.findById(message.author.id);
+    const user = await fetchDatabaseUser(message.author.id);
 
     await Promise.all(
       message.mentions.members.map(async (member) => {
-        const mentionedUser = await client.db.users.findById(member.id);
+        const mentionedUser = await fetchDatabaseUser(member.id);
         if (!mentionedUser.afkTime) return;
 
         const timeAfk = moment(mentionedUser.afkTime).fromNow();
@@ -43,7 +43,7 @@ export default class MessageEvent extends Event {
           }`
         );
       await message.channel.send({ embeds: [afkembed] });
-      await client.db.users.updateById(user.id, {
+      await updateUser(user.id, {
         afkMessage: null,
         afkTime: null,
       });

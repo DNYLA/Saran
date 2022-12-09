@@ -1,8 +1,11 @@
 import { GuildPremiumTier, Message, Role } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
+import {
+  fetchGuildUser,
+  updateGuildUser,
+} from '../../services/database/guildUser';
 import { ImageUrlOrAttachment } from '../../utils/argsparser';
 import { ArgumentTypes } from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
 import BoosterRoleCommand from './RoleColor';
 
 export default class BoosterRoleIcon extends BoosterRoleCommand {
@@ -29,7 +32,6 @@ export default class BoosterRoleIcon extends BoosterRoleCommand {
   }
 
   async run(message: Message, args: { iconLink: string }) {
-    const guildUsersService = (message.client as DiscordClient).db.guildUsers;
     const user = await message.client.users.fetch(message.author.id);
     if (!user) return message.reply('User doesnt exist!');
 
@@ -46,7 +48,7 @@ export default class BoosterRoleIcon extends BoosterRoleCommand {
     }
     if (!guildUser.premiumSince) return message.reply('You gotta be booster!');
 
-    const storedUser = await guildUsersService.findById(guild.id, user.id);
+    const storedUser = await fetchGuildUser(guild.id, user.id);
 
     const roleId = storedUser.customBoostRoleId;
     let boosterRole: Role;
@@ -83,7 +85,7 @@ export default class BoosterRoleIcon extends BoosterRoleCommand {
       // console.log(guildUser.roles.premiumSubscriberRole);
       await boosterRole.setIcon(args.iconLink);
       if (storedUser.customBoostRoleId !== boosterRole.id)
-        await guildUsersService.updateById(guild.id, user.id, {
+        await updateGuildUser(guild.id, user.id, {
           customBoostRoleId: boosterRole.id,
         });
       await guildUser.roles.add(boosterRole);

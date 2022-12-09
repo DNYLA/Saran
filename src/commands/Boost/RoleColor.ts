@@ -1,8 +1,11 @@
 import { ColorResolvable, GuildPremiumTier, Message, Role } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
+import {
+  fetchGuildUser,
+  updateGuildUser,
+} from '../../services/database/guildUser';
 import { StringToColour } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
 import { CommandOptions } from '../../utils/types';
 
 export default class BoosterRoleCommand extends Command {
@@ -36,7 +39,6 @@ export default class BoosterRoleCommand extends Command {
   async run(message: Message, args: unknown) {
     const argums = args as { colour: string };
 
-    const guildUsersService = (message.client as DiscordClient).db.guildUsers;
     const user = await message.client.users.fetch(message.author.id);
     if (!user) return message.reply('User doesnt exist!');
 
@@ -54,7 +56,7 @@ export default class BoosterRoleCommand extends Command {
     }
     if (!guildUser.premiumSince) return message.reply('You gotta be booster!');
 
-    const storedUser = await guildUsersService.findById(guild.id, user.id);
+    const storedUser = await fetchGuildUser(guild.id, user.id);
     const roleId = storedUser.customBoostRoleId;
     let boosterRole: Role;
 
@@ -89,7 +91,7 @@ export default class BoosterRoleCommand extends Command {
 
       await boosterRole.setColor(argums.colour as ColorResolvable);
       if (storedUser.customBoostRoleId !== boosterRole.id)
-        await guildUsersService.updateById(guild.id, user.id, {
+        await updateGuildUser(guild.id, user.id, {
           customBoostRoleId: boosterRole.id,
         });
       await guildUser.roles.add(boosterRole);

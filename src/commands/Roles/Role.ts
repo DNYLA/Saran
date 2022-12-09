@@ -34,8 +34,11 @@ export default class RoleCommand extends Command {
     try {
       const role = await message.guild.roles.fetch(args.roleId);
       const user = await message.guild.members.fetch(args.targetUserId);
+      await user.fetch();
 
-      user.roles.add(role);
+      if (user.roles.cache.has(role.id)) {
+        user.roles.remove(role);
+      } else user.roles.add(role);
     } catch (err) {
       return message.reply('idk an error happened');
     }

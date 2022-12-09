@@ -2,8 +2,8 @@ import { Message } from 'discord.js';
 import UsernameCheck from '../../checks/UsernameCheck';
 import NoUsernameSet from '../../hooks/NoUsernameSet';
 import StartTyping from '../../hooks/StartTyping';
+import { fetchDatabaseUser, updateUser } from '../../services/database/user';
 import { ArgumentTypes } from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
 import { CONSTANTS } from '../../utils/constants';
 import { isValidEmbed } from '../../utils/embedbuilder';
 import LastFMCommand from './LastFM';
@@ -29,8 +29,7 @@ export default class SetUsername extends LastFMCommand {
   }
 
   async run(message: Message, args: { mode: string }) {
-    const userService = (message.client as DiscordClient).db.users;
-    const user = await userService.findById(message.author.id);
+    const user = await fetchDatabaseUser(message.member.id);
     const mode = args.mode.toLowerCase();
     if (!user.donator)
       return message.channel.send({
@@ -53,7 +52,7 @@ export default class SetUsername extends LastFMCommand {
       });
     }
 
-    await userService.updateById(user.id, { lastFMMode: args.mode });
+    await updateUser(user.id, { lastFMMode: args.mode });
 
     return message.channel.send({
       embeds: [

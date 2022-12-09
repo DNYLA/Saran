@@ -1,6 +1,5 @@
 import { Message } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
-import { MentionIdOrArg } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
 import { buildEmbed } from '../../utils/embedbuilder';
 

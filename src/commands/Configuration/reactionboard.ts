@@ -1,10 +1,8 @@
-import { PrismaClient } from '@prisma/client';
 import { Message } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
+import { prisma } from '../../services/prisma';
 import { ChannelMentionIdOrArg } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
-
-const prisma = new PrismaClient();
 
 export default class SetReactionBoardChannel extends Command {
   constructor() {

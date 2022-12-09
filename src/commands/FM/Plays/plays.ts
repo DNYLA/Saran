@@ -2,9 +2,9 @@ import { Message, EmbedBuilder } from 'discord.js';
 import UsernameCheck from '../../../checks/UsernameCheck';
 import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
+import { fetchDatabaseUser } from '../../../services/database/user';
 import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
 import { ArgumentTypes } from '../../../utils/base/command';
-import DiscordClient from '../../../utils/client';
 import { setCachedPlays } from '../../../utils/database/redisManager';
 import {
   fetchRecentArtistInfo,
@@ -46,9 +46,7 @@ export default class Plays extends LastFMCommand {
     message: Message,
     args: { targetUserId: string; artistName: string }
   ) {
-    const user = await (message.client as DiscordClient).db.users.findById(
-      args.targetUserId
-    );
+    const user = await fetchDatabaseUser(args.targetUserId);
 
     let artist: Artist;
 

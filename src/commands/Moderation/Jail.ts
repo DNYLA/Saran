@@ -1,8 +1,9 @@
 import { Message, EmbedBuilder } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
+import { fetchGuild } from '../../services/database/guild';
+import { updateGuildUser } from '../../services/database/guildUser';
 import { MentionIdOrArg } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
 
 export default class Jail extends Command {
   constructor() {
@@ -36,8 +37,7 @@ export default class Jail extends Command {
     message: Message,
     args: { mentionedUserId: string; time: string; reason: string }
   ) {
-    const db = (message.client as DiscordClient).db;
-    const config = await db.guilds.findById(message.guildId);
+    const config = await fetchGuild(message.guildId);
     if (!config.jailChannel)
       return message.reply('Use ,jailsetup to setup the jail');
 
@@ -65,7 +65,7 @@ export default class Jail extends Command {
     //   await user.roles.remove(role.id);
     // }
 
-    await db.guildUsers.updateById(message.guildId, args.mentionedUserId, {
+    await updateGuildUser(message.guildId, args.mentionedUserId, {
       preJailedRoles: roleIds,
     });
 

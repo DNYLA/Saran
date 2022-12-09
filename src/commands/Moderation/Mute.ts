@@ -48,7 +48,7 @@ export default class Mute extends Command {
     if (isNaN(amount)) return message.reply('Add an number amount please!!!');
 
     try {
-      const timeout = await user.timeout(amount * 60 * 1000, args.reason ?? '');
+      await user.timeout(amount * 60 * 1000, args.reason ?? '');
       return message.reply('He got timeouted out or she');
     } catch (err) {
       console.log(err);

@@ -1,9 +1,9 @@
 import { Message } from 'discord.js';
 import OwnerOnly from '../../checks/OwnerOnly';
 import StartTyping from '../../hooks/StartTyping';
+import { updateUser } from '../../services/database/user';
 import { MentionIdOrArg } from '../../utils/argsparser';
 import Command, { ArgumentTypes } from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
 
 export default class Donator extends Command {
   constructor() {
@@ -31,7 +31,6 @@ export default class Donator extends Command {
 
   async run(message: Message, args: { type: string; userId: string }) {
     const { type, userId } = args;
-    const usersService = (message.client as DiscordClient).db.users;
 
     // if (!user && type === 'guild') {
     //   try {
@@ -53,13 +52,13 @@ export default class Donator extends Command {
     // }
 
     if (type === 'add') {
-      await usersService.updateById(userId, {
+      await updateUser(userId, {
         donator: true,
         lastFMMode: 'donator',
       });
       return message.reply(`Successfully given <@${userId}> donator`);
     } else if (type === 'remove') {
-      await usersService.updateById(userId, { donator: false });
+      await updateUser(userId, { donator: false });
       return message.reply(`Removed donator from <@${userId}>`);
     }
   }

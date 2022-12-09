@@ -6,8 +6,8 @@ import {
   fetchUserTracks,
 } from '../../api/lastfm';
 import StartTyping from '../../hooks/StartTyping';
+import { updateUser } from '../../services/database/user';
 import { ArgumentTypes } from '../../utils/base/command';
-import DiscordClient from '../../utils/client';
 import { CONSTANTS } from '../../utils/constants';
 import LastFMCommand from './LastFM';
 
@@ -32,8 +32,6 @@ export default class SetUsername extends LastFMCommand {
 
   //Update this to a transaction
   async run(message: Message, args: { username: string }) {
-    const userService = (message.client as DiscordClient).db.users;
-    const user = await userService.findById(message.author.id);
     const fmUser = await fetchUser(args.username, message.author.id);
 
     if (!fmUser) {
@@ -57,24 +55,16 @@ export default class SetUsername extends LastFMCommand {
 
     try {
       //Delete old/current data
-      if (user.lastFMName) {
-        await userService.repo.update({
-          where: { id: message.author.id },
-          data: {
-            Tracks: {
-              deleteMany: {},
-            },
-            Albums: {
-              deleteMany: {},
-            },
-            Artists: {
-              deleteMany: {},
-            },
-          },
-        });
-      }
-
-      await userService.updateById(message.author.id, {
+      await updateUser(message.author.id, {
+        Tracks: {
+          deleteMany: {},
+        },
+        Albums: {
+          deleteMany: {},
+        },
+        Artists: {
+          deleteMany: {},
+        },
         lastFMName: args.username,
       });
     } catch (err) {

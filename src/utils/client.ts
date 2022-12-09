@@ -1,7 +1,7 @@
 import { Client, ClientOptions, Collection, Message } from 'discord.js';
 import Command from './base/command';
 import Event from './base/event';
-import { DatabaseManager } from './database/DatabaseManager';
+// import { DatabaseManager } from './database/DatabaseManager';
 import { GoogleImagesSearch, ReverseImageSearch } from './types';
 
 export type Riddle = {
@@ -18,7 +18,7 @@ export default class DiscordClient extends Client {
   private _deletedMessages = new Collection<string, Message>();
   private _editedMessages = new Collection<string, Message>();
   private _riddles = new Collection<string, Riddle>();
-  private _database = new DatabaseManager();
+  // private _database = new DatabaseManager();
   constructor(options?: ClientOptions) {
     super(options);
   }
@@ -31,9 +31,9 @@ export default class DiscordClient extends Client {
     return this._events;
   }
 
-  get db(): DatabaseManager {
-    return this._database;
-  }
+  // get db(): DatabaseManager {
+  //   return this._database;
+  // }
 
   getImage(name: string): GoogleImagesSearch {
     return this._images[name];

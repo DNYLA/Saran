@@ -4,8 +4,6 @@ import {
   EmbedBuilder,
   EmbedAuthorData,
   EmbedFooterData,
-  Colors,
-  resolveColor,
 } from 'discord.js';
 import { CONSTANTS } from './constants';
 
