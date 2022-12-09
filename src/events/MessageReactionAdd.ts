@@ -6,7 +6,7 @@ import {
   createReactionBoardInfo,
   getReactionBoardInfo,
   updateReactionBoardInfo,
-} from '../services/database/Guild';
+} from '../services/database/guild';
 
 export default class MessageReactionAdd extends Event {
   constructor() {

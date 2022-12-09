@@ -5,7 +5,7 @@ import DiscordClient from '../utils/client';
 import {
   getReactionBoardInfo,
   updateReactionBoardInfo,
-} from '../services/database/Guild';
+} from '../services/database/guild';
 
 export default class MessageReactionAdd extends Event {
   constructor() {
