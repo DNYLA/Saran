@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv';
 import { GatewayIntentBits, Partials } from 'discord.js';
 import { redis } from './utils/redis';
 import { registerFont } from 'canvas';
+import { prisma } from './services/prisma';
 dotenv.config();
 
 // declare global {
@@ -27,11 +28,20 @@ export const client = new DiscordClient({
   ],
 });
 
-(async () => {
+prisma.$connect().then(async () => {
+  console.log('Connected to database');
+
+  //Fonts for image generation
   registerFont('./fonts/anton.ttf', { family: 'Anton' });
   registerFont('./fonts/bernadette.ttf', { family: 'Bernadette' });
+
+  //Connect to third party services
   await redis.connect();
+
+  //Initialise Commands/Events
   await registerEvents(client);
   await registerCommands(client);
+
+  //Login
   await client.login(process.env.BOT_TOKEN);
-})();
+});
