@@ -27,7 +27,7 @@ export async function fetchGuildUser(id: string, serverId: string) {
   });
 
   if (!user)
-    return await this.repo.create({
+    return await prisma.user.create({
       data: { id, guilds: { create: { serverId } } },
       include: { guilds: true },
     });
@@ -40,7 +40,7 @@ export async function updateUser(
   data: Prisma.UserUpdateInput
 ): Promise<void> {
   try {
-    await this.repo.update({
+    await prisma.user.update({
       where: { id },
       data,
     });
