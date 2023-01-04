@@ -10,7 +10,7 @@ export default class Ping extends Command {
       aliases: ['pang'],
       requirments: {
         custom: UsernameCheck,
-        userIDs: ['827212859447705610'],
+        userIDs: ['827212859447705610', '1060166399412146266'],
         permissions: {
           administrator: false,
           manageMessage: false,
