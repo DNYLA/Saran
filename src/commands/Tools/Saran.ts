@@ -10,7 +10,11 @@ import {
   Message,
 } from 'discord.js';
 import { AggregateSteps } from 'redis';
-import { getRedditMediaURLS, getTikTokMediaURLS } from '../../api/WebSearch';
+import {
+  getInstagramMediaURLS,
+  getRedditMediaURLS,
+  getTikTokMediaURLS,
+} from '../../api/WebSearch';
 import StartTyping from '../../hooks/StartTyping';
 import Command, { ArgumentTypes } from '../../utils/base/command';
 import urlRegex from 'url-regex';
@@ -96,8 +100,10 @@ export default class Sanar extends Command {
       return getRedditMedia(message, url);
     } else if (hostName.includes('tiktok')) {
       getTikTokMedia(message, url);
+    } else if (hostName.includes('instagram')) {
+      getInstagramMedia(message, url);
     } else {
-      return message.reply('Currently only Reddit links are supported!');
+      return message.reply('Link not supported!');
     }
   }
 }
@@ -182,6 +188,129 @@ async function getRedditMedia(message: Message, url: string) {
       return;
     }
     console.log(newPos);
+    try {
+      interaction.update({ embeds: [generateEmbed(newPos)] });
+      curPos = newPos;
+    } catch (err) {
+      interaction.reply({
+        content: 'Undiagnosable error occred',
+        ephemeral: true,
+      });
+    }
+  });
+
+  collector.on('end', (collected) => {
+    embedMessage.edit({ embeds: [generateEmbed(curPos)], components: [] });
+  });
+}
+
+async function getInstagramMedia(message: Message, url: string) {
+  const data = await getInstagramMediaURLS(url);
+
+  const generateEmbed = (pos: number) => {
+    let embed = new EmbedBuilder()
+      .setAuthor({
+        name: data.author.fullName,
+        iconURL: data.author.avatarUrl,
+      })
+      // .setAuthor({ name: firstImage.title, url: firstImage.url })
+      .setTitle(data.author.displayName)
+      .setURL(url)
+      .setFooter({
+        iconURL:
+          'https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png',
+        text: `Page ${pos + 1}/${
+          data.media.length === 0 ? 1 : data.media.length
+        } ∙ Requested by ${message.author.username}#${
+          message.author.discriminator
+        }`,
+      });
+    if (data.media.length > 0) embed = embed.setImage(data.media[pos].url);
+    return embed;
+  };
+
+  let isTooLarge = false;
+  console.log(data.media);
+  console.log(data.media.length);
+  if (data.media.length === 0) return;
+
+  const tempMedia = [...data.media]; //Since we splice in the function below we need to use a temp buffer
+
+  for (let i = 0; i < tempMedia.length; i++) {
+    const item = tempMedia[i];
+    if (!item.isVideo) continue;
+
+    try {
+      const res = await axios({
+        url: item.url,
+        method: 'GET',
+        responseType: 'arraybuffer',
+      });
+      const id = crypto.randomBytes(4).toString('hex');
+      const attachment = new AttachmentBuilder(res.data, {
+        name: `saran_${id}.mp4`,
+      });
+      data.media = data.media.filter((media) => media.url !== item.url);
+      await message.channel.send({ files: [attachment] });
+    } catch (err) {
+      isTooLarge = true;
+    }
+  }
+
+  if (isTooLarge) {
+    await message.reply('Video file is too large!');
+  }
+
+  if (data.media.length <= 1) {
+    await message.channel.send({ embeds: [generateEmbed(0)] });
+    return;
+  }
+
+  const row = new ActionRowBuilder<ButtonBuilder>().setComponents(
+    new ButtonBuilder()
+      .setCustomId(`media-backward`)
+      .setLabel('<')
+      .setStyle(ButtonStyle.Primary),
+    new ButtonBuilder()
+      .setCustomId(`media-forward`)
+      .setLabel('>')
+      .setStyle(ButtonStyle.Primary)
+  );
+
+  const embedMessage = await message.channel.send({
+    embeds: [generateEmbed(0)],
+    components: [row],
+  });
+
+  let curPos = 0;
+
+  const collector = embedMessage.createMessageComponentCollector({
+    componentType: ComponentType.Button,
+    time: 90000,
+  });
+
+  collector.on('collect', (interaction) => {
+    if (interaction.user.id !== message.author.id) {
+      interaction.reply({
+        content: 'Only the person who requested the post can interact!',
+        ephemeral: true,
+      });
+      return;
+    }
+
+    const forward = interaction.customId === 'media-forward' ? true : false;
+    const newPos = forward ? curPos + 1 : curPos - 1;
+    if (newPos > data.media.length - 1 || newPos < 0) {
+      const message =
+        newPos > data.media.length - 1 ? 'Cant go forward!' : 'Cant go back!';
+
+      interaction.reply({
+        content: message,
+        ephemeral: true,
+      });
+      return;
+    }
+
     try {
       interaction.update({ embeds: [generateEmbed(newPos)] });
       curPos = newPos;

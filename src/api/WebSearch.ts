@@ -116,3 +116,105 @@ export async function getTikTokMediaURLS(url: string) {
     resolve(urls!.find((url) => url.startsWith('https://v')));
   });
 }
+
+function getShortcode(url: string) {
+  const postRegex = /\/(p|tv|reel)\/(.*?)\//;
+  const reelsREgex = /\/(reels)\/(videos)\/(.*?)\//;
+  const page = url.match(postRegex);
+  const page1 = url.match(reelsREgex);
+
+  const shortCode = page ? page[2] : page1 ? page1[3] : '';
+
+  return shortCode;
+}
+
+async function getInstagramData(url: string) {
+  const postHash = '9f8827793ef34641b2fb195d4d41151c';
+
+  const postAPI = `https://www.instagram.com/graphql/query/?query_hash=${postHash}&variables=${encodeURIComponent(
+    `{"shortcode":"${getShortcode(url)}"}`
+  )}`;
+
+  console.log(postAPI);
+
+  try {
+    const respone = await fetch(postAPI);
+    const json = await respone.json();
+    return json.data['shortcode_media'];
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+}
+
+type InstagramMedia = {
+  url: string;
+  isVideo: boolean;
+};
+
+type InstagramPost = {
+  title: string;
+  media: InstagramMedia[];
+
+  author: {
+    displayName: string;
+    fullName: string;
+    avatarUrl: string;
+  };
+};
+
+export async function getInstagramMediaURLS(
+  url: string
+): Promise<InstagramPost> {
+  const data: InstagramPost = {
+    title: '',
+    media: [],
+    author: {
+      displayName: '',
+      fullName: '',
+      avatarUrl: '',
+    },
+  };
+
+  const json = await getInstagramData(url);
+
+  if (!json) return null;
+
+  data.author.displayName = json.owner.username;
+  data.author.fullName = json.owner['full_name'];
+  data.author.avatarUrl = json.owner['profile_pic_url'];
+
+  if (json['edge_sidecar_to_children']) {
+    json['edge_sidecar_to_children']['edges'].forEach((item) => {
+      if (!item) return;
+
+      if (item.node['is_video']) {
+        data.media.push({
+          url: item.node['video_url'],
+          isVideo: true,
+        });
+      } else {
+        data.media.push({
+          url: item.node['display_url'],
+          isVideo: false,
+        });
+      }
+    });
+
+    return data;
+  }
+
+  if (json['is_video']) {
+    data.media.push({
+      url: json['video_url'],
+      isVideo: true,
+    });
+  } else {
+    data.media.push({
+      url: json['display_url'],
+      isVideo: false,
+    });
+  }
+
+  return data;
+}
