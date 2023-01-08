@@ -10,10 +10,6 @@ export default class InteractionCreated extends Event {
   async run(client: DiscordClient, interaction: Interaction) {
     if (!interaction.isButton()) return;
     if (!interaction.customId.startsWith('image')) {
-      await interaction.reply({
-        content: 'Invalid Interaction!',
-        ephemeral: true,
-      });
       return;
     }
 

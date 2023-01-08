@@ -40,3 +40,62 @@ export class GoogleCSESearch {
     return `${noAnd ? '' : '&'}${fieldName}=${encodeURIComponent(value)}`;
   }
 }
+
+export async function getRedditMediaURLS(url: string) {
+  const newUrl = `${url}/.json`;
+  const response = await axios.get(newUrl);
+  const data = response.data;
+  const post = data.find((item) => item.data.children[0].kind === 't3').data
+    .children[0];
+  const info = {
+    title: post.data.title,
+    subreddit: post.data.subreddit,
+    upvotes: post.data.score ?? 0,
+  };
+
+  if (!post)
+    return {
+      urls: [],
+      ...info,
+    };
+
+  //Not a gallery so we can return the single URL
+  if (!post.data.url.includes('gallery'))
+    return {
+      urls: [post.data.url],
+      ...info,
+    };
+
+  const metadata = post.data.media_metadata;
+  if (!metadata)
+    return {
+      urls: [],
+      ...info,
+    };
+
+  const urls = [];
+  Object.keys(metadata).map((id) => {
+    const image = metadata[id];
+    // metadata.forEach((image) => {
+    let largest = { url: '', x: 0, y: 0 };
+    //We Could manually get first x,y then change the url to 1080 everytime however it is not always certain that
+    //the image will be in 1080P which will then lead to some images not being loaded.
+    if (!image.p || image.p.length === 0) return;
+    image.p.forEach((item) => {
+      if (item.x > largest.x && item.y > largest.y) {
+        largest = {
+          url: item.u,
+          x: item.x,
+          y: item.y,
+        };
+      }
+    });
+    const strippedUrl = largest.url.replaceAll('&amp;', '&');
+    urls.push(strippedUrl);
+  });
+
+  return {
+    urls,
+    ...info,
+  };
+}
