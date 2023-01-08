@@ -18,6 +18,7 @@ import { parse as parseUrl } from 'url';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import crypto from 'crypto';
+import { CONSTANTS } from '../../utils/constants';
 // const instagramGetUrl = require('instagram-url-direct');
 // import { downloader as Downloader } from 'instagram-url-downloader';
 
@@ -199,6 +200,7 @@ async function getRedditMedia(message: Message, url: string) {
 
 async function getTikTokMedia(message: Message, url: string) {
   const { video, videoUrl } = await dlpanda(url);
+  const stats = await fetchInfo(url);
   const id = crypto.randomBytes(4).toString('hex');
   const attachment = new AttachmentBuilder(video, {
     name: `saran_${id}.mp4`,
@@ -206,16 +208,17 @@ async function getTikTokMedia(message: Message, url: string) {
 
   console.log(attachment);
   try {
-    await message.channel.send({ files: [attachment] });
-    new EmbedBuilder()
+    const embed = new EmbedBuilder()
       // .setAuthor({ name: firstImage.title, url: firstImage.url })
-      .setTitle(`TikTok Video`)
+      .setTitle(stats.title)
       .setURL(url)
       .setFooter({
         iconURL:
-          'https://external-preview.redd.it/iDdntscPf-nfWKqzHRGFmhVxZm4hZgaKe5oyFws-yzA.png?auto=webp&s=38648ef0dc2c3fce76d5e1d8639234d8da0152b2',
-        text: `Requested by ${message.author.username}#${message.author.discriminator}`,
-      });
+          'https://www.freepnglogos.com/uploads/tik-tok-logo-png/tik-tok-april-tutuapp-5.png',
+        text: `Likes: ${stats.likes} ∙ Comments: ${stats.comments} ∙ Shares: ${stats.shares} ∙ Requested by ${message.author.username}#${message.author.discriminator}`,
+      })
+      .setColor(CONSTANTS.COLORS.MIXER);
+    await message.channel.send({ files: [attachment], embeds: [embed] });
     await message.delete();
   } catch (err) {
     return message.reply('File Too Large!');
@@ -228,11 +231,9 @@ async function dlpanda(url) {
   const { data } = await axios.get(`https://dlpanda.com/?url=${url}`);
 
   const $ = cheerio.load(data);
-  const test = $('tiktok-cqzvte-StrongText e1hk3hf92');
   const div = $('video').children();
   const videoUrl = div.attr('src');
 
-  console.log(test.html());
   const res = await axios({
     url: videoUrl,
     method: 'GET',
@@ -240,4 +241,39 @@ async function dlpanda(url) {
   });
 
   return { video: res.data, videoUrl };
+}
+
+async function fetchInfo(url) {
+  const { data } = await axios.get(url);
+
+  const $ = cheerio.load(data);
+  const statDiv = $('.tiktok-ln2tr4-DivActionItemContainer');
+  console.log(statDiv.children().length);
+
+  const stats = {
+    likes: '',
+    comments: '',
+    shares: '',
+    title: $('title').text(),
+  };
+
+  $('strong').each((i, e) => {
+    const type = e.attribs['data-e2e'];
+    if (!type) return;
+
+    if (type.includes('like')) {
+      stats.likes = $(e).text();
+    } else if (type.includes('comment')) {
+      stats.comments = $(e).text();
+    } else if (type.includes('share')) {
+      stats.shares = $(e).text();
+    }
+  });
+
+  return {
+    likes: stats.likes ?? '0',
+    comments: stats.comments ?? '0',
+    shares: stats.shares ?? '0',
+    title: stats.title,
+  };
 }
