@@ -28,6 +28,7 @@
     "ioredis": "5.1.0",
     "moment": "^2.29.4",
     "redis": "^4.1.0",
+    "url-regex": "^5.0.0",
     "youtube-search": "^1.1.6"
   },
   "devDependencies": {

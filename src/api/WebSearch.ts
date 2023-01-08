@@ -1,4 +1,5 @@
 import axios from 'axios';
+import urlRegex from 'url-regex';
 import { WebSearchImage } from '../utils/types';
 
 export type GoogleCSEOptions = {
@@ -98,4 +99,20 @@ export async function getRedditMediaURLS(url: string) {
     urls,
     ...info,
   };
+}
+
+export async function getTikTokMediaURLS(url: string) {
+  const response = await axios.get(url);
+  const body = await response.data;
+  const urls = body.match(urlRegex());
+  console.log(body);
+  console.log(urls.filter((url) => url.includes('https://v')));
+
+  urls.forEach((element) => {
+    console.log(element);
+  });
+
+  return new Promise<string>((resolve) => {
+    resolve(urls!.find((url) => url.startsWith('https://v')));
+  });
 }
