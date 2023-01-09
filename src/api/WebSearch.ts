@@ -138,8 +138,8 @@ async function getInstagramData(url: string) {
   console.log(postAPI);
 
   try {
-    const respone = await fetch(postAPI);
-    const json = await respone.json();
+    const respone = await axios.get(postAPI);
+    const json = await respone.data;
     return json.data['shortcode_media'];
   } catch (error) {
     console.log(error);
