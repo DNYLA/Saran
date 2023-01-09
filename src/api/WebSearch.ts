@@ -179,7 +179,7 @@ export async function getInstagramMediaURLS(
   const json = await getInstagramData(url);
 
   if (!json) return null;
-  if (!json.media || json.media.length === 0) return;
+  if (!json.media || json.media.length === 0) return null;
 
   data.author.displayName = json.owner.username;
   data.author.fullName = json.owner['full_name'];

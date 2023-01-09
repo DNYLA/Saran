@@ -206,6 +206,7 @@ async function getRedditMedia(message: Message, url: string) {
 
 async function getInstagramMedia(message: Message, url: string) {
   const data = await getInstagramMediaURLS(url);
+  if (!data) return message.reply('Unable to fetch post.');
 
   const generateEmbed = (pos: number) => {
     let embed = new EmbedBuilder()
