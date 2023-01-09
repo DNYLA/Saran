@@ -130,7 +130,6 @@ function getShortcode(url: string) {
 
 async function getInstagramData(url: string) {
   const postHash = '9f8827793ef34641b2fb195d4d41151c';
-
   const postAPI = `https://www.instagram.com/graphql/query/?query_hash=${postHash}&variables=${encodeURIComponent(
     `{"shortcode":"${getShortcode(url)}"}`
   )}`;
@@ -140,6 +139,7 @@ async function getInstagramData(url: string) {
   try {
     const respone = await axios.get(postAPI);
     const json = await respone.data;
+    if (!json.data) return null;
     return json.data['shortcode_media'];
   } catch (error) {
     console.log(error);
@@ -179,6 +179,7 @@ export async function getInstagramMediaURLS(
   const json = await getInstagramData(url);
 
   if (!json) return null;
+  if (!json.media || json.media.length === 0) return;
 
   data.author.displayName = json.owner.username;
   data.author.fullName = json.owner['full_name'];
