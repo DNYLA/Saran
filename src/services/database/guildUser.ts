@@ -4,12 +4,14 @@ import { prisma } from '../prisma';
 
 export async function fetchGuildUser(
   serverId: string,
-  userId: string
+  userId: string,
+  ignoreCreate?: boolean
 ): Promise<GuildUser> {
   const user = await prisma.guildUser.findUnique({
     where: { userId_serverId: { serverId, userId } },
   });
-  if (!user) return await createGuildUser(userId, serverId);
+
+  if (!user || ignoreCreate) return await createGuildUser(userId, serverId);
 
   return user;
 }

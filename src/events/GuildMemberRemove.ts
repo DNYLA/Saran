@@ -12,7 +12,7 @@ export default class InteractionCreated extends Event {
   }
 
   async run(client: DiscordClient, member: GuildMember) {
-    const user = await fetchGuildUser(member.id, member.guild.id);
+    const user = await fetchGuildUser(member.guild.id, member.id, true);
 
     if (!user || !user) return; //No point of adding user to guild
     try {
