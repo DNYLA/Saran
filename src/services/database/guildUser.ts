@@ -11,7 +11,7 @@ export async function fetchGuildUser(
     where: { userId_serverId: { serverId, userId } },
   });
 
-  if (!user || ignoreCreate) return await createGuildUser(userId, serverId);
+  if (!user || !ignoreCreate) return await createGuildUser(userId, serverId);
 
   return user;
 }
