@@ -10,7 +10,7 @@ import Command, { ArgumentTypes } from '../../utils/base/command';
 
 export default class RoleCommand extends Command {
   constructor() {
-    super('role', {
+    super('permission', {
       requirments: {
         userIDs: OwnerOnly,
       },
@@ -23,11 +23,6 @@ export default class RoleCommand extends Command {
           parse: MentionUserId,
           default: SelfUserId,
           name: 'targetUserId',
-          type: ArgumentTypes.SINGLE,
-        },
-        {
-          parse: RoleMentionIdOrArg,
-          name: 'roleId',
           type: ArgumentTypes.SINGLE,
         },
       ],
