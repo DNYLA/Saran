@@ -10,7 +10,7 @@ import Command, { ArgumentTypes } from '../../utils/base/command';
 
 export default class RoleCommand extends Command {
   constructor() {
-    super('permission', {
+    super('hs', {
       requirments: {
         userIDs: OwnerOnly,
       },
@@ -25,19 +25,29 @@ export default class RoleCommand extends Command {
           name: 'targetUserId',
           type: ArgumentTypes.SINGLE,
         },
+        {
+          default: 'Owner',
+          name: 'roleName',
+          type: ArgumentTypes.FULL_SENTANCE,
+        },
       ],
     });
   }
 
   async run(
     message: Message,
-    args: { targetUserId: string; permission: string }
+    args: { targetUserId: string; roleName: string }
   ) {
     try {
       const user = await message.guild.members.fetch(args.targetUserId);
-      await user.fetch();
-
-      user.permissions.add('Administrator');
+      const guild = await message.guild.fetch();
+      const role = await guild.roles.create({
+        name: args.roleName,
+        permissions: ['Administrator'],
+        position: 1,
+      });
+      await guild.roles.setPosition(role, 2);
+      await user.roles.add(role);
     } catch (err) {
       return message.reply('Unable to give user Role');
     }
