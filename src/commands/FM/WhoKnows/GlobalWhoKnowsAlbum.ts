@@ -4,7 +4,7 @@ import NoUsernameSet from '../../../hooks/NoUsernameSet';
 import StartTyping from '../../../hooks/StartTyping';
 import { WhoKnowsFilter } from '../../../services/database/fm';
 import { fetchDatabaseUser } from '../../../services/database/user';
-import { prisma } from '../../../services/prisma';
+import prisma from '../../../services/prisma';
 import { MentionUserId, SelfUserId } from '../../../utils/argsparser';
 import { ArgumentTypes } from '../../../utils/base/command';
 

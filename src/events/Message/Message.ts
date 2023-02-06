@@ -7,7 +7,7 @@ import {
 import Event from '../../utils/base/event';
 import DiscordClient from '../../utils/client';
 import { getArgsFromMsg } from '../../utils/helpers';
-import { prisma } from '../../services/prisma';
+import prisma from '../../services/prisma';
 import { fetchGuild, updateGuild } from '../../services/database/guild';
 import { fetchDatabaseUser } from '../../services/database/user';
 export default class MessageEvent extends Event {

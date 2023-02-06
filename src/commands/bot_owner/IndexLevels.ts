@@ -1,7 +1,7 @@
 import { Collection, Message } from 'discord.js';
 import OwnerOnly from '../../checks/OwnerOnly';
 import StartTyping from '../../hooks/StartTyping';
-import { prisma } from '../../services/prisma';
+import prisma from '../../services/prisma';
 import Command from '../../utils/base/command';
 
 export default class IndexLevels extends Command {

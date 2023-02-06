@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client';
 import { Message, Role } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
-import { prisma } from '../../services/prisma';
+import prisma from '../../services/prisma';
 import { RoleMentionIdOrArg } from '../../utils/argsparser';
 import { ArgumentTypes } from '../../utils/base/command';
 import LevelsCommand from './Levels';

@@ -2,7 +2,7 @@ import { GuildMember, Message } from 'discord.js';
 import UsernameCheck from '../../checks/UsernameCheck';
 import NoUsernameSet from '../../hooks/NoUsernameSet';
 import StartTyping from '../../hooks/StartTyping';
-import { prisma } from '../../services/prisma';
+import prisma from '../../services/prisma';
 import LastFMCommand from './LastFM';
 
 export default class IndexGuild extends LastFMCommand {

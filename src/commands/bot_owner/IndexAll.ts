@@ -7,7 +7,7 @@ import {
 } from '../../api/lastfm';
 import OwnerOnly from '../../checks/OwnerOnly';
 import StartTyping from '../../hooks/StartTyping';
-import { prisma } from '../../services/prisma';
+import prisma from '../../services/prisma';
 import Command from '../../utils/base/command';
 
 export default class IndexFM extends Command {

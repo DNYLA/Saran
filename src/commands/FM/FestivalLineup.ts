@@ -14,7 +14,7 @@ import {
 // import * as cover from 'canvas-image-cover';
 // import {cove} from 'canvas-image-cover';
 import cover from 'canvas-image-cover';
-import { prisma } from '../../services/prisma';
+import prisma from '../../services/prisma';
 import { fetchDatabaseUser } from '../../services/database/user';
 
 export default class Plays extends LastFMCommand {

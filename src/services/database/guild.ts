@@ -1,6 +1,6 @@
 import { GuildConfig, Levels, Prisma } from '@prisma/client';
 import { Message } from 'discord.js';
-import { prisma } from '../prisma';
+import prisma from '../prisma';
 
 export async function fetchGuild(id: string): Promise<GuildConfig> {
   const guild = await prisma.guildConfig.findUnique({ where: { id } });

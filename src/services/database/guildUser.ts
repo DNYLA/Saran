@@ -1,6 +1,6 @@
 import { GuildUser, Prisma } from '@prisma/client';
 import { client } from '../../main';
-import { prisma } from '../prisma';
+import prisma from '../prisma';
 
 export async function fetchGuildUser(
   serverId: string,

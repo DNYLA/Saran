@@ -1,6 +1,6 @@
 import { Message, EmbedBuilder } from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
-import { prisma } from '../../services/prisma';
+import prisma from '../../services/prisma';
 import Command from '../../utils/base/command';
 import { CommandOptions } from '../../utils/types';
 

@@ -4,7 +4,7 @@ import * as dotenv from 'dotenv';
 import { GatewayIntentBits } from 'discord.js';
 import { redis } from './utils/redis';
 import { registerFont } from 'canvas';
-import { prisma } from './services/prisma';
+import prisma from './services/prisma';
 dotenv.config();
 
 // declare global {

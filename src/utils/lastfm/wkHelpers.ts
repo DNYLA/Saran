@@ -2,7 +2,7 @@ import { User } from '@prisma/client';
 import { Message } from 'discord.js';
 import { fetchGuildUsersWithFM } from '../../services/database/guildUser';
 import { fetchDatabaseUser } from '../../services/database/user';
-import { prisma } from '../../services/prisma';
+import prisma from '../../services/prisma';
 import { getCachedPlays, setCachedPlays } from '../database/redisManager';
 import {
   fetchRecentAlbumInfo,

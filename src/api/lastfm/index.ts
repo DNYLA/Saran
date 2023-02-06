@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client';
 import axios, { AxiosRequestConfig } from 'axios';
 import { updateUser } from '../../services/database/user';
-import { prisma } from '../../services/prisma';
+import prisma from '../../services/prisma';
 import {
   Album,
   Artist,
