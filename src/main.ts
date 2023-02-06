@@ -43,5 +43,21 @@ prisma.$connect().then(async () => {
   //Connect to third party services
   await redis.connect();
   //Login
-  await client.login(process.env.BOT_TOKEN);
+  AwakeClient();
 });
+
+async function AwakeClient() {
+  await client.login(process.env.BOT_TOKEN);
+
+  setInterval(async () => {
+    console.log('Restarting Client');
+
+    client.destroy();
+    await prisma.$disconnect();
+
+    prisma.$connect().then(async () => {
+      await client.login(process.env.BOT_TOKEN);
+    });
+  }, 6 * 3600 * 1000);
+  // }, 60 * 1000);
+}
