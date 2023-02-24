@@ -41,8 +41,8 @@ export default class Jail extends Command {
     if (!user) return message.reply('Cant find guild member');
 
     const guildMember = await fetchGuildUser(
-      args.mentionedUserId,
-      message.guildId
+      message.guildId,
+      args.mentionedUserId
     );
 
     if (!user.roles.cache.has(config.jailRole)) {

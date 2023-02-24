@@ -9,18 +9,18 @@ datasource db {
 }
 
 model User {
-  id         String        @id
-  lastFMName String?
-  lastFMTag  String?
-  lastFMMode String?
+  id          String        @id
+  lastFMName  String?
+  lastFMTag   String?
+  lastFMMode  String?
   lastFMImage String?
-  donator    Boolean       @default(false)
-  afkMessage String?
-  afkTime    DateTime?
-  guilds     GuildUser[]
-  Artists    UserArtists[]
-  Albums     UserAlbums[]
-  Tracks     UserTracks[]
+  donator     Boolean       @default(false)
+  afkMessage  String?
+  afkTime     DateTime?
+  guilds      GuildUser[]
+  Artists     UserArtists[]
+  Albums      UserAlbums[]
+  Tracks      UserTracks[]
 }
 
 model GuildUser {
@@ -29,32 +29,34 @@ model GuildUser {
   serverId           String
   lastFMTag          String?
   reactionBoardScore Int      @default(0)
-  level Int @default(0)
+  level              Int      @default(0)
   xp                 Int      @default(0)
   customBoostRoleId  String?
   isBooster          Boolean  @default(false)
   preJailedRoles     String[]
   inactive           Boolean  @default(false) //Inactive is whenever a user leaves or gets kicked from a guild.
-  user               User     @relation(fields: [userId], references: [id],  onDelete: Cascade)
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@id([userId, serverId])
 }
 
 model GuildConfig {
   id                   String                  @id
   prefix               String                  @default(",")
-  name String @default("")
+  name                 String                  @default("")
   reactionBoardChannel String?
   reactionBoardLimit   Int                     @default(0)
   jailChannel          String?
   jailLogChannel       String?
   jailRole             String?
-  joinLog String?
-  joinMessage String?
-  joinMessageChannel String?
-  afkLog String?
-  messageLog String?
+  joinLog              String?
+  joinMessage          String?
+  joinMessageChannel   String?
+  afkLog               String?
+  messageLog           String?
+  filters              String[]
   rbMessages           ReactionBoardMessages[]
-  levels Levels[]
+  levels               Levels[]
 }
 
 model ReactionBoardMessages {
@@ -70,12 +72,12 @@ model ReactionBoardMessages {
 }
 
 model Levels {
-  serverId       String
-  roleId String
-  level Int
-  guild          GuildConfig @relation(fields: [serverId], references: [id])
-  @@id([roleId, serverId])
+  serverId String
+  roleId   String
+  level    Int
+  guild    GuildConfig @relation(fields: [serverId], references: [id])
 
+  @@id([roleId, serverId])
 }
 
 model UserTracks {
@@ -84,7 +86,7 @@ model UserTracks {
   name       String
   artistName String
   plays      Int
-  user       User   @relation(fields: [userId], references: [id],  onDelete: Cascade)
+  user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model UserAlbums {
@@ -93,7 +95,7 @@ model UserAlbums {
   name       String
   artistName String
   plays      Int
-  user       User   @relation(fields: [userId], references: [id],  onDelete: Cascade)
+  user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model UserArtists {
@@ -101,7 +103,5 @@ model UserArtists {
   userId   String
   name     String
   plays    Int
-  user     User   @relation(fields: [userId], references: [id],  onDelete: Cascade)
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
-
-

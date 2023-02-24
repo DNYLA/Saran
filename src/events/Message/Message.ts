@@ -1,5 +1,5 @@
 import { GuildConfig } from '@prisma/client';
-import { Message } from 'discord.js';
+import { EmbedBuilder, Message } from 'discord.js';
 import {
   fetchGuildUser,
   updateGuildUser,
@@ -10,6 +10,8 @@ import { getArgsFromMsg } from '../../utils/helpers';
 import prisma from '../../services/prisma';
 import { fetchGuild, updateGuild } from '../../services/database/guild';
 import { fetchDatabaseUser } from '../../services/database/user';
+import { CONSTANTS } from '../../utils/constants';
+import { JailUser } from '../../commands/Moderation/Jail';
 export default class MessageEvent extends Event {
   constructor() {
     super('messageCreate');
@@ -24,11 +26,23 @@ export default class MessageEvent extends Event {
     );
     const user = await fetchDatabaseUser(message.author.id);
     const config = await fetchGuild(message.guildId);
-
+    const guildMember = await message.guild.members.fetch(message.author.id);
     if (config) {
       await updateGuild(message.guildId, {
         name: message.guild.name,
       });
+    }
+
+    if (!guildMember.permissions.has('Administrator') && config) {
+      for (let i = 0; i < config.filters.length; i++) {
+        const filter = config.filters[i];
+        if (!message.content.includes(filter)) continue;
+        const reason = 'Jailed for saying filtered word.';
+
+        await JailUser(message, { mentionedUserId: message.author.id, reason });
+        await message.delete();
+        return;
+      }
     }
 
     await handleLevelUp(client, message, config);

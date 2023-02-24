@@ -102,3 +102,11 @@ export const RoleMentionIdOrArg = (
 export const SelfUserId = (message: Message) => {
   return message.author.id;
 };
+
+export const LowerCase = async (
+  message: Message,
+  args: string[],
+  index: number
+) => {
+  return args[index].toLowerCase();
+};
