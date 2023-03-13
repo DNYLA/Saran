@@ -31,10 +31,10 @@ export default class Snipe extends Command {
         name: editedMessage.member.displayName,
         iconURL: editedMessage.member.displayAvatarURL(),
       })
-      .setDescription(editedMessage.content)
       .setFooter({ text: `Sniped by ${message.member.displayName}` })
       .setTimestamp();
 
+    if (editedMessage.content) embed.setDescription(editedMessage.content);
     if (attachmentUrl) embed.setImage(attachmentUrl);
     message.channel.send({ embeds: [embed] });
   }
