@@ -58,8 +58,6 @@ export async function JailUser(
 
   await Promise.all(
     user.roles.cache.map(async (role) => {
-      console.log(role);
-
       if (role.id === guild.roles.everyone.id) return;
       roleIds.push(role.id);
       await user.roles.remove(role.id);
@@ -123,8 +121,12 @@ export async function JailUser(
     return message.reply('Jail Role Doesnt exist');
   }
 
+  let responseMessage = `Jailed ${user.displayName}#${user.user.discriminator}`;
+  if (args.reason) {
+    responseMessage += ` for ${args.reason}`;
+  }
   const channelEmbed = new EmbedBuilder()
     .setColor(CONSTANTS.COLORS.ERROR)
-    .setDescription(`<@${message.author.id}>: **${args.reason}**`);
+    .setDescription(`<@${message.author.id}>: **${responseMessage}**`);
   return await message.channel.send({ embeds: [channelEmbed] });
 }
