@@ -11,24 +11,27 @@ export default class MessageEvent extends Event {
 
   async run(client: DiscordClient, message: Message) {
     const user = await fetchDatabaseUser(message.author.id);
+    const mentionMembers = message.mentions.members;
 
-    await Promise.all(
-      message.mentions.members.map(async (member) => {
-        const mentionedUser = await fetchDatabaseUser(member.id);
-        if (!mentionedUser.afkTime) return;
+    if (mentionMembers) {
+      await Promise.all(
+        message.mentions.members.map(async (member) => {
+          const mentionedUser = await fetchDatabaseUser(member.id);
+          if (!mentionedUser.afkTime) return;
 
-        const timeAfk = moment(mentionedUser.afkTime).fromNow();
-        const reason = mentionedUser.afkMessage ?? '😴';
+          const timeAfk = moment(mentionedUser.afkTime).fromNow();
+          const reason = mentionedUser.afkMessage ?? '😴';
 
-        const afkembed = new EmbedBuilder()
-          .setColor('#49b166')
-          .setDescription(
-            `😴 <@${mentionedUser.id}> has been **AFK** for **${timeAfk}**: **${reason}**`
-          );
+          const afkembed = new EmbedBuilder()
+            .setColor('#49b166')
+            .setDescription(
+              `😴 <@${mentionedUser.id}> has been **AFK** for **${timeAfk}**: **${reason}**`
+            );
 
-        await message.channel.send({ embeds: [afkembed] });
-      })
-    );
+          await message.channel.send({ embeds: [afkembed] });
+        })
+      );
+    }
 
     if (!user) return;
 
