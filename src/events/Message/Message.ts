@@ -81,8 +81,11 @@ export default class MessageEvent extends Event {
 
     try {
       if (process.env.DISABLED) {
-        message.reply(
+        await message.reply(
           'To Continue Using Saran Bot invite the new bot using this link. When you invite the new bot please make sure the bot role is set to one of the highest in the server.\nhttps://discord.com/api/oauth2/authorize?client_id=1086495829214371930&permissions=8&scope=bot'
+        );
+        console.log(
+          `${message.guild.name} using old bot. Command Not Executed.`
         );
         return;
       }
