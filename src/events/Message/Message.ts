@@ -85,17 +85,17 @@ export default class MessageEvent extends Event {
           'To Continue Using Saran Bot invite the new bot using this link. When you invite the new bot please make sure the bot role is set to one of the highest in the server.\nhttps://discord.com/api/oauth2/authorize?client_id=1086495829214371930&permissions=8&scope=bot'
         );
         console.log(
-          `Command?: ${command.getName()}; Author: ${message.author.username}; Guild: ${
-            message.guild.name
-          }`
+          `Command?: ${command.getName()}; Author: ${
+            message.author.username
+          }; Guild: ${message.guild.name}`
         );
         return;
       }
 
       console.log(
-        ` Command: ${command.getName()}; Author: ${message.author.username}; Guild: ${
-          message.guild.name
-        }
+        ` Command: ${command.getName()}; Author: ${
+          message.author.username
+        }; Guild: ${message.guild.name}`
       );
       await command.execute(client, message, args);
     } catch (err) {
