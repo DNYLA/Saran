@@ -180,8 +180,8 @@ export default class NowPlaying extends Command {
       const npMessage = await message.channel.send({
         embeds: [EmbedBuilder],
       });
-      npMessage.react('987085166285553715');
-      npMessage.react('987085556733321247');
+      npMessage.react('1087219871718318111');
+      npMessage.react('1087220109153669180');
     } catch (err) {
       message.reply('Unable to display track! Try playing another one');
       console.log(err);
