@@ -11,7 +11,7 @@ import {
 } from '../../../utils/fmHelpers';
 import { convertPeriodToText } from '../../../utils/helpers';
 import { TopTenArguments } from '../TopTen/topartists';
-import { createCollage } from '@wylie39/image-collage';
+// import { createCollage } from '@wylie39/image-collage';
 import LastFMCommand from '../LastFM';
 import { fetchDatabaseUser } from '../../../services/database/user';
 
@@ -45,6 +45,7 @@ export default class AlbumCollage extends LastFMCommand {
   }
 
   async run(message: Message, args: TopTenArguments) {
+    return message.reply('Temporarily Disabled');
     const user = await fetchDatabaseUser(args.targetUserId);
     const period = getPeriodFromString(args.period);
     const topTen = await getTopTenStatsNoEmbed(
@@ -72,18 +73,18 @@ export default class AlbumCollage extends LastFMCommand {
       }
     }
 
-    createCollage(imageUrls, 900).then((imageBuffer) => {
-      const embedTitle = `${user.lastFMName} ${convertPeriodToText(
-        period
-      )} top albums`;
-      const attachment = new AttachmentBuilder(imageBuffer, {
-        name: 'collage.jpg',
-      });
-      const embed = new EmbedBuilder()
-        .setTitle(embedTitle)
-        .setImage('attachment://collage.jpg');
-      message.channel.send({ embeds: [embed], files: [attachment] });
-    });
+    // createCollage(imageUrls, 900).then((imageBuffer) => {
+    //   const embedTitle = `${user.lastFMName} ${convertPeriodToText(
+    //     period
+    //   )} top albums`;
+    //   const attachment = new AttachmentBuilder(imageBuffer, {
+    //     name: 'collage.jpg',
+    //   });
+    //   const embed = new EmbedBuilder()
+    //     .setTitle(embedTitle)
+    //     .setImage('attachment://collage.jpg');
+    //   message.channel.send({ embeds: [embed], files: [attachment] });
+    // });
 
     if (topTen.length === 0) return;
   }

@@ -17,7 +17,7 @@ import LastFMCommand from '../LastFM';
 export default class PlaysAlbum extends LastFMCommand {
   constructor() {
     super('playsalbum', {
-      aliases: ['playsa', 'pa', 'ap', 'palbum'],
+      aliases: ['playsa', 'pa', 'palbum'],
       requirments: {
         custom: UsernameCheck,
       },

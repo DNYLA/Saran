@@ -10,6 +10,7 @@ import {
   loadImage,
   Canvas,
   CanvasRenderingContext2D,
+  CanvasTextAlign,
 } from 'canvas';
 // import * as cover from 'canvas-image-cover';
 // import {cove} from 'canvas-image-cover';

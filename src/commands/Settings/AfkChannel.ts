@@ -1,4 +1,8 @@
-import { Message, NonThreadGuildBasedChannel } from 'discord.js';
+import {
+  GuildBasedChannel,
+  Message,
+  NonThreadGuildBasedChannel,
+} from 'discord.js';
 import StartTyping from '../../hooks/StartTyping';
 import { updateGuild } from '../../services/database/guild';
 import { ChannelMentionIdOrArg } from '../../utils/argsparser';
@@ -30,7 +34,7 @@ export default class AfkChannel extends SettingsCommand {
   }
 
   async run(message: Message, args: { channelId?: string }) {
-    let channel: NonThreadGuildBasedChannel;
+    let channel: GuildBasedChannel;
     try {
       channel = await message.guild.channels.fetch(args.channelId);
     } catch (err) {

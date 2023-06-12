@@ -119,7 +119,7 @@ export type Album = {
   url: string;
   userplaycount: number;
   mbid?: string;
-  tracks: AlbumTrack[];
+  tracks: { track: AlbumTrack[] };
   image: FMImage[];
 };
 
